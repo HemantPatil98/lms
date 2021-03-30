@@ -4,7 +4,7 @@
 
 {% block extrastyle %}
 {{ block.super }}
-<!-- <link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}" /> -->
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}" />
 {% endblock %}
 
 {% block coltype %}colMS{% endblock %}
@@ -128,65 +128,8 @@
 
         {% block sidebar %}
 
-        <div class="card card-widget col-md-12">
-            <div class="card-header ">
-                <h2 class="card-title">{% trans 'Recent actions' %} / </h2>
-                <h3 class="card-title"> {% trans 'My actions' %}</h3>
-                <h3 class="card-title"><a href="{{ app.app_url }}" class="nav-link"
-                        title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
-                </h3>
+        {% include "admin/includes/widgets.html" %} 
 
-                <div class="card-tools pull-right">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fa fa-minus"></i>
-                    </button>
-                </div>
-                <!-- /.box-tools -->
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        {% load log %}
-                        {% get_admin_log 10 as admin_log for_user user %}
-                        {% if not admin_log %}
-                        <p>{% trans 'None available' %}</p>
-                        {% else %}
-                        <div class="timeline">
-                            {% for entry in admin_log %}
-                            <div>
-                                <i
-                                    class="fas fa-{% if entry.is_addition %}plus bg-blue{% endif %}{% if entry.is_change %}edit bg-green{% endif %}{% if entry.is_deletion %}minus bg-red{% endif %} "></i>
-                                <div class="timeline-item">
-                                    <span class="time"><i class="fas fa-clock"></i> {{entry.action_time}}</span>
-
-                                    <div class="timeline-body">
-                                        <a href="#">{{entry.user}}</a>
-                                        {% if entry.is_addition %}added{% endif %}{% if entry.is_change %}edited
-                                        {% endif %}{% if entry.is_deletion %}deleted{% endif %}
-                                        {% if entry.is_deletion or not entry.get_admin_url %}
-                                        {{ entry.object_repr }}
-                                        {% else %}
-                                        <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
-                                        {% endif %}
-                                        <br />
-                                        {% if entry.content_type %}
-                                        <span class="mini quiet">{% filter capfirst %}
-                                            {{ entry.content_type }}{% endfilter %}</span>
-                                        {% else %}
-                                        <span class="mini quiet">{% trans 'Unknown content' %}</span>
-                                        {% endif %}
-
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
 
         {% endblock %}
 

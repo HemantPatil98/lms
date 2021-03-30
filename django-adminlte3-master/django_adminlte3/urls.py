@@ -17,12 +17,13 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
 from django.views.generic.base import TemplateView
-from . import views
+
+from . import views,sheetsapi
 urlpatterns = [
     path('',include('lms.urls')),
-    # url(r'^$', TemplateView.as_view(template_name='adminlte/index.html')),
-    # url('', TemplateView.as_view(template_name='adminlte/login.html')),
-    path('',views.st,name='st'),
-    path('admin/', admin.site.urls)
-
+    path('', include('adminlte3_theme.urls')),
+    path('admin/', admin.site.urls),
+    # path('admin/include/addstudent/', views.addstudent, name='addstudent'),
+    # path('admin/include/view_data/<slug:table>/',views.viewstudent, name='viewstudent'),
+    path('admin/include/view_data/<int:row>/<int:col>/<slug:value>/',sheetsapi.updatesheet,name='updatesheet')
 ]
