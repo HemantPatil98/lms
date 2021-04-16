@@ -1,0 +1,303 @@
+{%extends 'admin/base.html'%}
+{%load admin_menu%}
+{%load static%}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    {%block content_header%}
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>View Members</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">View Members</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    {%endblock%}
+
+    <!-- Main content -->
+    {%block content%}
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">Members </h3>
+              </div>
+              <!-- /.card-header -->
+                 <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Striped Full Width Table</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body p-0">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th style="width: 10px">#</th>
+                      <th>Username</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Group</th>
+                      <th style="width: 40px">Active</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {%for member in members%}
+                    <tr id="{{member.id}}" class="a">{%firstof member.id as i%}
+                      <td field='id'>{{member.id}}</td>
+                      <td field='username'>{{member.username}}</td>
+                      <td field='first_name'>{{member.first_name}}</td>
+                      <td field='last_name'>{{member.last_name}}</td>
+                      <td field='group' class="a" {{memb_grp|grp_id:i}}>{{memb_grp|grp_name:i}} <span class="edit_group hide" onclick="editusergroup()">+</span></td>
+                      <td>
+                        <div class="form-group clearfix">
+                          <div class="icheck-success d-inline">
+                            <input type="checkbox" name="is_active" {%if member.is_staff%} checked="checked" {%endif%} class="checkbox">
+                            <label for="is_active"></label>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    {%endfor%}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+                <div class="card-footer">
+                  <form action="/view_data/members/" method="POST">
+                    {%csrf_token%}
+                  <input type="text" name="id" class="hide">
+                  <input type="text" name="field" class="hide">
+                  <input type="text" name="data" class="hide">
+                  <button id="submit" name="submit" value="submit" type="submit" class="btn btn-primary hide">Submit</button>
+                  </form>
+                </div>
+            </div>
+              <!-- /.card -->
+            </div>
+        </div>
+      </div>
+
+    </section>
+    {%endblock%}
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+
+{%block style%}
+<style type="text/css">
+  .hide{
+    display: none;
+  }
+</style>
+{%endblock%}
+{%block script%}
+<style type="text/css">
+  .hide{
+    display: none;
+  }
+</style>
+<script type="text/javascript">
+  active_cell_value= "";
+  $("td").dblclick(function(){
+    if ($(this).attr('field')!='id' && $(this).attr('field')!='group') {
+      active_cell_value=$("input[name='value']").val();
+    $("input[name='value']").parent().text(active_cell_value);
+    value=$(this).text();
+      $(this).html("<input type='text' name='value' value='"+value+"' onchange='back()' onkeypress='myFunction(event)''>");
+    
+    }
+  });
+
+  function editusergroup(){
+    alert($(this).html());
+    location.replace();
+  }
+
+  $("td[field='group']").hover(function(){$(this).children('span').removeClass('hide')},
+    function(){$(this).children('span').addClass('hide')})
+
+  function myFunction(event){
+    // alert();
+    var Code = event.keyCode || event.which;
+    // alert(Code);
+    if (Code == 13) {
+    active_cell_value=$("input[name='value']").val();
+    $("input[name='value']").parent().text(active_cell_value);  
+    }
+    
+  }
+  function back(){
+
+    $("input[name='id']").attr('value',$("input[name='value']").parent().parent().attr('id'));
+    $("input[name='field']").attr('value',$("input[name='value']").parent().attr('field'));
+    $("input[name='data']").attr('value',$("input[name='value']").val());
+
+    // $("#backend").attr("src","/view_data/members/");
+    $('#submit').trigger('click');
+
+  }
+</script>
+<script>
+  $(function () {
+$("label[for='is_active']").click(function(){
+
+  if($(this).parent().hasClass('icheck-success')){
+    $(this).parent().children('input').removeAttr('checked')
+    var val = confirm("Are you sure want to remove Active status");
+    alert(val);
+  }
+  else{
+    $(this).parent().children('input').attr('checked','checked')
+    var val = confirm("Are you sure want to add Active status");
+    alert(val);
+  }
+
+  
+});
+    $("select[name='gname']").change(function(){
+      $('#submit').trigger('click');
+    });
+
+    //Initialize Select2 Elements
+    $('.select2').select2()
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    })
+
+    //Datemask dd/mm/yyyy
+    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+    //Datemask2 mm/dd/yyyy
+    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
+    //Money Euro
+    $('[data-mask]').inputmask()
+
+    //Date range picker
+    $('#reservationdate').datetimepicker({
+        format: 'L'
+    });
+    //Date range picker
+    $('#reservation').daterangepicker()
+    //Date range picker with time picker
+    $('#reservationtime').daterangepicker({
+      timePicker: true,
+      timePickerIncrement: 30,
+      locale: {
+        format: 'MM/DD/YYYY hh:mm A'
+      }
+    })
+    //Date range as a button
+    $('#daterange-btn').daterangepicker(
+      {
+        ranges   : {
+          'Today'       : [moment(), moment()],
+          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate  : moment()
+      },
+      function (start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+      }
+    )
+
+    //Timepicker
+    $('#timepicker').datetimepicker({
+      format: 'LT'
+    })
+
+    //Bootstrap Duallistbox
+    $('.duallistbox').bootstrapDualListbox()
+
+    //Colorpicker
+    $('.my-colorpicker1').colorpicker()
+    //color picker with addon
+    $('.my-colorpicker2').colorpicker()
+
+    $('.my-colorpicker2').on('colorpickerChange', function(event) {
+      $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
+    })
+
+    $("input[data-bootstrap-switch]").each(function(){
+      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+    })
+
+  })
+  // BS-Stepper Init
+  document.addEventListener('DOMContentLoaded', function () {
+    window.stepper = new Stepper(document.querySelector('.bs-stepper'))
+  })
+
+  // DropzoneJS Demo Code Start
+  Dropzone.autoDiscover = false
+
+  // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
+  var previewNode = document.querySelector("#template")
+  previewNode.id = ""
+  var previewTemplate = previewNode.parentNode.innerHTML
+  previewNode.parentNode.removeChild(previewNode)
+
+  var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
+    url: "/target-url", // Set the url
+    thumbnailWidth: 80,
+    thumbnailHeight: 80,
+    parallelUploads: 20,
+    previewTemplate: previewTemplate,
+    autoQueue: false, // Make sure the files aren't queued until manually added
+    previewsContainer: "#previews", // Define the container to display the previews
+    clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
+  })
+
+  myDropzone.on("addedfile", function(file) {
+    // Hookup the start button
+    file.previewElement.querySelector(".start").onclick = function() { myDropzone.enqueueFile(file) }
+  })
+
+  // Update the total progress bar
+  myDropzone.on("totaluploadprogress", function(progress) {
+    document.querySelector("#total-progress .progress-bar").style.width = progress + "%"
+  })
+
+  myDropzone.on("sending", function(file) {
+    // Show the total progress bar when upload starts
+    document.querySelector("#total-progress").style.opacity = "1"
+    // And disable the start button
+    file.previewElement.querySelector(".start").setAttribute("disabled", "disabled")
+  })
+
+  // Hide the total progress bar when nothing's uploading anymore
+  myDropzone.on("queuecomplete", function(progress) {
+    document.querySelector("#total-progress").style.opacity = "0"
+  })
+
+  // Setup the buttons for all transfers
+  // The "add files" button doesn't need to be setup because the config
+  // `clickable` has already been specified.
+  document.querySelector("#actions .start").onclick = function() {
+    myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED))
+  }
+  document.querySelector("#actions .cancel").onclick = function() {
+    myDropzone.removeAllFiles(true)
+  }
+  // DropzoneJS Demo Code End
+</script>
+
+{%endblock%}

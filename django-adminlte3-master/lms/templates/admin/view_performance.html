@@ -1,0 +1,267 @@
+{%extends 'admin/base.html'%}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    {%block content_header%}
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Student Performance Data</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Student Performance Data</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    {%endblock%}
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    {%block content%}
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">Student Performance Data</h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <div class="card-body" style="overflow: auto;">
+                  <table id="example2" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                      <th>Id</th>
+                      <th>Name</th>
+                      <th>Contact</th>
+                      <th>Email id</th>
+                      <th>Center</th>
+                      <th>Date of Admission</th>
+                      <th>Training mode</th>
+                      <th>Batch start Date</th>
+                      <th>Course</th>
+                      <th>Course Start From</th>
+                      <th>Current Module</th>
+                      <th>C Trainer Name</th>
+                      <th>C Module Start Date</th>
+                      <th>C Module end Date</th>
+                      <th>C Theory</th>
+                      <th>C Practicle</th>
+                      <th>C Orals</th>
+                      <th>C Total Marks</th>
+                      <th>SQL Trainer Name</th>
+                      <th>SQL Module Start Date</th>
+                      <th>SQL Module end Date</th>
+                      <th>SQL Theory</th>
+                      <th>SQL Practicle</th>
+                      <th>SQL Orals</th>
+                      <th>SQL Total Marks</th>
+                      <th>WD Trainer Name</th>
+                      <th>WD Module Start Date</th>
+                      <th>WD Module end Date</th>
+                      <th>WD Practicle</th>
+                      <th>WD Orals</th>
+                      <th>WD Total Marks</th>
+                      <th>Portfolio Link</th>
+                      <th>Mock 1</th>
+                      <th>Project Guide</th>
+                      <th>Mini Project</th>
+                      <th>Core Trainer Name</th>
+                      <th>Core Module Start Date</th>
+                      <th>Core Module end Date</th>
+                      <th>Core Theory</th>
+                      <th>Core Practicle</th>
+                      <th>Core Orals</th>
+                      <th>Core Total Marks</th>
+                      <th>Mock 2</th>
+                      <th>Adv Trainer Name</th>
+                      <th>Adv Module Start Date</th>
+                      <th>Adv Module end Date</th>
+                      <th>Adv Theory</th>
+                      <th>Adv Practicle</th>
+                      <th>Adv Orals</th>
+                      <th>Adv Total Marks</th>
+                      <th>Full Course End Date</th>
+                      <th>Cravita Project Start Date</th>
+                      <th>Mock 3</th>
+                      <th>Soft Skill</th>
+                      <th>Final Mock</th>
+                      <th>Total Marks</th>
+                      <th>Eligible for Placement</th>
+                      <th>Remark</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      {%firstof 1 as i%}
+                      {%for row in data%}
+                      <tr>
+                        {%for col in row%}
+                        {%if col%}
+                        <td rowv="{{i}}" colv="{{forloop.counter}}">{{col}}</td>
+                        {%else%}
+                        <td></td>
+                        {%endif%}
+                        {%endfor%}
+                      </tr>
+                      {%firstof i|add:1 as i%}
+                      {%endfor%}
+                    </tbody>
+                    <tfoot>
+
+                    </tfoot>
+                </table>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+
+      <iframe id="backend" src="/update/" style="display: none;"></iframe>
+    </section>
+    {%endblock%}
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{%block script%}
+<style type="text/css">
+  .hide{
+    display: none;
+  }
+</style>
+
+<script type="text/javascript">
+  active_cell_value= "";
+  $("td").dblclick(function(){
+    active_cell_value=$("input[name='value']").val();
+    $("input[name='value']").parent().text(active_cell_value);
+    if($(this).attr("colv") != 1 & $(this).attr("colv") != 2){
+      value=$(this).text();
+    $(this).html("<input type='text' class='form-control' name='value' value='"+value+"' onchange='back()' onkeypress='myFunction(event)'>");
+    }
+    
+
+  });
+
+  function myFunction(event){
+    // alert();
+    var Code = event.keyCode || event.which;
+    // alert(Code);
+    if (Code == 13) {
+    active_cell_value=$("input[name='value']").val();
+    $("input[name='value']").parent().text(active_cell_value);  
+    }
+    
+  }
+  function back(){
+    rowv=$("input[name='value']").parent().attr('rowv');
+    colv=$("input[name='value']").parent().attr('colv');
+    active_cell_value=$("input[name='value']").val();
+
+    $("#backend").attr("src","/admin/include/view_data/performance/"+rowv+"/"+colv+"/"+active_cell_value+"/True/");
+
+  }
+</script>
+<script>
+  $(document).ready(function(){
+    $("#expand").click(function(){
+      $(".educol").toggleClass("hide");
+    });
+    $("#expandrows").click(function(){
+      $(".educol").toggleClass("hide");
+    });
+    $("input[name='month']").change(function(){
+      $("input[submit]").trigger("click");
+    });
+    
+  });
+
+  $('.edurow1').dblclick(function(){
+    $('.edurow').addClass('hide');
+    $(this).next().children().removeClass('hide');
+    $(this).next().next().children().removeClass('hide');
+    $(this).next().next().next().children().removeClass('hide');
+  });
+
+
+  function filterdate() {
+    board = [];
+      $.each($(".date"), function(index, cell){
+          board.push($(cell)); //Need to return contents of cell
+      });
+      // alert(board);
+      for(i=0;i<51;i++){
+        x=board[i].text();
+        y=$("input[name='date']").val()
+        // alert(board[i],$("input[name='date']").val());
+        if (x!=y) {
+          x = $(board[i]).parent()
+          x.css("display","none");
+          x=x.next("tr");
+          x.css("display","none");
+          x=x.next("tr");
+          x.css("display","none");
+          x=x.next("tr");
+          x.css("display","none");
+        }
+        else{
+          x = $(board[i]).parent()
+          x.css("display","revert");
+          x=x.next("tr");
+          x.css("display","revert");
+          x=x.next("tr");
+          x.css("display","revert");
+          x=x.next("tr");
+          x.css("display","revert");
+        }
+      } 
+  }
+
+   function filtercourse() {
+      board = [];
+      $.each($(".course"), function(index, cell){
+          board.push($(cell)); //Need to return contents of cell
+      });
+      // alert(board);
+      // alert($(".course").text());
+      c=$("#course").val();
+      alert(c[0]);
+      for(i=0;i<51;i++){
+        // alert(board[i].text());
+        x=board[i].text();
+        // alert(x);
+        if (x.search(c)==-1) {
+          // alert("hi");
+          x = $(board[i]).parent()
+          x.css("display","none");
+          x=x.next("tr");
+          x.css("display","none");
+          x=x.next("tr");
+          x.css("display","none");
+          x=x.next("tr");
+          x.css("display","none");
+        }
+        else{
+          x = $(board[i]).parent()
+          x.css("display","revert");
+          x=x.next("tr");
+          x.css("display","revert");
+          x=x.next("tr");
+          x.css("display","revert");
+          x=x.next("tr");
+          x.css("display","revert");
+        }
+      }
+   }
+</script>
+{%endblock%}
+
+
+
