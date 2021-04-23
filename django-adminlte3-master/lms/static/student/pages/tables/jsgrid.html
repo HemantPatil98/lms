@@ -880,7 +880,7 @@
   <!-- /.control-sidebar -->
 </div>
 <!-- ./wrapper -->
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <!-- jQuery -->
 <script src="../../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
@@ -892,6 +892,7 @@
 <script src="../../dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="../../dist/js/demo.js"></script>
+
 <!-- Page specific script -->
 <script>
   $(function () {
@@ -899,6 +900,8 @@
         height: "100%",
         width: "100%",
 
+        filtering: true,
+        editing: true,
         sorting: true,
         paging: true,
 
@@ -907,12 +910,19 @@
         fields: [
             { name: "Name", type: "text", width: 150 },
             { name: "Age", type: "number", width: 50 },
-            { name: "Address", type: "text", width: 200 },
+            { name: "Address", type: "text", width: 200},
             { name: "Country", type: "select", items: db.countries, valueField: "Id", textField: "Name" },
             { name: "Married", type: "checkbox", title: "Is Married" }
         ]
     });
   });
+$(document).keypress(function(event){
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if(keycode == '13'){
+        db.updateItem('iii'); 
+        // alert(db.updateItem);   
+    }
+});
 </script>
 </body>
 </html>

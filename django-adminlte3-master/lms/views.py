@@ -202,6 +202,7 @@ def viewperformance(request):
     fp.close()
     sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
     data = sheetsapi.sheetvalues(sheetid, sheetname)
+    print(data)
     return render(request,'admin/view_performance.html',{'data':data})
 
 def admin(request):
@@ -442,7 +443,7 @@ def addnotice(request):
     # data : ""
     if request.method == 'POST':
         notice.addnoticein(request)
-    data = notice.objects.all()
+    data = notice.objects.all().order_by('-generateddate').filter(createdby=request.user)
     print(data)
     return render(request,'admin/add_notice.html',{'data':data})
 
@@ -498,4 +499,5 @@ def mail(reciver,message):
 
 
 def test(request):
+    print(request.GET)
     return render(request,'admin/add_users.html')

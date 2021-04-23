@@ -16,7 +16,19 @@
             this.clients.push(insertingClient);
         },
 
-        updateItem: function(updatingClient) { },
+        updateItem: function(updatingClient) { 
+            alert(1);
+            const Url = 'http://127.0.0.1:8000/test/?name=123?id=87';
+            const data={
+                name:'said',
+                id:23
+            }
+            // $('.btn').click(function(){
+                $.get(Url,function(data,status){
+                    console.log('${data}and status is ${status}');
+                });
+            // });
+        },
 
         deleteItem: function(deletingClient) {
             var clientIndex = $.inArray(deletingClient, this.clients);
