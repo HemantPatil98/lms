@@ -164,7 +164,7 @@ def addsheet():
     addcolumns(sheetname)
     # print(response)
 
-def sheetvalues(SPREADSHEET_ID,sheetname,range='!A2:AS'):
+def sheetvalues(SPREADSHEET_ID,sheetname,range='!A2:BE'):
 
     # fields = "sheets(data(rowMetadata(hiddenByFilter)),properties/sheetId)"
     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=sheetname+range).execute()

@@ -200,6 +200,10 @@ def str_int(val):
 def sub(num1,num2):
     return int(num1)-int(num2)
 
+@register.filter(name='str')
+def strf(str):
+    return str(str)
+
 import math
 @register.filter(name='div')
 def sub(num1,num2):

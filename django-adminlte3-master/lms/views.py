@@ -197,13 +197,47 @@ def viewstudent(request):
     return render(request,'admin/view_data.html',{'data':data})
 
 def viewperformance(request):
+    student_performance = {'id': "", 'name': "", 'contact': "", 'emailid': "", 'dateofadmission': "",
+                           'trainingmode': "",
+                           'batchstartdate': "", 'course': "", 'startcourse': "", 'currentmodule': "",
+                           'ctrainername': "", 'cmodulestartdate': "", 'cmoduleenddate': "", 'ctheory': "",
+                           'cpracticle': "", 'coral': "", 'ctotal': "",
+                           'sqltrainername': "", 'sqlmodulestartdate': "", 'sqlmoduleenddate': "",'sqltheory':"", 'sqlpracticle': "",
+                           'sqloral': "", 'sqltotal': "",
+                           'wdtrainername': "", 'wdmodulestartdate': "", 'wdmoduleenddate': "", 'wdpracticle': "",
+                           'wdoral': "", 'wdtotal': "", 'portfoliolink': "",
+                           'mock1': "", 'miniguide': "", 'miniproject': "",
+                           'coretrainername': "", 'coremodulestartdate': "", 'coremoduleenddate': "", 'coretheory': "",
+                           'corepracticle': "", 'coreoral': "", 'coretotal': "",
+                           'mock2': "",
+                           'advtrainername': "", 'advmodulestartdate': "", 'advmoduleenddate': "", 'advtheory': "",
+                           'advpracticle': "", 'advoral': "", 'advtotal': "",
+                           'fullcourseenddate': "", 'cravitaprojectstartdate': "",
+                           'mock3': "", 'softskillsmarks': "", 'finalmock': "", 'totalmarks': "",
+                           'eligibleforplacement': "", 'remark': ""
+                           }
     fp = open('student_performance.txt', 'r')
     sheetid = fp.read()
     fp.close()
     sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
-    data = sheetsapi.sheetvalues(sheetid, sheetname)
-    print(data)
-    return render(request,'admin/view_performance.html',{'data':data})
+    values = sheetsapi.sheetvalues(sheetid, sheetname)
+    # print(data)
+    # data =[{key:val for key in student_performance for val in data[0]} ]
+    # data = [dict(zip(student_performance,data[i])) for i in range(len(data))]
+    data = []
+    for row in values:
+        dict = {}
+        for s,i in zip(student_performance,range(len(student_performance))):
+            if i<len(row):
+                dict[s]=row[i]
+            else:
+                dict[s]=''
+        data.append(dict)
+        # print(dict)
+    # print(data)
+
+    # data = [{id:1,'name':'adsa'}]
+    return render(request,'admin/test.html',{'data':data})
 
 def admin(request):
     return render(request, 'admin/index.html')
@@ -497,7 +531,9 @@ def mail(reciver,message):
 
 
 
-
+from django.views.decorators.clickjacking import xframe_options_exempt,xframe_options_sameorigin
+@xframe_options_exempt
 def test(request):
-    print(request.GET)
-    return render(request,'admin/add_users.html')
+    # request.POST['abc']='abc'
+    print(request.GET['row'].split(','))
+    return HttpResponse("")
