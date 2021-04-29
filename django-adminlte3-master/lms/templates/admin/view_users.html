@@ -59,11 +59,11 @@
                       <td field='username'>{{member.username}}</td>
                       <td field='first_name'>{{member.first_name}}</td>
                       <td field='last_name'>{{member.last_name}}</td>
-                      <td field='group' class="a" {{memb_grp|grp_id:i}}>{{memb_grp|grp_name:i}} <span class="edit_group hide" onclick="editusergroup()">+</span></td>
+                      <td field='group' class="a" {{memb_grp|grp_id:i}}>{{member|grp_name}} <span class="edit_group hide" onclick="editusergroup()">+</span></td>
                       <td>
                         <div class="form-group clearfix">
                           <div class="icheck-success d-inline">
-                            <input type="checkbox" name="is_active" {%if member.is_staff%} checked="checked" {%endif%} class="checkbox">
+                            <input type="checkbox" name="is_active" {%if member.is_active%} checked="checked" {%endif%} class="checkbox">
                             <label for="is_active"></label>
                           </div>
                         </div>
@@ -157,7 +157,17 @@ $("label[for='is_active']").click(function(){
   if($(this).parent().hasClass('icheck-success')){
     $(this).parent().children('input').removeAttr('checked')
     var val = confirm("Are you sure want to remove Active status");
-    alert(val);
+    // alert(val);
+    if (val) {
+      id=$(this).parent().parent().parent().parent().attr('id');
+      console.log(id);
+      $("input[name='id']").attr('value',id);
+      $("input[name='field']").attr('value','is_active');
+      $("input[name='data']").attr('value',"True");
+
+    // $("#backend").attr("src","/view_data/members/");
+    $('#submit').trigger('click');
+    }
   }
   else{
     $(this).parent().children('input').attr('checked','checked')

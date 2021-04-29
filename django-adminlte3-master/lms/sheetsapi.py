@@ -47,6 +47,7 @@ service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
 
 def startsheet():
+    # print("hi")
     if not os.path.exists('student_performance.txt'):
         # print("start")
 
@@ -99,6 +100,16 @@ def startsheet():
         fp = open('student_profile.txt', 'a')
         fp.write(SPREADSHEET_ID)
         fp.close()
+    # print(os.path.exists('attendance.txt'))
+    if not os.path.exists('attendance.txt'):
+        attendance = ["id","name","contact","emailid"]
+        SPREADSHEET_ID = createsheet('Attendance',attendance)
+        # print("HI")
+
+        fp = open('attendance.txt','a')
+        fp.write(SPREADSHEET_ID)
+        fp.close()
+
 
 #Create Spreadsheet
 def createsheet(name,columns):
@@ -128,7 +139,7 @@ def createsheet(name,columns):
 
 
 
-def addcolumns(sheetname,columns):
+def addcolumns(SPREADSHEET_ID,sheetname,columns):
 
     sheet_fields = columns
     # print(sheet_fields)
@@ -147,9 +158,9 @@ def addcolumns(sheetname,columns):
     }
     ).execute()
 
-def addsheet():
+def addsheet(SPREADSHEET_ID,sheetname,columns):
     print(sheet.get(spreadsheetId=SPREADSHEET_ID))
-    sheetname = "Apr - Mar "+datetime.datetime.now().strftime("%Y")
+    # sheetname = "Apr - Mar "+datetime.datetime.now().strftime("%Y")
     body = {
         'requests': [{
             'addSheet': {
@@ -161,7 +172,7 @@ def addsheet():
         }]
     }
     response = sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID,body=body).execute()
-    addcolumns(sheetname)
+    addcolumns(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=sheetname,columns=columns)
     # print(response)
 
 def sheetvalues(SPREADSHEET_ID,sheetname,range='!A2:BE'):
@@ -169,15 +180,15 @@ def sheetvalues(SPREADSHEET_ID,sheetname,range='!A2:BE'):
     # fields = "sheets(data(rowMetadata(hiddenByFilter)),properties/sheetId)"
     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=sheetname+range).execute()
     values = result.get('values', [])
-
+    # print(result)
     if not values:
         return None
     else:
         return values
 
 
-def appendsheet(sheetid,values):
-    SPREADSHEET_ID = sheetid
+def appendsheet(SPREADSHEET_ID,values,range='!A:A',dimension='ROWS'):
+    # SPREADSHEET_ID = sheetid
     values = [values]
     sheetname = "Apr - Mar "+datetime.datetime.now().strftime("%Y")
     properties = sheet.get(spreadsheetId=SPREADSHEET_ID).execute().get("sheets")
@@ -194,12 +205,12 @@ def appendsheet(sheetid,values):
             break
 
     if flag:
-        addsheet()
+        addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=sheetname)
 
         # sheet_id = (item.get("properties").get('sheetId'))
 
     value_range_body = {
-        'majorDimension': 'ROWS',
+        'majorDimension': dimension,
         'values': values
     }
     # print(sheet.getActiveSpreadsheet())
@@ -207,18 +218,22 @@ def appendsheet(sheetid,values):
     res = sheet.values().append(
         spreadsheetId=SPREADSHEET_ID,
         valueInputOption='USER_ENTERED',
-        range=sheetname+'!A:A',
+        range=sheetname+range,
         body=value_range_body
     ).execute()
 
     print(res)
     import re
-
-    txt = res['tableRange'].split(':')[1]
-    x = re.search('[0-9]', txt)
+    try:
+        txt = res['tableRange'].split(':')[1]
+        x = re.search('[0-9]', txt)
+    except:
+        txt = res['updates']['updatedRange'].split('!')[1].split(':')[1]
+        x = re.search('[0-9]',txt)
+        # print(x)
     return txt[x.span()[0]:len(txt)]
 
-def updatesheet(SPREADSHEET_ID,row,col,value,cell=False):
+def updatesheet(SPREADSHEET_ID,row,value,col=0,cell=False):
 
     if cell:
         body = {
@@ -237,8 +252,9 @@ def updatesheet(SPREADSHEET_ID,row,col,value,cell=False):
                 value
             ]
         }
+        print(value)
         request = sheet.values().update(spreadsheetId=SPREADSHEET_ID,
-                                    range="Apr - Mar 2021!A"+str(row)+":AO"+str(row),
+                                    range="Apr - Mar 2021!A"+str(row)+":BE"+str(row),
                                     valueInputOption="USER_ENTERED", body=body)
     response = request.execute()
-    # print(response)
+    print(response)

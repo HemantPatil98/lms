@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate,login,logout
 from . import sheetsapi
 import datetime
 from django.contrib.auth.models import User,Group,Permission,GroupManager
-from .models import notice
+from .models import notice,user_profile
 # Create your views here.
 def log_in(request):
     if request.method=="POST":
@@ -38,10 +38,29 @@ def index(request):
     if request.user.is_staff:
         return render(request,'admin/adminindex.html')
     else:
-        return render(request,'admin/index.html')
+        fp = open('student_profile.txt', 'r')
+        sheetid = fp.read()
+        fp.close()
+        row = int(request.user.username.split(':')[1])
+        range = "!A" + str(row) + ":AS" + str(row + 3)
+        # print(range)
+        values = sheetsapi.sheetvalues(SPREADSHEET_ID=sheetid, sheetname='Apr - Mar 2021', range=range)
+        print(values[0])
+        fields = ["id", "datetime", "center", "dateofadmission", "course", "batchstartdate", "modulestartfrom",
+                  "trainingmode",
+                  "name", "address", "dateofbirth", "contact", "emailid", "alternatecontact", "examination", "stream",
+                  "collegename",
+                  "boardname", "yearofpassing", "percentage", "fees", "mode", "regammount", "installment1",
+                  "installment2",
+                  "installment3", "regdate", "installment1date", "installment2date", "installment3date", 'remark']
 
-# def addstudent(request):
-    # return HttpResponse("hi")
+        profile = [dict(zip(fields, values[0])), dict(zip(fields, values[1])), dict(zip(fields, values[2])),
+                   dict(zip(fields, values[3]))]  # list data to object
+        print(profile[1])
+        from .models import notice
+        notice1 = notice.objects.all().order_by('-generateddate')
+        return render(request, 'admin/index.html', {'profile': profile,'notice':notice1})
+
 
 def addstudent(request):
     if request.method == 'POST':
@@ -111,6 +130,7 @@ def addstudent(request):
             index = 1
 
         # print(filledaddstudentform)
+        # print(addstudentform)
 
         row = sheetsapi.appendsheet(sheetid, [index, ""] + filledaddstudentform)
         sheetsapi.appendsheet(sheetid, ["", ""] + [""] * 12 + acced[0])
@@ -155,7 +175,7 @@ def addstudent(request):
 
         student_performance['id'] = index
 
-        print(student_performance)
+        # print(student_performance)
 
 
         sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
@@ -171,10 +191,22 @@ def addstudent(request):
         username = randomstring(request)
         password = randomstring(request)
 
-
         us = User.objects.create_user(username=username+":"+str(int(row)+1),first_name=request.POST['name'],
                   password=password,email=request.POST['emailid'])
         us.save()
+        try:
+            file = request.FILES['photo']
+            file._name = str(request.user.username.split(':')[0]) +"."+ file._name.split('.')[1]
+        except:
+            file = ""
+        from .models import user_profile
+        us_profile = user_profile.objects.all().filter(user_id=us.id)
+        if len(us_profile)==0 and file != "":
+            us_profile = user_profile(user_id=us,student_performance_row=str(int(row)+1),photo=file)
+            us_profile.save()
+        else:
+            us_profile.update(photo=file)
+            # user_profile.save()
         # message to be sent
         header = 'To:' + us.email + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
 
@@ -190,54 +222,19 @@ def viewstudent(request):
     fp = open('student_profile.txt', 'r')
     sheetid = fp.read()
     fp.close()
-
+    student_profile = ["center", "dateofadmission", "course", "batchstartdate", "startcourse","trainingmode",
+                       "name", "address", "dateofbirth", "contact", "emailid","alternatecontact",
+                       'examination', 'stream', 'collegename', 'boardname', 'yearofpassing','percentage',
+                       "fees", "mode", "regammount", "installment1", "installment2", "installment3", "regdate",
+                       "installment1date", "installment2date", "installment3date",
+                       "remark"]
     sheetname = "Apr - Mar "+datetime.datetime.now().strftime("%Y")
     data = sheetsapi.sheetvalues(sheetid,sheetname)
     print(data)
     return render(request,'admin/view_data.html',{'data':data})
 
 def viewperformance(request):
-    student_performance = {'id': "", 'name': "", 'contact': "", 'emailid': "", 'dateofadmission': "",
-                           'trainingmode': "",
-                           'batchstartdate': "", 'course': "", 'startcourse': "", 'currentmodule': "",
-                           'ctrainername': "", 'cmodulestartdate': "", 'cmoduleenddate': "", 'ctheory': "",
-                           'cpracticle': "", 'coral': "", 'ctotal': "",
-                           'sqltrainername': "", 'sqlmodulestartdate': "", 'sqlmoduleenddate': "",'sqltheory':"", 'sqlpracticle': "",
-                           'sqloral': "", 'sqltotal': "",
-                           'wdtrainername': "", 'wdmodulestartdate': "", 'wdmoduleenddate': "", 'wdpracticle': "",
-                           'wdoral': "", 'wdtotal': "", 'portfoliolink': "",
-                           'mock1': "", 'miniguide': "", 'miniproject': "",
-                           'coretrainername': "", 'coremodulestartdate': "", 'coremoduleenddate': "", 'coretheory': "",
-                           'corepracticle': "", 'coreoral': "", 'coretotal': "",
-                           'mock2': "",
-                           'advtrainername': "", 'advmodulestartdate': "", 'advmoduleenddate': "", 'advtheory': "",
-                           'advpracticle': "", 'advoral': "", 'advtotal': "",
-                           'fullcourseenddate': "", 'cravitaprojectstartdate': "",
-                           'mock3': "", 'softskillsmarks': "", 'finalmock': "", 'totalmarks': "",
-                           'eligibleforplacement': "", 'remark': ""
-                           }
-    fp = open('student_performance.txt', 'r')
-    sheetid = fp.read()
-    fp.close()
-    sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
-    values = sheetsapi.sheetvalues(sheetid, sheetname)
-    # print(data)
-    # data =[{key:val for key in student_performance for val in data[0]} ]
-    # data = [dict(zip(student_performance,data[i])) for i in range(len(data))]
-    data = []
-    for row in values:
-        dict = {}
-        for s,i in zip(student_performance,range(len(student_performance))):
-            if i<len(row):
-                dict[s]=row[i]
-            else:
-                dict[s]=''
-        data.append(dict)
-        # print(dict)
-    # print(data)
-
-    # data = [{id:1,'name':'adsa'}]
-    return render(request,'admin/test.html',{'data':data})
+    return render(request,'admin/view_performance.html')
 
 def admin(request):
     return render(request, 'admin/index.html')
@@ -259,17 +256,28 @@ def addgroups(requet):
         if not Group.objects.filter(name=requet.POST['gname']):
             gp=Group(name=requet.POST['gname'])
             gp.save()
-            for permission in requet.POST.getlist('permission'):
-                pass
+            fp = open('attendance.txt', 'r')
+            SPREADSHEET_ID = fp.read()
+            fp.close()
+            attendance = ["id", "name", "contact", "emailid"]
+            sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=requet.POST['gname'],columns=attendance)
+            # for permission in requet.POST.getlist('permission'):
         else:
             gp=Group.objects.filter(name=requet.POST['gname'])[0]
 
         print(requet.POST.getlist('permissions'))
+        print(gp)
+        for permission in requet.POST.getlist('permissions'):
+            print(int(permission))
+            gp.permissions.add(permission)
 
-        print(gp.permissions.set(requet.POST.getlist('permissions')))
+        print(gp.permissions.all())
+        pre = []
+        for i in gp.permissions.all():
+            pre.append(i.id)
 
 
-        return render(requet,'admin/add_groups.html',{'gname':gp,'permissions':Permission.objects.all()})
+        return render(requet,'admin/add_groups.html',{'gname':gp,'permissions':Permission.objects.all(),'pre':pre})
     return render(requet,'admin/add_groups.html')
     # return render(requet,'admin/test.html')
 
@@ -345,16 +353,26 @@ def addusers(request):
 def viewmembers(request):
     if request.method == 'POST':
         us = User.objects.filter(id=request.POST['id'])[0]
-        vars(us)[request.POST['field']]=request.POST['data']
+        print(request.POST['field'])
+        if request.POST['field']=="is_active":
+            print(vars(us)[request.POST['field']])
+            if vars(us)['is_active']==True:
+                print(vars(us)[request.POST['field']])
+                vars(us)[request.POST['field']]=False
+            else:
+                vars(us)[request.POST['field']]=True
+        else:
+            vars(us)[request.POST['field']]=request.POST['data']
         us.save()
-        print(request.POST['id'])
+        # print(vars(us)[request.POST['field']])
     members = User.objects.filter(is_staff=True)
     groups = Group.objects.all()
 
     # memb_grp = [{member.id:{'grp_id':group.id,'grp_name':group.name}} for member in members for group in groups]
     memb_grp = {member.id: {'grp_id':group.id,'grp_name':group.name} for member in members for group in groups}
     # print(memb_grp[0][members[0].id])
-    print(memb_grp)
+    # print(memb_grp)
+    print(members[0].groups.all())
     return render(request,'admin/view_users.html',{'members':members,'groups':groups,'memb_grp':memb_grp})
 
 def viewprofile(request):
@@ -375,10 +393,18 @@ def viewprofile(request):
     print(profile[1])
     return render(request,'admin/profile.html',{'profile':profile})
 
-def studentupdate(request,idvalue,row,col,value,cell):
+def editprofile(request):
+
+    return redirect(request,'index')
+
+def studentupdate(request):
     fp = open('student_profile.txt', 'r')
     SPREADSHEET_ID = fp.read()
     fp.close()
+    cell = 'False'
+    row = request.user.username.split(':')[1]
+    value = ''
+    col = 0
     if cell=="False":
         Basic = {"center": "", "dateofadmission": "", "course": "", "batchstartdate": "", "startcourse": "",
                  "trainingmode": ""}
@@ -436,22 +462,89 @@ def studentupdate(request,idvalue,row,col,value,cell):
                     else:
                         filledaddstudentform.append("")
 
-        print(filledaddstudentform)
+        # print(filledaddstudentform)
         sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
         index = "=INDIRECT(" + '"A"' + "&ROW()-4)+1"
+        import math
         if sheetsapi.sheetvalues(SPREADSHEET_ID, sheetname) is None:
             index = 1
+        index = math.ceil((int(request.user.username.split(':')[1])-1)/4)
 
-        print(filledaddstudentform)
+        # print(filledaddstudentform)
 
         rowv = int(request.user.username.split(":")[1])
-        row = sheetsapi.updatesheet(SPREADSHEET_ID,rowv, col, [index, ""] + filledaddstudentform, cell=False)
+        row = sheetsapi.updatesheet(SPREADSHEET_ID,rowv, [index, ""] + filledaddstudentform,col, cell=False)
         # print(print(type(int.from_bytes(row.getvalue(),"big"))))
         # row = int.from_bytes(row.getvalue(),"big")
-        sheetsapi.updatesheet(SPREADSHEET_ID,rowv+1, col, ["", ""] + [""] * 12 + acced[0], cell=False)
-        sheetsapi.updatesheet(SPREADSHEET_ID,rowv+2, col, ["", ""] + [""] * 12 + acced[1], cell=False)
-        sheetsapi.updatesheet(SPREADSHEET_ID,rowv+3, col, ["", ""] + [""] * 12 + acced[2], cell=False)
+        sheetsapi.updatesheet(SPREADSHEET_ID,rowv+1, ["", ""] + [""] * 12 + acced[0], col, cell=False)
+        sheetsapi.updatesheet(SPREADSHEET_ID,rowv+2, ["", ""] + [""] * 12 + acced[1], col, cell=False)
+        sheetsapi.updatesheet(SPREADSHEET_ID,rowv+3, ["", ""] + [""] * 12 + acced[2], col, cell=False)
         # sheetsapi.updatesheet(SPREADSHEET_ID, row, col, value=filledaddstudentform, cell=False)
+
+        fp = open('student_performance.txt', 'r')
+        sheetid = fp.read()
+        fp.close()
+
+        student_performance = {'id': "", 'name': "", 'contact': "", 'emailid': "", 'dateofadmission': "",
+                               'trainingmode': "",
+                               'batchstartdate': "", 'course': "", 'startcourse': "", 'currentmodule': "",
+                               'ctrainername': "", 'cmodulestartdate': "", 'cmoduleenddate': "", 'ctheory': "",
+                               'cpracticle': "", 'coral': "", 'ctotal': "",
+                               'sqltrainername': "", 'sqlmodulestartdate': "", 'sqlmoduleenddate': "",
+                               'sqlpracticle': "", 'sqloral': "", 'sqltotal': "",
+                               'wdtrainername': "", 'wdmodulestartdate': "", 'wdmoduleenddate': "", 'wdpracticle': "",
+                               'wdoral': "", 'wdtotal': "", 'portfoiliolink': "",
+                               'mock1': "", 'miniguide': "", 'miniproject': "",
+                               'coretrainername': "", 'coremodulestartdate': "", 'coremoduleenddate': "",
+                               'coretheory': "", 'corepracticle': "", 'coreoral': "", 'coretotal': "",
+                               'mock2': "",
+                               'advtrainername': "", 'advmodulestartdate': "", 'advmoduleenddate': "", 'advtheory': "",
+                               'advpracticle': "", 'advoral': "", 'advtotal': "",
+                               'fullcourseenddate': "", 'cravitaprojectstartdate': "",
+                               'mock3': "", 'softskillsmarks': "", 'finalmock': "", 'totalmarks': "",
+                               'eligibleforplacement': "", 'remark': ""
+                               }
+
+        for s in student_performance.keys():
+            try:
+                student_performance[s] = request.POST[s]
+            except:
+                student_performance[s] = ""
+
+        # index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
+        # if sheetsapi.sheetvalues(sheetid, sheetname) is None:
+        #     index = 1
+        index = math.ceil((int(request.user.username.split(':')[1])-1)/4)
+
+        student_performance['id'] = index
+
+        # print(student_performance)
+
+        sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
+        # index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
+        # if sheetsapi.sheetvalues(sheetid, sheetname) is None:
+        #     index = 1
+        # print(filledaddstudentform)
+        student_performance = [x for x in student_performance.values()]
+        # import math
+        print(math.ceil((int(request.user.username.split(':')[1])-1)/4))
+        row = math.ceil((int(request.user.username.split(':')[1])-1)/4)+1
+        sheetsapi.updatesheet(sheetid,row,student_performance)
+
+        try:
+            file = request.FILES['photo']
+            file._name = str(request.user.username.split(':')[0]) +"."+ file._name.split('.')[1]
+        except:
+            file = ""
+        from .models import user_profile
+        us_profile = user_profile.objects.all().filter(user_id=request.user.id)
+        if len(us_profile)==0:
+            us_profile = user_profile(user_id=request.user,student_performance_row=str(int(row)+1),photo=file)
+            us_profile.save()
+        else:
+            us_profile.update(photo=file)
+
+
         return redirect(viewprofile)
     else:
         sheetsapi.updatesheet(SPREADSHEET_ID,row,col,value,cell)
@@ -462,13 +555,13 @@ def studentupdate(request,idvalue,row,col,value,cell):
         return redirect(viewstudent)
 
     return HttpResponse("")
-
-def studentpupdate(request,row,col,value,cell):
-    fp = open('student_performance.txt', 'r')
-    sheetid = fp.read()
-    fp.close()
-    sheetsapi.updatesheet(sheetid,row,col,value,cell)
-    return redirect(request,viewperformance)
+#
+# def studentpupdate(request,row,col,value,cell):
+#     fp = open('student_performance.txt', 'r')
+#     sheetid = fp.read()
+#     fp.close()
+#     sheetsapi.updatesheet(sheetid,row,col,value,cell)
+#     return redirect(request,viewperformance)
 
 def attendance(request):
     return render(request,'admin/attendance.html')
@@ -533,7 +626,176 @@ def mail(reciver,message):
 
 from django.views.decorators.clickjacking import xframe_options_exempt,xframe_options_sameorigin
 @xframe_options_exempt
-def test(request):
+def student_performance_out(request):
     # request.POST['abc']='abc'
-    print(request.GET['row'].split(','))
+    # print(request.GET['row'].split(','))
+    rowv = request.GET['rowv'].split(',')
+    fp = open('student_performance.txt', 'r')
+    SPREADSHEET_ID = fp.read()
+    fp.close()
+    sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,row=int(rowv[0])+1,value=rowv)
+    return HttpResponse("")
+
+@xframe_options_exempt
+def student_performance_in(request):
+    student_performance = {'id': "", 'name': "", 'contact': "", 'emailid': "", 'dateofadmission': "",
+                           'trainingmode': "",
+                           'batchstartdate': "", 'course': "", 'startcourse': "", 'currentmodule': "",
+                           'ctrainername': "", 'cmodulestartdate': "", 'cmoduleenddate': "", 'ctheory': "",
+                           'cpracticle': "", 'coral': "", 'ctotal': "",
+                           'sqltrainername': "", 'sqlmodulestartdate': "", 'sqlmoduleenddate': "", 'sqltheory': "",
+                           'sqlpracticle': "",
+                           'sqloral': "", 'sqltotal': "",
+                           'wdtrainername': "", 'wdmodulestartdate': "", 'wdmoduleenddate': "", 'wdpracticle': "",
+                           'wdoral': "", 'wdtotal': "", 'portfoliolink': "",
+                           'mock1': "", 'miniguide': "", 'miniproject': "",
+                           'coretrainername': "", 'coremodulestartdate': "", 'coremoduleenddate': "", 'coretheory': "",
+                           'corepracticle': "", 'coreoral': "", 'coretotal': "",
+                           'mock2': "",
+                           'advtrainername': "", 'advmodulestartdate': "", 'advmoduleenddate': "", 'advtheory': "",
+                           'advpracticle': "", 'advoral': "", 'advtotal': "",
+                           'fullcourseenddate': "", 'cravitaprojectstartdate': "",
+                           'mock3': "", 'softskillsmarks': "", 'finalmock': "", 'totalmarks': "",
+                           'eligibleforplacement': "", 'remark': ""
+                           }
+    fp = open('student_performance.txt', 'r')
+    sheetid = fp.read()
+    fp.close()
+    sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
+    values = sheetsapi.sheetvalues(sheetid, sheetname)
+    # print(data)
+    # data =[{key:val for key in student_performance for val in data[0]} ]
+    # data = [dict(zip(student_performance,data[i])) for i in range(len(data))]
+    data = []
+    for row in values:
+        dict = {}
+        for s, i in zip(student_performance, range(len(student_performance))):
+            if i < len(row):
+                dict[s] = row[i]
+            else:
+                dict[s] = ''
+        data.append(dict)
+    return HttpResponse(str(data))
+
+@xframe_options_exempt
+def student_profile_in(request):
+    student_profile = ["id", "datetime", "center", "dateofadmission", "course", "batchstartdate", "modulestartfrom","trainingmode",
+              "name", "address", "dateofbirth", "contact", "emailid", "alternatecontact", "examination", "stream","collegename",
+              "boardname", "yearofpassing", "percentage", "fees", "mode", "regammount", "installment1", "installment2",
+              "installment3", "regdate", "installment1date", "installment2date", "installment3date", 'remark']
+    field = student_profile
+    fp = open('student_profile.txt', 'r')
+    sheetid = fp.read()
+    fp.close()
+    sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
+    values = sheetsapi.sheetvalues(sheetid, sheetname)
+    # print(data)
+    # data =[{key:val for key in student_performance for val in data[0]} ]
+    # data = [dict(zip(student_performance,data[i])) for i in range(len(data))]
+    data = []
+    for row in values:
+        dict = {}
+        for s, i in zip(field, range(len(field))):
+            if i < len(row):
+                dict[s] = row[i]
+            else:
+                dict[s] = ''
+        data.append(dict)
+    # print(data)
+    return HttpResponse(str(data))
+
+def student_profile_out(request):
+    rowv = request.GET['rowv'].split(',')
+    row = request.GET['row']
+    fp = open('student_profile.txt', 'r')
+    SPREADSHEET_ID = fp.read()
+    fp.close()
+    print(rowv)
+    sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=int(row) + 2, value=rowv)
+    return HttpResponse("")
+
+def change_user_data(request):
+    return HttpResponse("")
+
+def get_data(request,table):
+    if table == 'attendance':
+        fp = open('attendance.txt')
+        SPREADSHEET_ID = fp.read()
+        fp.close()
+    if table == 'profile':
+        fp = open('student_profile.txt')
+        SPREADSHEET_ID = fp.read()
+        fp.close()
+    if table == 'performance':
+        fp = open('student_performance.txt')
+        SPREADSHEET_ID = fp.read()
+        fp.close()
+
+    sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
+    values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=sheetname,range='!A1:GZ')
+    data = []
+    fields = [x for x in values[0]]
+    for row in values[1::1]:
+        dict = {}
+        for s, i in zip(fields, range(len(fields))):
+            if i < len(row):
+                dict[s] = row[i]
+            else:
+                dict[s] = ''
+        data.append(dict)
+    # print(values)
+    return HttpResponse(str(data))
+
+def set_data(request,table):
+    # print(request.GET['row'])
+    # print(request.GET['rowv'])
+    row = request.GET['row']
+    rowv = request.GET['rowv'].split(',')
+    # print(row,rowv[4::])
+    if table != 'attendance':
+        if table == 'profile':
+            fp = open('student_profile.txt')
+            SPREADSHEET_ID = fp.read()
+            fp.close()
+        if table == 'performance':
+            fp = open('student_performance.txt')
+            SPREADSHEET_ID = fp.read()
+            fp.close()
+
+        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=int(row) + 2, value=rowv)
+    elif table == 'attendance':
+        fp = open('attendance.txt')
+        SPREADSHEET_ID = fp.read()
+        fp.close()
+        print(rowv)
+        rowv = [int(x) for x in rowv]
+
+        print(rowv)
+
+        rowv.sort()
+        date = datetime.datetime.now()
+        currentdate = date.strftime("%d")
+        month = date.strftime("%m")
+        year = date.strftime("%Y")
+        currentdate.strip()
+        month.strip()
+        currentdate=currentdate+"/"+month+"/"+year
+        present = [currentdate]
+        # rowv.sort()
+        print(rowv)
+        print(row)
+        for i in range(0,rowv[-1]+1):
+            # print(i)
+            if i in rowv:
+                present.append("p")
+            else:
+                present.append("")
+        print(present)
+        row = int(row)
+        a=""
+        while row>1:
+            a+=(chr((row%26)+66))
+            row = row/26
+        print(a)
+        sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,values=present,range='!'+a+':'+a+'',dimension="COLUMNS")
     return HttpResponse("")

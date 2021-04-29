@@ -180,8 +180,11 @@ def modulo(val, num):
     return int(val) % int(num)
 
 @register.filter(name='grp_name')
-def grp_name(obj,key):
-    return obj[int(key)]['grp_name']
+def grp_name(mem):
+    abc = []
+    for i in mem.groups.all():
+        abc.append(i.name)
+    return abc
 
 @register.filter(name='grp_id')
 def grp_id(obj,key):
@@ -203,6 +206,25 @@ def sub(num1,num2):
 @register.filter(name='str')
 def strf(str):
     return str(str)
+
+from _datetime import datetime
+@register.filter(name='installmentdate')
+def installmentdate(date1):
+    date1 = datetime.strptime(date1, '%Y-%m-%d')
+    date2 = datetime.now()
+    print(date1,date2)
+    if date1>=date2:
+        return date1.strftime("%Y-%m-%d")
+    else:
+        return ""
+
+@register.filter(name='replace')
+def replace(txt):
+    return txt.split(':')[0]
+
+@register.filter(name='replace1')
+def replace1(txt):
+    return txt.split(':')[1]
 
 import math
 @register.filter(name='div')

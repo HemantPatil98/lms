@@ -38,9 +38,15 @@
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-              <form action="{%if request.user.is_staff%}{%url 'addstudents'%}{%else%}/admin/include/view_data/0/0/0/False/{%endif%}" method="POST">
+              <form action="{%if request.user.is_staff%}{%url 'addstudents'%}{%else%}/admin/include/view_data/0/0/0/False/{%endif%}" method="POST" enctype="multipart/form-data">
                 {%csrf_token%}
                 <div class="card-body row">
+                 <div class="form-group row">
+                  <div class="form-group col-md-6"></div>
+                  <div class="form-group col-md-6">
+                    <label for="photo">Profile Photo </label>
+                    <input type="file" name="photo" id="photo" style="height: 100px; width: 100px; border: 2px solid black;float: right;border-radius: 5%;">
+                  </div>
                 	<div class="form-group col-md-6">
 	                  <label for="center">Center: </label>
 	                  <select name="center" class="custom-select form-control-border" id="center">

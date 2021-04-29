@@ -42,3 +42,10 @@ class notice(models.Model):
             note = notice(title=title,description=description,file=file,externallink=externallink,createdby=request.user,type=type)
             note.save()
 
+class user_profile(models.Model):
+    user_id = models.OneToOneField(User,on_delete=nothing)
+    student_performance_row = models.IntegerField()
+    photo = models.FileField(upload_to='profile_photo/')
+
+    def __str__(self):
+        return self.user_id.username

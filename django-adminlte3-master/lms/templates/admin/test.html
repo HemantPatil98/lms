@@ -48,7 +48,7 @@
   </div>
 
 {%block script%}
-<script src="{%static 'student/plugins/jsgrid/demos/db.js'%}"></script>
+<script src="{%static 'student/dist/js/student_performance.js'%}"></script>
 <script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
 <style type="text/css">
   .fix-id{
@@ -164,44 +164,39 @@
 //     }
 // });
 // alert();
-$(document).ready(function(){
-  $('.jsgrid-filter-row').children('td').each(function(){
-        $(this).children('input').attr('onkeypress','filter()');
-      });
-    $('.jsgrid-table tbody tr').click(function(){
-        // $(this).attr('onclick','editing()');
-        // db.updateItem();
-        $('.jsgrid-edit-row').attr('onkeypress','editing()');
-      });
-});
-function editing(){
-  var keycode = (event.keyCode ? event.keyCode : event.which);
-  if(keycode == '13'){
-      edit_row = [];
-      $('.jsgrid-edit-row').children('td').each(function(){
-        edit_row.push($(this).children('input').val())
-      });
-      db.updateItem(edit_row);
-    }
-  
-  // edit_row = [];
-  //   $('.jsgrid-edit-row').children('td').each(function(){
-  //     edit_row.push($(this).children('input').val())
-  //   });
-  // db.updateItem(edit_row);
-}
-  function filter(){
-    var keycode = (event.keyCode ? event.keyCode : event.which);
-      if(keycode == '13'){
-        // console.log(typeof($('#jsGrid1').jsGrid("getFilter").name));
-        a=db.loadData($('#grid').jsGrid("getFilter"));
-        $('#grid').jsGrid({data:a});
-      }
-      $('.jsgrid-filter-row').children('td').each(function(){
-        $(this).children('input').attr('onkeypress','filter()');
-      })
-  }
-// });
+// function addaction(){
+//   $('.jsgrid-filter-row').children('td').each(function(){
+//         $(this).children('input').attr('onkeypress','filter()');
+//       });
+//     $('.jsgrid-table tbody tr').click(function(){
+//         // $(this).attr('onclick','editing()');
+//         // db.updateItem();
+//         $('.jsgrid-edit-row').attr('onkeypress','editing()');
+//       });
+// // });
+// function editing(){
+//   var keycode = (event.keyCode ? event.keyCode : event.which);
+//   if(keycode == '13'){
+//       edit_row = [];
+//       $('.jsgrid-edit-row').children('td').each(function(){
+//         edit_row.push($(this).children('input').val())
+//       });
+//       db.updateItem(edit_row);
+//     }
+
+// }
+//   function filter(){
+//     var keycode = (event.keyCode ? event.keyCode : event.which);
+//       if(keycode == '13'){
+//         // console.log(typeof($('#jsGrid1').jsGrid("getFilter").name));
+//         a=db.loadData($('#grid').jsGrid("getFilter"));
+//         $('#grid').jsGrid({data:a});
+//       }
+//       $('.jsgrid-filter-row').children('td').each(function(){
+//         $(this).children('input').attr('onkeypress','filter()');
+//       })
+//   }
+// }
 </script>
 
 {%endblock%}

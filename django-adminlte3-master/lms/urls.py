@@ -24,11 +24,15 @@ urlpatterns = [
     path('attendance/', views.attendance, name='attendance'),
     path('add/notice/',views.addnotice,name='addnotice'),
 
-    path('test/',views.test,name='test'),
-
-    path('admin/include/view_data/<int:idvalue>/<int:row>/<int:col>/<slug:value>/<slug:cell>/', views.studentupdate, name='updatesheet'),
-    path('admin/include/view_data/performance/<int:row>/<int:col>/<slug:value>/<slug:cell>/', views.studentpupdate,
-         name='updatesheet')
+    path('student_performance_in/',views.student_performance_in,name='student_performance_in'),
+    path('student_performance_out/',views.student_performance_out,name='student_performance_out'),
+    path('student_profile_in/', views.student_profile_in, name='student_profile_in'),
+    path('student_profile_out/', views.student_profile_out, name='student_profile_out'),
+    path('admin/include/studentupdate/', views.studentupdate, name='updatesheet'),
+    # path('admin/include/view_data/performance/<int:row>/<int:col>/<slug:value>/<slug:cell>/', views.studentpupdate,
+    #      name='updatesheet')
+    path('getdata/<slug:table>/',views.get_data,name='getdata'),
+    path('setdata/<slug:table>/',views.set_data,name='setdata'),
 
     # path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
