@@ -5,6 +5,7 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import datetime
+from .models import extra_data
 # from .models import extra_data
 from django.shortcuts import HttpResponse
 # If modifying these scopes, delete the file token.pickle.
@@ -48,8 +49,9 @@ service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
 
 def startsheet():
-    # print("hi")
-    if not os.path.exists('student_performance.txt'):
+    print("hi")
+    print(extra_data.objects.all())
+    if not extra_data.objects.filter(name='student_performance'):
         # print("start")
 
         student_performance = ['id', 'Name', 'Contact No', 'Email ID', 'Admission Date', 'Training Mode',
@@ -77,9 +79,11 @@ def startsheet():
 
         SPREADSHEET_ID = createsheet('Student Performance',student_performance)
 
-        fp = open('student_performance.txt', 'a')
-        fp.write(SPREADSHEET_ID)
-        fp.close()
+        # fp = open('student_performance.txt', 'a')
+        # fp.write(SPREADSHEET_ID)
+        # fp.close()
+        ex = extra_data(name='student_performance',value=SPREADSHEET_ID)
+        ex.save()
 
     if not os.path.exists('student_profile.txt'):
         # print("start")
@@ -134,7 +138,7 @@ def createsheet(name,columns):
     global SPREADSHEET_ID
     SPREADSHEET_ID = spreadsheet.get('spreadsheetId')
 
-    addcolumns(sheetname,columns)
+    addcolumns(SPREADSHEET_ID,sheetname,columns)
 
     return SPREADSHEET_ID
 
@@ -152,7 +156,7 @@ def addcolumns(SPREADSHEET_ID,sheetname,columns):
     sheet.values().update(
         spreadsheetId=SPREADSHEET_ID,
         valueInputOption='USER_ENTERED',
-        range=sheetname+'!A1:1',
+        range=sheetname+'!1:1',
         body={
         'majorDimension': 'ROWS',
         'values': values
