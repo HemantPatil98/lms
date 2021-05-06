@@ -5,6 +5,7 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import datetime
+# from .models import extra_data
 from django.shortcuts import HttpResponse
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive.file','https://www.googleapis.com/auth/drive']
@@ -187,14 +188,23 @@ def sheetvalues(SPREADSHEET_ID,sheetname,range='!A2:BE'):
         return values
 
 
-def appendsheet(SPREADSHEET_ID,values,range='!A:A',dimension='ROWS'):
+def getsheetnames(SPREADSHEET_ID):
+    properties = sheet.get(spreadsheetId=SPREADSHEET_ID).execute().get("sheets")
+    sheets = []
+    for item in properties:
+        sheets.append(item.get("properties").get('title'))
+    return sheets
+
+
+def appendsheet(SPREADSHEET_ID,values,range='!A:A',dimension='ROWS',sheetname="Apr - Mar "+datetime.datetime.now().strftime("%Y")):
     # SPREADSHEET_ID = sheetid
     values = [values]
-    sheetname = "Apr - Mar "+datetime.datetime.now().strftime("%Y")
+    # sheetname = "Apr - Mar "+datetime.datetime.now().strftime("%Y")
     properties = sheet.get(spreadsheetId=SPREADSHEET_ID).execute().get("sheets")
-    # print(properties)
+    print(properties)
     sheets = []
     flag = 1
+    # assert isinstance(properties, object)
     for item in properties:
         sheets.append(item.get("properties").get('title'))
         # print(sheets)
@@ -222,7 +232,7 @@ def appendsheet(SPREADSHEET_ID,values,range='!A:A',dimension='ROWS'):
         body=value_range_body
     ).execute()
 
-    print(res)
+    # print(res)
     import re
     try:
         txt = res['tableRange'].split(':')[1]

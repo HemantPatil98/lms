@@ -1,4 +1,4 @@
-{%extends 'admin/base.html'%}
+{%extends 'student/base.html'%}
 {%load admin_menu%}
 {%load static%}
 {%block style%}
@@ -50,6 +50,14 @@
       <div class="card card-primary">
         <div class="card-header">
           <h3 class="card-title">Student Profile</h3>
+          <div class="" style="width: max-content;float: right;">
+            <!-- <label>Custom Select</label> -->
+            <select name="sheetname" class="custom-select" onchange="load()">
+              {%for sheetname in sheetnames%}
+              <option value="{{sheetname}}">{{sheetname}}</option>
+              {%endfor%}
+            </select>
+          </div>
         </div>
         <!-- /.card-header -->
         <div class="card-body">
@@ -69,9 +77,34 @@
     display: none;
   }
 </style>
-<script type="text/javascript" src="{%static 'student/dist/js/student_profile.js'%}"></script>
+<!-- <script type="text/javascript" src="{%static 'student/dist/js/student_profile.js'%}"></script> -->
 <script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
 
+<script type="text/javascript">
+  // window.db = db;
+  var db = {};
+  load();
+ function load(){
+    var sheetname=$("select[name='sheetname']").val();
+console.log(sheetname);
+  var url = "http://127.0.0.1:8000/getdata/profile/?sheetname="+sheetname;
+$.get(url,function(data,status){
+    // console.log(data);
+    // console.log(JSON.parse(data.replaceAll("'",'"')));
+    // db = {};
+    data = data.replaceAll("'",'"');
+    db.data=JSON.parse(data);
+    // console.log(db.data);
+    $('#grid').jsGrid({data:db.data});
+// wndow.db=db;
+    // db.loadData;
+    // addaction();
+    $(".jsgrid-grid-body").keypress(function(){var keycode = (event.keyCode ? event.keyCode : event.which);
+          if(keycode == '13'){window.edit_row=this;$('#grid').jsGrid('updateItem')}});
+});
+ }
+
+</script>
 <script type="text/javascript">
 $(function () {
 
@@ -85,6 +118,44 @@ $(function () {
         paging: true,
 
         data: db.data,
+
+        controller: {
+          loadData: function(filter) {
+           return $.grep(db.data, function(client) {
+                var flag=false;
+                $.each(Object.keys(client),function(key,val){
+                    val=val.toString();
+                    val1=client[val].toString();
+                    val2=filter[val];
+                    if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
+
+                    flag=true;
+                    }else{
+                        flag=false;
+                        return false;
+                    };
+                })
+                 if (flag) {
+                    return client;
+                }
+            });
+        },
+          insertItem: $.noop,
+          updateItem: function(item) {
+            // console.log(Object.values(item));
+            // console.log(item);
+            sheetname = $("select[name='sheetname']").val();
+            console.log(sheetname);
+            Url = 'http://127.0.0.1:8000/setdata/profile/?rowv='+Object.values(item)+'&sheetname='+sheetname;
+            data={
+                row:item,
+            }
+                $.get(Url,function(data,status){
+                    console.log(data);
+                });
+            },
+          deleteItem: $.noop
+        },
 
         fields: [
             { name: "ID", type: "number", width: 70, css:""},

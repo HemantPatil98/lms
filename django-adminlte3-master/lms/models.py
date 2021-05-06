@@ -42,10 +42,29 @@ class notice(models.Model):
             note = notice(title=title,description=description,file=file,externallink=externallink,createdby=request.user,type=type)
             note.save()
 
+class certificate_request(models.Model):
+    student_id = models.ForeignKey(User,on_delete=nothing)
+    certificate_number = models.CharField(max_length=10)
+    certificate = models.FileField(upload_to='certificate/')
+    certificate_status = models.CharField(max_length=10,default="In Process")
+
+    def __str__(self):
+        return self.student_id.first_name
+
 class user_profile(models.Model):
     user_id = models.OneToOneField(User,on_delete=nothing)
-    student_performance_row = models.IntegerField()
+    student_performance_row = models.IntegerField(null=True)
+    otp = models.CharField(max_length=6)
     photo = models.FileField(upload_to='profile_photo/')
+    certificate = models.ForeignKey(certificate_request,on_delete=nothing,null=True)
 
     def __str__(self):
         return self.user_id.username
+
+
+class extra_data(models.Model):
+    name = models.CharField(max_length=20)
+    value = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name

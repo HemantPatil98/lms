@@ -1,4 +1,4 @@
-{%extends 'admin/base.html'%}
+{%extends 'student/base.html'%}
 {%load static%}
 {%load admin_menu%}
  <!-- Content Wrapper. Contains page content -->
@@ -36,7 +36,7 @@
               <div class="card-body box-profile">
                 <div class="text-center">
                   <img class="profile-user-img img-fluid img-circle"
-                       src="/media/profile_photo/{{request.user.username|replace}}.jpg"
+                       src="/media/{{request.session.ab.photo}}"
                        alt="User profile picture">
                 </div>
 
@@ -63,8 +63,7 @@
                     {{profile.0.installment3date|installmentdate}}</a>
                   </li>
                 </ul>
-
-                <a href="#" class="btn btn-primary btn-block"><b>Request for Certificate</b></a>
+                <a href="{%if not rc.id%}{%url 'request_certificate'%}{%endif%}" class="btn btn-primary {%if rc.certificate_status == 'In Process'%}btn-info{%elif rc.certificate_status == 'success'%}btn-success{%endif%} btn-block"><b>Request for Certificate</b></a>
               </div>
               <!-- /.card-body -->
             </div>
@@ -194,7 +193,7 @@
                       <!-- timeline time label -->
                       <div class="time-label">
                         <span class="bg-success">
-                          3 Jan. 2014
+                          {{performance}}
                         </span>
                       </div>
                       <!-- /.timeline-label -->
@@ -229,8 +228,8 @@
                   <div class="card-body row">
                     <div class="form-group col-md-6"></div>
                   <div class="form-group col-md-6">
-                    <label for="photo">Profile Photo </label>
-                    <input type="file" name="photo" id="photo" style="height: 100px; width: 100px; border: 2px solid black;float: right;border-radius: 5%;">
+                    <!-- <label for="photo">Profile Photo </label> -->
+                    <!-- <input type="file" name="photo" id="photo" style="height: 100px; width: 100px; border: 2px solid black;float: right;border-radius: 5%;"> -->
                   </div>
                 	<div class="form-group col-md-6">
 	                  <label for="center">Center: </label>

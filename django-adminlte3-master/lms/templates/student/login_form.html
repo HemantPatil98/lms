@@ -30,11 +30,12 @@
   transform: translate(-50%, -50%);
 }
 </style>
-<body class="container">
+<body class="container" style="position: inherit">
 
-  <div class="row">
-    <div class="col-md-5 center">
-      <h2 style="text-align: center;">Login At Cravita India's Learning Managment System</h2>
+  <div class="row" style="height: 100%">
+    <div class="col-md-5 center" style="height: 100%">
+      <img src="{%static 'logon.png'%}" style="height: 20%;margin: 10px;">
+      <!-- <h2 style="text-align: center;">Login At Cravita India's Learning Managment System</h2> -->
       <div class="card">
         <div class="card-header card-header-primary">
           <h4 class="card-title">
@@ -83,7 +84,7 @@
               Don't have an account? <a href="/register/" class="text-primary">Create</a>
             </span>
  -->
-            <div class="clearfix"></div>
+            <a href="{%url 'resspass'%}" style="float: right;">Forget Password?</a>
 
           </form>
         </div>

@@ -1,7 +1,5 @@
-{%extends 'admin/base.html'%}
-{%load admin_menu%}
+{%extends 'student/base.html'%}
 {%load static%}
-
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -10,12 +8,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>View Members</h1>
+            <h1>Manage Groups</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">View Members</li>
+              <li class="breadcrumb-item active">Manage Groups</li>
             </ol>
           </div>
         </div>
@@ -23,8 +21,8 @@
     </section>
     {%endblock%}
 
-    <!-- Main content -->
     {%block content%}
+    <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
         <div class="row">
@@ -32,155 +30,95 @@
             <!-- general form elements -->
             <div class="card card-primary">
               <div class="card-header">
-                <h3 class="card-title">Members </h3>
+                <h3 class="card-title">Manage Groups </h3>
               </div>
               <!-- /.card-header -->
-                 <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">Striped Full Width Table</h3>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body p-0">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th style="width: 10px">#</th>
-                      <th>Username</th>
-                      <th>First Name</th>
-                      <th>Last Name</th>
-                      <th>Group</th>
-                      <th style="width: 40px">Active</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {%for member in members%}
-                    <tr id="{{member.id}}" class="a">{%firstof member.id as i%}
-                      <td field='id'>{{member.id}}</td>
-                      <td field='username'>{{member.username}}</td>
-                      <td field='first_name'>{{member.first_name}}</td>
-                      <td field='last_name'>{{member.last_name}}</td>
-                      <td field='group' class="a" {{memb_grp|grp_id:i}}>{{member|grp_name}} <span class="edit_group hide" onclick="editusergroup()">+</span></td>
-                      <td>
-                        <div class="form-group clearfix">
-                          <div class="icheck-success d-inline">
-                            <input type="checkbox" name="is_active" {%if member.is_active%} checked="checked" {%endif%} class="checkbox">
-                            <label for="is_active"></label>
-                          </div>
+              <!-- form start -->
+              <form action="{%url 'viewgroups'%}" method="POST">
+                {%csrf_token%}
+                <div class="card-body row">
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Name</label>
+                      <select class="form-control select2" name="gname" style="width: 100%;">
+                        {%for group in groups%}
+                        <option {%if gname == group.name%} selected="selected" {%endif%}>{{group}}</option>
+                        {%endfor%}
+                      </select>
+                    </div>
+                  </div>
+
+                  {%if gname%}
+
+                    <div class="card card-default">
+                      <div class="card-header">
+                        <h3 class="card-title">Select Perm</h3>
+
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                          </button>
                         </div>
-                      </td>
-                    </tr>
-                    {%endfor%}
-                  </tbody>
-                </table>
-              </div>
-              <!-- /.card-body -->
-                <div class="card-footer">
-                  <form action="/view_data/members/" method="POST">
-                    {%csrf_token%}
-                  <input type="text" name="id" class="hide">
-                  <input type="text" name="field" class="hide">
-                  <input type="text" name="data" class="hide">
-                  <button id="submit" name="submit" value="submit" type="submit" class="btn btn-primary hide">Submit</button>
-                  </form>
+                      </div>
+                      <!-- /.card-header -->
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-12">
+                            <div class="form-group">
+                              <label>Multiple</label>
+                              <select class="duallistbox" name="permissions" multiple="multiple">
+                                {%for p in members%} 
+                                <option {%if p.id in group_per%} selected="selected" {%endif%} value="{{p.id}}">{{p}}</option>
+                                {%endfor%}
+                              </select>
+                            </div>
+                            <!-- /.form-group -->
+                          </div>
+                          <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                      </div>
+                      <!-- /.card-body -->
+                      <div class="card-footer">
+
+                      </div>
+                    </div>
+                    <!-- /.card -->
+
+                  {%endif%}
+
                 </div>
-            </div>
-              <!-- /.card -->
+                <!-- /.card-body -->
+
+                <div class="card-footer">
+                  <button id="submit" name="submit" value="submit" type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </form>
             </div>
         </div>
       </div>
 
     </section>
-    {%endblock%}
     <!-- /.content -->
+    {%endblock%}
   </div>
   <!-- /.content-wrapper -->
-
-
-{%block style%}
-<style type="text/css">
-  .hide{
-    display: none;
-  }
-</style>
-{%endblock%}
 {%block script%}
 <style type="text/css">
   .hide{
     display: none;
   }
 </style>
-<script type="text/javascript">
-  active_cell_value= "";
-  $("td").dblclick(function(){
-    if ($(this).attr('field')!='id' && $(this).attr('field')!='group') {
-      active_cell_value=$("input[name='value']").val();
-    $("input[name='value']").parent().text(active_cell_value);
-    value=$(this).text();
-      $(this).html("<input type='text' name='value' value='"+value+"' onchange='back()' onkeypress='myFunction(event)''>");
-    
-    }
-  });
-
-  function editusergroup(){
-    alert($(this).html());
-    location.replace();
-  }
-
-  $("td[field='group']").hover(function(){$(this).children('span').removeClass('hide')},
-    function(){$(this).children('span').addClass('hide')})
-
-  function myFunction(event){
-    // alert();
-    var Code = event.keyCode || event.which;
-    // alert(Code);
-    if (Code == 13) {
-    active_cell_value=$("input[name='value']").val();
-    $("input[name='value']").parent().text(active_cell_value);  
-    }
-    
-  }
-  function back(){
-
-    $("input[name='id']").attr('value',$("input[name='value']").parent().parent().attr('id'));
-    $("input[name='field']").attr('value',$("input[name='value']").parent().attr('field'));
-    $("input[name='data']").attr('value',$("input[name='value']").val());
-
-    // $("#backend").attr("src","/view_data/members/");
-    $('#submit').trigger('click');
-
-  }
-</script>
 <script>
   $(function () {
-$("label[for='is_active']").click(function(){
 
-  if($(this).parent().hasClass('icheck-success')){
-    $(this).parent().children('input').removeAttr('checked')
-    var val = confirm("Are you sure want to remove Active status");
-    // alert(val);
-    if (val) {
-      id=$(this).parent().parent().parent().parent().attr('id');
-      console.log(id);
-      $("input[name='id']").attr('value',id);
-      $("input[name='field']").attr('value','is_active');
-      $("input[name='data']").attr('value',"True");
-
-    // $("#backend").attr("src","/view_data/members/");
-    $('#submit').trigger('click');
-    }
-  }
-  else{
-    $(this).parent().children('input').attr('checked','checked')
-    var val = confirm("Are you sure want to add Active status");
-    alert(val);
-  }
-
-  
-});
     $("select[name='gname']").change(function(){
       $('#submit').trigger('click');
     });
-
     //Initialize Select2 Elements
     $('.select2').select2()
 
@@ -309,5 +247,4 @@ $("label[for='is_active']").click(function(){
   }
   // DropzoneJS Demo Code End
 </script>
-
 {%endblock%}

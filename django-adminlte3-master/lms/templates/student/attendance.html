@@ -1,0 +1,335 @@
+{%extends 'student/base.html'%}
+{%load static%}
+{%block style%}
+  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid.min.css'%}">
+  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid-theme.min.css'%}">
+  <style type="text/css">
+  .fix-id{
+     position: sticky;
+  left: 0;
+  z-index: 2;
+  }
+  .fix-name{
+    position: sticky;
+    left: 0px;
+    z-index: 2;
+  }
+  .fix-contact{
+    position: sticky;
+    left: 150px;
+    z-index: 2;
+  }
+</style>
+{%endblock%}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    {%block content_header%}
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Attendance</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Attendance</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </div>
+    {%endblock%}
+
+    <!-- Main content -->
+    {%block content%}
+    <section class="content">
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Student Attendance</h3>
+
+          <button class="btn btn-success" style="float: right;" onclick=markattendance()>Mark Attendance</button>
+          <div class="" style="width: max-content;float: right;margin-right: 10px;">
+            <!-- <label>Custom Select</label> -->
+            <select name="sheetname" class="custom-select" onchange="load()">
+              {%for sheetname in sheetnames%}
+              <option value="{{sheetname}}">{{sheetname}}</option>
+              {%endfor%}
+            </select>
+          </div>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+          <div id="grid"></div>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    <button class="btn btn-success" style="float: right;" onclick=markattendance()>Mark Attendance</button>
+
+    </section>
+    {%endblock%}
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+<!-- jQuery -->
+{%block script%}
+<style type="text/css">
+  .hide{
+    display: none;
+  }
+</style>
+<!-- <script type="text/javascript" src="{%static 'student/dist/js/attendance.js'%}"></script> -->
+<script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
+
+<script type="text/javascript">
+
+window.db ={};
+load();
+function load(){
+    var sheetname=$("select[name='sheetname']").val();
+console.log(sheetname);
+var url = "http://127.0.0.1:8000/getdata/attendance/?sheetname="+sheetname;
+$.get(url,function(data,status){
+    // console.log(data);
+    // console.log(JSON.parse(data.replaceAll("'",'"')));
+    data = data.replaceAll("'",'"');
+    db.data=JSON.parse(data);
+
+    fields= [
+        { name: "ID", type: "number", width: 70, css:"",editing:false},
+        { name: "NAME", type: "text", width: 150,css:"fix-name",editing:false},
+        { name: "CONTACT", type: "text", width: 100,css:'fix-contact',editing:false},
+        { name: "EMAIL ID", type: "text",width: 100,editing:false},
+        { name: "Today", type:"checkbox", width:50,editing: false}
+    ];
+
+
+    window.col = Object.keys(db.data[0]);
+    // console.log(col);
+    // fields.push({name:col[i],type:'checkbox',editing:true});
+    for(i=col.length-1;i>3;i--){
+        // console.log(col[i]);
+        if (col[i]===currentdate) {
+        fields.push({name:col[i],type:'checkbox',editing:false});
+
+        }
+        else{
+        fields.push({name:col[i],type:'checkbox',editing:false});
+
+        }
+        // console.log(fields);
+    };
+    $('#grid').jsGrid({fields:fields});
+ 
+    $('#grid').jsGrid({data:db.data});
+
+    add();
+
+    // $('#grid tr td:nth-child(5)').html("<input name='present' type='checkbox'></html>");
+});
+}
+
+
+
+$(function () {
+   d = new Date();
+  date = d.getDate();
+  // console.log(date.toString().length==1);
+  if(date.toString().length==1){
+   date="0"+date;
+  }
+  month = d.getMonth()+1;
+  // console.log(month.toString().length);
+  if(month.toString().length==1){
+   month="0"+month;
+   // month=parseInt(month, 10)
+  }
+  year = d.getFullYear();
+  console.log(date,month,year);
+  const currentdate = date+'/'+month+'/'+year;
+  currentdate.replaceAll('"','')
+    $("#grid").jsGrid({
+        height: "100%",
+        width: "100%",
+
+        filtering: true,
+        editing: false,
+        sorting: true,
+        paging: true,
+        // rowClick: function(args) {
+        //   if(args.item[currentdate]==='p'){
+        //     args.item[currentdate]="";
+        //   }else{
+        //     args.item[currentdate]="p";
+        //   }db.loadData},
+        // editTemplate: function(value, item) { console.log(value) },
+
+        data: db.data,
+
+        controller: {
+          loadData: function(filter) {
+           return $.grep(db.data, function(client) {
+                var flag=false;
+                $.each(Object.keys(client),function(key,val){
+                    val=val.toString();
+                    val1=client[val].toString();
+                    val2=filter[val];
+                    if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
+
+                    flag=true;
+                    }else{
+                        flag=false;
+                        return false;
+                    };
+                })
+                 if (flag) {
+                    return client;
+                }
+            });
+        },
+          insertItem: $.noop,
+          // updateItem: function(item) {
+          //   // console.log(Object.values(item));
+          //   // console.log(item);
+          //   Url = 'http://127.0.0.1:8000/setdata/profile/?rowv='+Object.values(item);
+          //   data={
+          //       row:item,
+          //   }
+          //       $.get(Url,function(data,status){
+          //           console.log(data);
+          //       });
+          //   },
+          updateItem: function(rowIndex) { 
+            console.log(rowIndex.present.join(","));
+            // alert(1);
+            // const col = Object.keys(db.data[0]);
+            console.log(col.length-1);
+            len = (Object.keys(window.db.data[0]).length-1).toString();
+            console.log(len);
+            sheetname = $("select[name='sheetname']").val();
+            console.log(sheetname);
+            Url = "";
+            if(!db.data[0][currentdate]){
+                Url = 'http://127.0.0.1:8000/setdata/attendance/?rowv='+rowIndex.present.join(",")+'&row='+len+'&sheetname='+sheetname;
+
+            }else{
+                console.log("update");
+            }
+            // console.log(Url);
+            data={
+                // row:updatingRow,
+            }
+            // $('.btn').click(function(){
+                $.get(Url,function(data,status){
+                    console.log(data);
+                });
+            // });
+            // return db.data
+            load();
+        },
+          deleteItem: $.noop
+        },
+        fields: [
+            { name: "ID", type: "number", width: 70, css:"",editing:false},
+            { name: "NAME", type: "text", width: 150,css:"fix-name",editing:false},
+            { name: "CONTACT", type: "text", width: 100,css:'fix-contact',editing:false},
+            { name: "EMAIL ID", type: "text",width: 100,editing:false},
+            { name: "Today", type:"checkbox", width:50,editing: true}
+        ]
+    });
+  });
+ present = [];
+function addattendance(x){
+  flag=true;
+  console.log(x);
+  for( var i = 0; i < present.length; i++){ 
+    
+        if ( present[i] === x) { 
+    
+            present.splice(i,1); 
+            flag = false;
+        }
+    
+    }
+    if (flag) {
+      present.push(x);
+    }
+  // present.push(x);
+  console.log(present);
+}
+function markattendance(){
+  console.log('a');
+  // db.updateItem(present);
+  $("#grid").jsGrid("updateItem",{present:present});
+}
+function add(){
+  {%if request.user.is_staff%}
+  addaction();
+  {%endif%}
+}
+    d = new Date();
+  date = d.getDate();
+  // console.log(date.toString().length==1);
+  if(date.toString().length==1){
+   date="0"+date;
+  }
+  month = d.getMonth()+1;
+  // console.log(month.toString().length);
+  if(month.toString().length==1){
+   month="0"+month;
+   // month=parseInt(month, 10)
+  }
+  year = d.getFullYear();
+  console.log(date,month,year);
+  const currentdate = date+'/'+month+'/'+year;
+  currentdate.replaceAll('"',"");
+function addaction(){
+      // $('.jsgrid-filter-row').children('td').each(function(){
+      //       $(this).children('input').attr('onkeypress','filter()');
+      //     });
+      //   $('.jsgrid-table tbody tr').click(function(){
+      //       $('.jsgrid-edit-row').attr('onkeypress','editing(this)');
+      //     });
+        // console.log($('.jsgrid-row:nth-child(4)'));
+        $('.jsgrid-table tbody tr').each(function(){
+          a=$(this)[0];
+          b=a.children[4];
+          // b.setAttribute('onclick','addattendance(this)');
+          // console.log(b);
+   
+
+          if (db.data[0][currentdate]=="" ||db.data[0][currentdate]=="p") {
+            e=$('.jsgrid-grid-header .jsgrid-table tr')[0].children[4];
+            f=$('.jsgrid-grid-header .jsgrid-table tr')[1].children[4];
+            b.setAttribute("class","hide");
+            e.setAttribute("class","hide");
+            f.setAttribute("class","hide");
+            f=$('.jsgrid-grid-header .jsgrid-table tr')[0].children[5];
+            g=a.children[5];
+            f.innerText='Today';
+          if(db.data[this.rowIndex][currentdate]==='p'){
+
+              g.innerHTML='<input type=checkbox checked onchange=addattendance('+this.rowIndex+')></input>';
+              present.push(this.rowIndex);
+            }
+            else{
+              g.innerHTML='<input type=checkbox onchange=addattendance('+this.rowIndex+')></input>';
+            // b.attr("class",'hide');
+
+            }
+          }
+          else{
+            b.innerHTML='<input type=checkbox onchange=addattendance('+this.rowIndex+')></input>';
+          }
+            // b.innerHTML='<input type=checkbox onchange=addattendance('+this.rowIndex+')></input>';
+          
+        });
+    }
+
+    function changesheet(){
+
+    }
+</script>
+{%endblock%}

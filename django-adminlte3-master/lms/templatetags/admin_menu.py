@@ -230,3 +230,7 @@ import math
 @register.filter(name='div')
 def sub(num1,num2):
     return int(num1)//int(num2)
+
+@register.filter(name='range')
+def sub(num):
+    return range(1,num+1)

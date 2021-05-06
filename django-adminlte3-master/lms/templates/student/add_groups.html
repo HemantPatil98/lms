@@ -1,5 +1,4 @@
-{%extends 'admin/base.html'%}
-
+{%extends 'student/base.html'%}
 {%load static%}
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -9,18 +8,18 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Add Members</h1>
+            <h1>Add Group</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Add Members</li>
+              <li class="breadcrumb-item active">Add Group</li>
             </ol>
           </div>
         </div>
       </div><!-- /.container-fluid -->
     </section>
-    {%endblock%} 
+    {%endblock%}
 
     <!-- Main content -->
     {%block content%}
@@ -31,46 +30,26 @@
             <!-- general form elements -->
             <div class="card card-primary">
               <div class="card-header">
-                <h3 class="card-title">Members </h3>
+                <h3 class="card-title">Groups </h3>
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-              <form action="{%url 'addusers'%}" method="POST">
+              <form action="{%url 'addgroups'%}" method="POST">
                 {%csrf_token%}
                 <div class="card-body row">
 
-                  <div class="form-group col-md-6" style="display: none;">
-                    <label for="nameInputEmail1">User Name</label>
-                    <input name="username" type="text" class="form-control" id="nameInputEmail1" placeholder="Enter Name" value="{{member.username}}">
-                  </div>
-
-                  <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">First Name</label>
-                    <input name="fname" type="text" class="form-control" id="nameInputEmail1" placeholder="Enter Name" value="{{member.first_name}}">
-                  </div>
-
-                  <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">Last Name</label>
-                    <input name="lname" type="text" class="form-control" id="nameInputEmail1" placeholder="Enter Name" value="{{member.last_name}}">
-                  </div>
-
-                  <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">Email</label>
-                    <input name="email" type="email" class="form-control" id="nameInputEmail1" placeholder="Enter Name" value="{{member.email}}">
-                  </div>
-
-                  <div class="form-group col-md-6">
+                  <!-- <div class="form-group col-md-6">
                     <label for="nameInputEmail1">Group Name</label>
-                    <select class="form-control select2" name="gname" style="width: 100%;">
-                      {%if gname%}
-                      <option selected="selected">{{gname}}</option>
-                      {%else%}
-                        {%for group in groups%}
-                        <option {%if gname == group.name%} selected="selected" {%endif%}>{{group}}</option>
-                        {%endfor%}
-                      {%endif%}
-                      </select>
-                  </div>
+                    <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
+                  </div> -->
+                  <div class="form-group col-md-6">
+                  <label>Minimal</label>
+                  <select class="form-control select2" style="width: 100%;" name="gname" {%if gname%}disabled{%endif%}>
+                    {%for group in groups%}
+                    <option>{{group}}</option>
+                    {%endfor%}}
+                  </select>
+                </div>
 
                   {%if gname%}
                     <div class="card card-default">
@@ -93,8 +72,8 @@
                             <div class="form-group">
                               <label>Multiple</label>
                               <select class="duallistbox" name="permissions" multiple="multiple">
-                                {%for p in permissions%} 
-                                <option {%if p.id in perm.group_per or p.id in perm.user_per%} selected="selected" {%endif%} value="{{p.id}}">{{p}}</option>
+                                {%for p in permissions%}
+                                <option value="{{p.id}}" {%if p.id in pre%}selected{%endif%}>{{p}}</option>
                                 {%endfor%}
                               </select>
                             </div>
@@ -110,13 +89,49 @@
                       </div>
                     </div>
                     <!-- /.card -->
+                    <div class="card card-default">
+                      <div class="card-header">
+                        <h3 class="card-title">Select Users</h3>
+
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <!-- /.card-header -->
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-12">
+                            <div class="form-group">
+                              <label>Multiple</label>
+                              <select class="duallistbox" name="members" multiple="multiple">
+                                {%for m in members%}
+                                <option value="{{m.id}}" {%if m.id in memb_pre%}selected{%endif%}>{{m.first_name}}</option>
+                                {%endfor%}
+                              </select>
+                            </div>
+                            <!-- /.form-group -->
+                          </div>
+                          <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                      </div>
+                      <!-- /.card-body -->
+                      <div class="card-footer">
+
+                      </div>
+                    </div>
                   {%endif%}
 
                 </div>
                 <!-- /.card-body -->
 
                 <div class="card-footer">
-                  <button id="submit" type="submit" name="submit" value="submit" class="btn btn-primary">Submit</button>
+                  <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
               </form>
             </div>
@@ -125,17 +140,13 @@
 
     </section>
     {%endblock%}
-
     <!-- /.content -->
   </div>
-{%block script%}
+  <!-- /.content-wrapper -->
+
+    {%block script%}
 <script>
   $(function () {
-
-    $("select[name='gname']").change(function(){
-      $('#submit').trigger('click');
-    });
-
     //Initialize Select2 Elements
     $('.select2').select2()
 
@@ -262,5 +273,6 @@
   document.querySelector("#actions .cancel").onclick = function() {
     myDropzone.removeAllFiles(true)
   }
+  // DropzoneJS Demo Code End
 </script>
-{%endblock%}
+    {%endblock%}

@@ -1,4 +1,4 @@
-{%extends 'admin/base.html'%}
+{%extends 'student/base.html'%}
 {%load static%}
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -27,22 +27,7 @@
     <section class="content">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <h3>44</h3>
-
-                <p>View Performance</p>
-              </div>
-              <div class="icon">
-                <a href="" class="icon"><i class="fas fa-user-plus"></i></a>
-              </div>
-              <a href="{% url 'viewperformance'%}" class="small-box-footer">
-                View Performance <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
+          {%if request.user.is_superuser%}
           <div class="col-lg-3 col-6">
             <!-- small card -->
             <div class="small-box bg-info">
@@ -52,31 +37,31 @@
                 <p>Add Students</p>
               </div>
               <div class="icon">
-                <a href="{% url 'addstudents' %}" class="icon"><i class="fas fa-user-plus"></i></a>
+                <a href="{% url 'addstudents' %}" class="icon"><i class="fas fa-user-graduate"></i></a>
               </div>
               <a href="{% url 'viewstudents'%}" class="small-box-footer">
                 View Student <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
           </div>
-
+          
           <div class="col-lg-3 col-6">
             <!-- small card -->
-            <div class="small-box bg-info">
+            <div class="small-box bg-danger">
               <div class="inner">
                 <h3>44</h3>
 
                 <p>Groups Registrations</p>
               </div>
               <div class="icon">
-                <a href="{% url 'addgroups' %}" class="icon"><i class="fas fa-user-plus"></i></a>
+                <a href="{% url 'addgroups' %}" class="icon"><i class="icon-group"></i></a>
               </div>
               <a href="{% url 'viewgroups'%}" class="small-box-footer">
                 View Groups <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
           </div>
-
+          {%endif%}
           <div class="col-lg-3 col-6">
             <!-- small card -->
             <div class="small-box bg-info">
@@ -96,43 +81,76 @@
 
           <div class="col-lg-3 col-6">
             <!-- small card -->
-            <div class="small-box bg-info">
+            <div class="small-box bg-success">
               <div class="inner">
                 <h3>44</h3>
 
                 <p>Attendance</p>
               </div>
               <div class="icon">
-                <a href="{%url 'attendance'%}" class="icon"><i class="fas fa-user-plus"></i></a>
+                <a href="{%url 'attendance'%}" class="icon"><i class="fas fa-check-square"></i></a>
               </div>
               <a href="{%url 'attendance'%}" class="small-box-footer">
                 Attendance <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
           </div>
+          <div class="col-lg-3 col-6">
+            <!-- small card -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>44</h3>
+
+                <p>View Performance</p>
+              </div>
+              <div class="icon">
+                <a href="" class="icon"><i class="fas fa-percentage"></i></a>
+              </div>
+              <a href="{% url 'viewperformance'%}" class="small-box-footer">
+                View Performance <i class="fas fa-arrow-circle-right"></i>
+              </a>
+            </div>
+          </div>
 
           <div class="col-lg-3 col-6">
             <!-- small card -->
-            <div class="small-box bg-info">
+            <div class="small-box bg-warning">
               <div class="inner">
                 <h3>44</h3>
 
                 <p>Add Notice</p>
               </div>
               <div class="icon">
-                <a href="{%url 'addnotice'%}" class="icon"><i class="fas fa-user-plus"></i></a>
+                <a href="{%url 'addnotice'%}" class="icon"><i class="fas fa-bell"></i></a>
               </div>
               <a href="{%url 'addnotice'%}" class="small-box-footer">
                 Notice <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
           </div>
+          <div class="col-lg-3 col-6">
+            <!-- small card -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>44</h3>
+
+                <p>Certificate Requests</p>
+              </div>
+              <div class="icon">
+                <a href="{%url 'addcertificate'%}" class="icon"><i class="fas fa-bell"></i></a>
+              </div>
+              <a href="{%url 'viewcertificate'%}" class="small-box-footer">
+                Certificate Issue <i class="fas fa-arrow-circle-right"></i>
+              </a>
+            </div>
+          </div>
         </div>
        
       </div><!--/. container-fluid -->
+  </div>
     </section>
-    {%endblock%}
     
+    {%endblock%}
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->

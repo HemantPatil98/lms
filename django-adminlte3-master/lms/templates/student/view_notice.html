@@ -1,5 +1,5 @@
 
-{%extends 'admin/base.html'%}
+{%extends 'student/base.html'%}
 {%load static%}
 {%load admin_menu%}
   <!-- Content Wrapper. Contains page content -->
@@ -30,61 +30,6 @@
     <section class="content">
       <div class="container-fluid">
       	<div class="row">
-      		<div class="col-md-4">
-          <div class="card card-primary">
-            <div class="card-header">
-              <h3 class="card-title">Add Notice</h3>
-
-              <div class="card-tools">
-                <button type="button" class="btn btn-tool">
-                  <i class="fas fa-minus"></i>
-                </button>
-              </div>
-            </div>
-            <form action="{%url 'addnotice'%}" method="POST" enctype="multipart/form-data">
-              {%csrf_token%}
-              <div class="card-body">
-                <div class="form-group">
-                  <label for="inputName">Subject</label>
-                  <input type="text" name="subject" id="inputName" class="form-control">
-                </div>
-                <div class="form-group">
-                  <label for="inputDescription">Description</label>
-                  <textarea id="inputDescription" name="description" class="form-control" rows="4"></textarea>
-                </div>
-
-                <div class="form-group">
-                  <label for="inputtype">Type</label>
-                  <select id="inputtype" name="type" class="form-control">
-                    <option value="Notice">Notice</option>
-                    <option value="Placement">Placement</option>
-                    <!-- <option></option> -->
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label for="customFile">File</label>
-                  <div class="custom-file">
-                    <input type="file" name="file" class="custom-file-input" id="customFile">
-                    <label class="custom-file-label" for="customFile">Choose file</label>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="externallink">External links</label>
-                  <div class="form-group">
-                    <input type="text" name="externallink" class="form-control" id="externallink">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <input type="submit" name="submit" class="form-control bg-info" value="Submit">
-                </div>
-              </div>
-            <!-- </form> -->
-
-            <!-- /.card-body -->
-          </div>
-          <!-- /.card -->
-        </div>
         {%for notice in data%}
         <div class="col-md-4">
           <div class="card card-primary">
@@ -92,17 +37,11 @@
               <h3 class="card-title">{{notice.generateddate}}</h3>
 
               <div class="card-tools">
-                <button type="button" class="btn btn-tool">
-                  <i class="fas fa-edit"></i>
-                </button>
               </div>
             </div>
             <!-- <form action="{%url 'addnotice'%}" method="POST" enctype="multipart/form-data"> -->
               
               <div class="card-body">
-                <div class="form-group hide">
-                  <input type="hidden" name="id" id="inputid" class="form-control" value="{{notice.id}}" disabled>
-                </div>
                 <div class="form-group">
                   <label for="inputName">Subject</label>
                   <input type="text" name="subject" id="inputName" class="form-control" value="{{notice.title}}" disabled>
@@ -140,9 +79,6 @@
                     <input type="text" name="externallink" class="form-control" id="externallink" value="{{notice.externallink}}">
                   </div>
                 </div>
-                <div class="form-group">
-                  <input type="submit" name="submit" class="form-control bg-success" value="Submit" disabled>
-                </div>
               </div>
             <!-- </form> -->
 
@@ -151,8 +87,41 @@
           <!-- /.card -->
         </div>
         {%endfor%}
-      </form>
+      <!-- </form> -->
       </div>
+      <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-end">
+            {% if data.has_previous %}
+            <li class="page-item {%if data.number == 1%} hide{%endif%}">
+                    <a class="page-link" href="?page=1">&laquo; First</a>
+                  </li>
+            <li class="page-item {%if data.number == 1%} hide{%endif%}">
+                    <a class="page-link" href="?page={{ data.previous_page_number }}">< Previous</a>
+                  </li>
+            {% endif %}
+            
+            {%for i in data.paginator.num_pages|range%}
+            {%if forloop.counter < 5%}
+            <li class="page-item  {%if data.number == i%}active{%endif%}">
+              {%if forloop.counter == 5%}
+              <a class="page-link" href="">...</a>
+              {%else%}
+              <a class="page-link" href="?page={{i}}">{{i}}</a>
+              {%endif%}
+            </li>
+            {%endif%}
+            {%endfor%}
+
+            {% if data.has_next %}
+            <li class="page-item">
+                    <a class="page-link" href="?page={{ data.next_page_number }}">Next ></a>
+                  </li>
+            <li class="page-item">
+                    <a class="page-link" href="?page={{ data.paginator.num_pages }}">Last &raquo;</a>
+                  </li>
+            {% endif %}
+          </ul>
+        </nav>
     </div>
   </section>
     {%endblock%}
