@@ -1,0 +1,381 @@
+{%extends 'student/base.html'%}
+{%block style%}
+<style type="text/css">
+	#add_questions{
+		float: right;
+		border-radius: 10px;
+		padding: 10px;
+		margin-top: 7px;
+	}
+/*	#add_questions_form .col-md-5{
+		position: fixed;
+		top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	}
+	.hide{
+		display: none;
+	}*/
+  body{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+</style>
+{%endblock%}
+{%load static%}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    {%block content_header%}
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>MCQ Test</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">MCQ Test</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    {%endblock%}
+
+    <!-- Main content -->
+    {%block content%}
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="card card-primary">
+              <div id="header" class="card-header bg-info">
+                <div class="form-group">
+                  <i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
+                  {{crs.instructions}}
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form action="{%if not crs%}{%url 'mcq_exam'%}{%endif%}#" method="POST">
+                {%csrf_token%}
+                <div class="card-body" style="border: 2px solid #17a2b8;">
+                	<div class="row">
+
+                  <!-- <div class="form-group col-md-6">
+                    <label for="nameInputEmail1">Group Name</label>
+                    <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
+                  </div> -->
+                  <div class="form-group col-md-4">
+                  <label>Course</label>
+                  <select class="form-control select2" style="width: 100%;" name="cname" {%if crs%}disabled{%endif%}>
+                    {%for course in courses%}
+                    <option {%if crs ==  course%}selected{%endif%}>{{course}}</option>
+                    {%endfor%}}
+                  </select>
+                  {%if crs%}
+                  <input type="hidden" name="cname" value="{{crs}}">
+                  {%endif%}
+                	</div>
+                	<div class="form-group col-md-4">
+                		<div class="row">
+                			<div class="col-md-6">
+                				<label>Section</label>
+		                		<select class="form-control select2" name="type" {%if crs%}disabled{%endif%}>
+		                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>MCQ</option>
+		                			<option {%if crs.type == 'PROGRAM' %}selected{%endif%}>PROGRAM</option>
+		                		</select>
+		                		{%if crs%}
+				                  <input type="hidden" name="type" value="{{crs.type}}">
+				                  {%endif%}
+		                	</div>
+		                	<div class="col-md-6">
+                        {%if crs%}
+                				<label>Duration</label><br>
+		                		<span id="time" style="font-size: xx-large;"><input type="number" class="form-control center" name="time" placeholder="Duration in minutes" value="{{crs.time}}"  {%if crs%}disabled{%endif%}></span>
+		                		{%endif%}
+		                	</div>
+                		</div>
+                		
+                	</div>
+                	<div class="form-group col-md-4">
+                		<!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
+                    <div class="row">
+                      <div class="col-md-6">
+                        <label id='marks'>Marks Scored: </label><br>
+                        <label>Out Off: 40</label>
+                      </div>
+                    </div>
+                	</div>
+                	</div>
+                 {%if crs%}
+                 <div>
+                 	<hr>
+                 	<div id="add_questions_form" class="row hide">
+                 		<div class="col-md-12">
+                 			<div class="card ">
+				              <!-- <div class="card-header bg-info">
+				                <div class="form-group">
+				                	<i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
+                          {{crs.instructions}}
+				                </div>
+				              </div> -->
+				              <!-- /.card-header -->
+				              <!-- form start -->
+				                <div class="card-body" id="body" style="height: 800px;overflow: auto;">
+                          <i>Click on Question to open IDE</i>
+				                {%for pro in prog_set%}
+                        <div class='question' id='{{que.question.id}}'>
+                         <div>
+                            <div class="form-group">
+                                <label for="question">Program #{{forloop.counter}}</label>
+                                <!-- <textarea name="question" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea> -->
+                                <div class="form-control" onclick="(function(){$('#program{{pro.id}}').toggleClass('collapse')})()">{{pro}}</div> <!-- data-toggle="collapse" data-target='#program{{pro.id}}' -->
+                            </div>
+                            <div id="program{{pro.id}}" class="row collapse">
+                              {%if crs.type == 'PROGRAM'%}
+                             <div class="col-md-12"><iframe src="https://techiedelight.com/compiler/" width="100%" height="500px;"></iframe>
+                             </div>
+                             <textarea class="form-control" style="width: 100%;" rows="3" name="{{pro.id}}" placeholder="Paste your code here"></textarea>
+                             {%else%}
+                             <div class="col-md-12">
+                               <div class="form-group">
+                                 <input type="file" name="{{pro.id}}" class="form-group">
+                                 <label>Submit Your Code Here...</label>
+                               </div>
+                             </div>
+                             {%endif%}
+                          </div>
+                        </div>
+                    </div>
+                        <hr>
+
+
+                        {%endfor%}
+				                </div>
+				                
+				                <!-- /.card-body -->
+				            </div>
+                 		</div>
+                 	</div>
+                 </div>
+                  
+                 {%endif%}
+                <!-- /.card-body -->
+            	</div>
+                <div class="card-footer">
+                  <input name="submit" type="submit" class="btn btn-primary">
+                  <!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
+                </div>
+              </form>
+            </div>
+        </div>
+      </div>
+
+    </section>
+    {%endblock%}
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+    {%block script%}
+
+{%if crs%}
+<script type="text/javascript">
+  function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    a=setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            // exit();
+            // stopTimer(fiveMinutes);
+            $('#time').addClass('text-danger');
+            $("input[name='submit']").trigger('click');
+            // $("input[name='submit']").trigger('click');
+            clearInterval(a);
+            // exit();
+        }
+    }, 1000);
+}
+
+window.onload = function () {
+    duration = $("input[name='time']").val();
+    var fiveMinutes = 60 * duration,
+        display = document.querySelector("#time");
+    startTimer(fiveMinutes, display);
+};
+  function choice(a){
+    $(a).toggleClass('btn-info');
+  }
+window.onscroll = function() {myFunction()};
+var header = $("#header");
+var sticky = header.offsetTop;
+// alert(sticky);
+function myFunction() {
+  // alert();
+  if (window.pageYOffset > sticky) {
+    alert();
+    header.classList.add("sticky");
+  } else {
+    header.classList.remove("sticky");
+  }
+}
+  </script>
+{%endif%}
+
+
+
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2({
+    	tags:true
+    })
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4',
+      tags:true
+    })
+
+    //Datemask dd/mm/yyyy
+
+    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+    //Datemask2 mm/dd/yyyy
+    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
+    //Money Euro
+    $('[data-mask]').inputmask()
+
+    //Date range picker
+    $('#reservationdate').datetimepicker({
+        format: 'L'
+    });
+    //Date range picker
+    $('#reservation').daterangepicker()
+    //Date range picker with time picker
+    $('#reservationtime').daterangepicker({
+      timePicker: true,
+      timePickerIncrement: 30,
+      locale: {
+        format: 'MM/DD/YYYY hh:mm A'
+      }
+    })
+    //Date range as a button
+    $('#daterange-btn').daterangepicker(
+      {
+        ranges   : {
+          'Today'       : [moment(), moment()],
+          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate  : moment()
+      },
+      function (start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+      }
+    )
+
+    //Timepicker
+    $('#timepicker').datetimepicker({
+      format: 'LT'
+    })
+
+    //Bootstrap Duallistbox
+    $('.duallistbox').bootstrapDualListbox()
+
+    //Colorpicker
+    $('.my-colorpicker1').colorpicker()
+    //color picker with addon
+    $('.my-colorpicker2').colorpicker()
+
+    $('.my-colorpicker2').on('colorpickerChange', function(event) {
+      $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
+    })
+
+    $("input[data-bootstrap-switch]").each(function(){
+      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+    })
+
+  })
+  // BS-Stepper Init
+  document.addEventListener('DOMContentLoaded', function () {
+    window.stepper = new Stepper(document.querySelector('.bs-stepper'))
+  })
+
+  // DropzoneJS Demo Code Start
+  Dropzone.autoDiscover = false
+
+  // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
+  var previewNode = document.querySelector("#template")
+  previewNode.id = ""
+  var previewTemplate = previewNode.parentNode.innerHTML
+  previewNode.parentNode.removeChild(previewNode)
+
+  var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
+    url: "/target-url", // Set the url
+    thumbnailWidth: 80,
+    thumbnailHeight: 80,
+    parallelUploads: 20,
+    previewTemplate: previewTemplate,
+    autoQueue: false, // Make sure the files aren't queued until manually added
+    previewsContainer: "#previews", // Define the container to display the previews
+    clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
+  })
+
+  myDropzone.on("addedfile", function(file) {
+    // Hookup the start button
+    file.previewElement.querySelector(".start").onclick = function() { myDropzone.enqueueFile(file) }
+  })
+
+  // Update the total progress bar
+  myDropzone.on("totaluploadprogress", function(progress) {
+    document.querySelector("#total-progress .progress-bar").style.width = progress + "%"
+  })
+
+  myDropzone.on("sending", function(file) {
+    // Show the total progress bar when upload starts
+    document.querySelector("#total-progress").style.opacity = "1"
+    // And disable the start button
+    file.previewElement.querySelector(".start").setAttribute("disabled", "disabled")
+  })
+
+  // Hide the total progress bar when nothing's uploading anymore
+  myDropzone.on("queuecomplete", function(progress) {
+    document.querySelector("#total-progress").style.opacity = "0"
+  })
+
+  // Setup the buttons for all transfers
+  // The "add files" button doesn't need to be setup because the config
+  // `clickable` has already been specified.
+  document.querySelector("#actions .start").onclick = function() {
+    myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED))
+  }
+  document.querySelector("#actions .cancel").onclick = function() {
+    myDropzone.removeAllFiles(true)
+  }
+  // DropzoneJS Demo Code End
+</script>
+    {%endblock%}

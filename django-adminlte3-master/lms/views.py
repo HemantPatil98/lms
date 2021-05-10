@@ -245,7 +245,7 @@ def addstudent(request):
         message = header + '\n Username: ' + username + '\n Password: ' + password + ' \n\n'
         print(message)
 
-        # mail(us.email,message)
+        mail(us.email,message)
         # up = user_profile.objects.all().filter(user_id=request.user.id)[0]
 
     return render(request,'student/add_student.html')
@@ -385,7 +385,7 @@ def addusers(request):
             message = header + '\n Username: ' + us.username + '\n Password: ' + us.password + ' \n\n'
             print(message)
 
-            # mail(us.email,message)
+            mail(us.email,message)
 
         else:
             us = User.objects.get(username=request.POST['username'])

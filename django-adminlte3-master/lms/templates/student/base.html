@@ -69,6 +69,9 @@
 </body>
 <!-- Page specific script -->
 <script>
+  function push(){
+    $('[data-widget="pushmenu"]').PushMenu('toggle');
+  }
   $(function() {
     var Toast = Swal.mixin({
       toast: true,

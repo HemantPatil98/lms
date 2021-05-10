@@ -1,11 +1,11 @@
 
   {%load static%}
   {%load admin_menu%}
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <aside id="sidebar" class="main-sidebar sidebar-dark-primary">
     <!-- Brand Logo -->
-    <a href="{%if request.user.is_superuser%}{%url 'index'%}{%else%}{%url 'index'%}{%endif%}" class="brand-link">
-      <img src="{%static 'student/dist/img/AdminLTELogo.png'%}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+    <a href="{%if request.user.is_superuser%}{%url 'index'%}{%else%}{%url 'index'%}{%endif%}" class="brand-link" class="" style="background-color: white">
+      <img src="{%static 'logon.png'%}" alt="Cravita Logo" class="brand-image " style="">
+      <!-- <span class="brand-text font-weight-light">LMS</span> -->
     </a>
 
     <!-- Sidebar -->
@@ -13,7 +13,7 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="/media/{{request.session.ab.photo}}" class="img-circle elevation-2" alt="User Image">
+          {%if not request.user.is_staff%}<img src="/media/{{request.session.ab.photo}}" class="img-circle elevation-2" alt="User Image">{%endif%}
         </div>
         <div class="info">
           <a href="{%url 'viewprofile'%}" class="d-block">{{request.user.first_name}} {{request.user.last_name}}</a>

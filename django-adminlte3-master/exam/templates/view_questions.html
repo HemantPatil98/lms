@@ -1,0 +1,463 @@
+{%extends 'student/base.html'%}
+{%load admin_menu%}
+{%block style%}
+<style type="text/css">
+	#add_questions{
+		float: right;
+		border-radius: 10px;
+		padding: 10px;
+		margin-top: 7px;
+	}
+/*	#add_questions_form .col-md-5{
+		position: fixed;
+		top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	}
+	.hide{
+		display: none;
+	}*/
+  body{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+</style>
+{%endblock%}
+{%load static%}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    {%block content_header%}
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>MCQ Test</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">MCQ Test</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    {%endblock%}
+
+    <!-- Main content -->
+    {%block content%}
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="card card-primary">
+              <div class="card-header bg-info">
+                <div class="form-group">
+                  <i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
+                  {{crs.instructions}}
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form action="{%if not crs%}{%url 'view_questions' pageno=1%}{%endif%}#" method="POST">
+                {%csrf_token%}
+                <input type="hidden" name="page" value="1">
+                <div class="card-body" style="border: 2px solid #17a2b8;">
+                	<div class="row">
+
+                  <!-- <div class="form-group col-md-6">
+                    <label for="nameInputEmail1">Group Name</label>
+                    <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
+                  </div> -->
+                  <div class="form-group col-md-4">
+                  <label>Course</label>
+                  <select class="form-control select2" style="width: 100%;" name="cname" {%if crs%}disabled{%endif%}>
+                    {%for course in courses%}
+                    <option {%if crs ==  course%}selected{%endif%}>{{course}}</option>
+                    {%endfor%}}
+                  </select>
+                  {%if crs%}
+                  <input type="hidden" name="cname" value="{{crs}}">
+                  {%endif%}
+                	</div>
+                	<div class="form-group col-md-4">
+                		<div class="row">
+                			<div class="col-md-6">
+                				<label>Section</label>
+		                		<select class="form-control select2" name="type" {%if crs%}disabled{%endif%}>
+		                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>MCQ</option>
+		                			<option {%if crs.type == 'PROGRAM' %}selected{%endif%}>PROGRAM</option>
+		                		</select>
+		                		{%if crs%}
+				                  <input type="hidden" name="type" value="{{crs.type}}">
+				                  {%endif%}
+		                	</div>
+		                	<div class="col-md-6">
+                        {%if crs%}
+                				<label>Duration</label><br>
+		                		<span id="time" style="font-size: xx-large;"><input type="number" class="form-control center" name="time" placeholder="Duration in minutes" value="{{crs.time}}"  {%if crs%}disabled{%endif%}></span>
+		                		{%endif%}
+		                	</div>
+                		</div>
+                		
+                	</div>
+                	<div class="form-group col-md-4">
+                		<!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
+                    <div class="row">
+                      <div class="col-md-6">
+                        <label id='marks'>Marks Scored: </label><br>
+                        <label>Out Off: 40</label>
+                      </div>
+                    </div>
+                	</div>
+                	</div>
+                 {%if crs%}
+                 <div>
+                 	<hr>
+                 	<div id="add_questions_form" class="row hide">
+                 		<div class="col-md-12">
+                 			<div class="card ">
+				              <!-- <div class="card-header bg-info">
+				                <div class="form-group">
+				                	<i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
+                          {{crs.instructions}}
+				                </div>
+				              </div> -->
+				              <!-- /.card-header -->
+				              <!-- form start -->
+				                <div class="card-body" id="body">
+				                {%for que in ques_set%}
+                        <div class='question' id='{{que.question.id}}'>
+                         <div>
+                            <div class="form-group">
+                                <label for="question">Question #{{que.question.id}}</label>
+                                <!-- <textarea name="question" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea> -->
+                                <div class="form-control">{{que.question.question}}</div>
+                            </div>
+                            <div id="choice" class="row">
+                            {%for opt in que.options%}
+                            <div class="form-group col-md-6">
+                                <div class="input-group">
+                                  <div class="input-group-append">
+                                      <div class="input-group-text"><input type="checkbox" id="customCheckbox{{opt.id}}" name="ans{{que.question.id}}" {%if opt.status%}checked{%endif%} value="{{opt.id}}" disabled=""></div>
+                                </div>
+                                <label for="customCheckbox{{opt.id}}" class="form-control {%if opt.status%}bg-success{%endif%}">{{opt.option}}</label>
+                                
+                              </div>
+                              </div>
+                            {%endfor%}
+                          </div>
+                        </div>
+                    </div>
+                        <hr>
+
+
+                        {%endfor%}
+				                </div>
+				                
+				                <!-- /.card-body -->
+                        <div class="card-footer">
+                                <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-end">
+            {% if ques_set.has_previous %}
+            <li class="page-item {%if ques_set.number == 1%} hide{%endif%}">
+                    <a class="page-link" id="1" onclick="page(this)">&laquo; First</a>
+                  </li>
+            <li class="page-item {%if ques_set.number == 1%} hide{%endif%}">
+                    <a class="page-link" id="{{ ques_set.previous_page_number }}" onclick="page(this)">< Previous</a>
+                  </li>
+            {% endif %}
+            
+            {%for i in ques_set.paginator.num_pages|range%}
+            {%if forloop.counter < 5%}
+            <li class="page-item  {%if ques_set.number == i%}active{%endif%}">
+              {%if forloop.counter == 5%}
+              <a class="page-link" href="">...</a>
+              {%else%}
+              <a class="page-link" id="{{i}}" onclick="page(this)">{{i}}</a>
+              {%endif%}
+            </li>
+            {%endif%}
+            {%endfor%}
+
+            {% if ques_set.has_next %}
+            <li class="page-item">
+                    <a class="page-link" id="{{ ques_set.next_page_number }}" onclick="page(this)">Next ></a>
+                  </li>
+            <li class="page-item">
+                    <a class="page-link" id="{{ ques_set.paginator.num_pages }}" onclick="page(this)">Last &raquo;</a>
+                  </li>
+            {% endif %}
+          </ul>
+        </nav>
+                        </div>
+				            </div>
+                 		</div>
+                 	</div>
+                 </div>
+                  
+                 {%endif%}
+                <!-- /.card-body -->
+            	</div>
+                <div class="card-footer">
+                  <input name="submit" type="submit" class="btn btn-primary">
+                  <!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
+                </div>
+              </form>
+            </div>
+        </div>
+      </div>
+
+    </section>
+    {%endblock%}
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+    {%block script%}
+
+{%if crs%}
+<script type="text/javascript">
+  function page(a){
+    alert($(a).attr('id'))
+    $("input[name='page']").val($(a).attr('id'));
+    $("input[name='submit']").trigger('click');
+  }
+ // $(window).load(function(){
+ //  $("input[name='submit']").trigger(click);
+ // })
+//   function choice(a){
+//     $(a).toggleClass('btn-info');
+//   }
+//   $( "form" ).on( "submit", function( event ) {
+//   event.preventDefault();
+//   // console.log( $( this ).serialize() );
+//   $.post( "http://127.0.0.1:8000/mcq_validate/", $( "form" ).serialize() ).done(function(data){
+//     console.log(data);
+//     window.marks = parseInt(data);
+//     $('#marks').append(marks);
+//     if (marks>28) {
+//       $('#marks').addClass('text-success');
+//     }
+//     else{
+//       $('#marks').addClass('text-danger');
+//     }
+//     // $("input[name='submit']").trigger('click');
+//   });
+//   var q_set = [];
+//   $.each($('.question'),function(){
+//       // console.log($(this).attr('id'));
+//       q_set.push($(this).attr('id'));
+//       });
+//   // console.log(q_set);
+// var q_a_set = [];
+//   $.post("http://127.0.0.1:8000/get/answers/",{question_set:q_set}).done(function(data){
+//     // console.log(data);
+//     window.set=JSON.parse(data);
+//     // console.log(q_a_set);
+//   });
+//   // console.log(window.set);\
+//   window.oss = [];
+//   $.each(window.set,function(i,it){
+//     // console.log(it);
+//     question = '#'+it.question+'';      //question
+//     o = it.options;       //options of question
+//     // console.log(question,o);
+//     $.grep(o,function(i,it){
+//       // console.log(i.status);
+//       if (i.status){
+//         window.oss.push(i);
+//       }
+//     });
+//     // console.log(oss);
+//     opts = $(question).children().children();
+//     // console.log(opts.children(".form-group"));
+//     choices = opts.children(".form-group");
+//     // choices = choices.children();
+//     $.each(choices,function(){
+//       label = $(this).children().children('label');
+//       c = $(this).children().children('label').attr('for');
+//       // c = c.children().children();
+//       c = parseInt(c.replace("customCheckbox",''));
+//       // console.log(c,oss);
+//       flag = false;
+//       $.each(oss,function(){
+//         oid = this.id;
+//         if (c == oid) {
+//           flag = true;
+//         }
+//         if (flag == true) {
+
+//           if ($(label).hasClass('btn-info')) {
+//             $(label).removeClass('btn-info');
+//             $(label).addClass('btn-success');
+//           }
+//           else{
+//             $(label).removeClass('btn-info');
+//             $(label).addClass('btn-primary');
+//           }
+//         }
+//         else{
+//           if ($(label).hasClass('btn-info') && !$(label).hasClass('btn-primary')) {
+//             // $(label).removeClass('btn-info');
+//             // $(label).removeClass('btn-sucess');
+//             $(label).removeClass('btn-info');
+//             $(label).addClass('btn-danger');
+//           }
+//         }
+//       });
+//       })
+//     // console.log();
+//       $("input['name='checkbox']").each(function(){
+//     $(this).attr('disabled','disabled');
+//   })
+//   })
+//   // console.log(q_a_set);
+
+// });
+</script>
+{%endif%}
+
+
+
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2({
+    	tags:true
+    })
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4',
+      tags:true
+    })
+
+    //Datemask dd/mm/yyyy
+
+    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+    //Datemask2 mm/dd/yyyy
+    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
+    //Money Euro
+    $('[data-mask]').inputmask()
+
+    //Date range picker
+    $('#reservationdate').datetimepicker({
+        format: 'L'
+    });
+    //Date range picker
+    $('#reservation').daterangepicker()
+    //Date range picker with time picker
+    $('#reservationtime').daterangepicker({
+      timePicker: true,
+      timePickerIncrement: 30,
+      locale: {
+        format: 'MM/DD/YYYY hh:mm A'
+      }
+    })
+    //Date range as a button
+    $('#daterange-btn').daterangepicker(
+      {
+        ranges   : {
+          'Today'       : [moment(), moment()],
+          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate  : moment()
+      },
+      function (start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+      }
+    )
+
+    //Timepicker
+    $('#timepicker').datetimepicker({
+      format: 'LT'
+    })
+
+    //Bootstrap Duallistbox
+    $('.duallistbox').bootstrapDualListbox()
+
+    //Colorpicker
+    $('.my-colorpicker1').colorpicker()
+    //color picker with addon
+    $('.my-colorpicker2').colorpicker()
+
+    $('.my-colorpicker2').on('colorpickerChange', function(event) {
+      $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
+    })
+
+    $("input[data-bootstrap-switch]").each(function(){
+      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+    })
+
+  })
+  // BS-Stepper Init
+  document.addEventListener('DOMContentLoaded', function () {
+    window.stepper = new Stepper(document.querySelector('.bs-stepper'))
+  })
+
+  // DropzoneJS Demo Code Start
+  Dropzone.autoDiscover = false
+
+  // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
+  var previewNode = document.querySelector("#template")
+  previewNode.id = ""
+  var previewTemplate = previewNode.parentNode.innerHTML
+  previewNode.parentNode.removeChild(previewNode)
+
+  var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
+    url: "/target-url", // Set the url
+    thumbnailWidth: 80,
+    thumbnailHeight: 80,
+    parallelUploads: 20,
+    previewTemplate: previewTemplate,
+    autoQueue: false, // Make sure the files aren't queued until manually added
+    previewsContainer: "#previews", // Define the container to display the previews
+    clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
+  })
+
+  myDropzone.on("addedfile", function(file) {
+    // Hookup the start button
+    file.previewElement.querySelector(".start").onclick = function() { myDropzone.enqueueFile(file) }
+  })
+
+  // Update the total progress bar
+  myDropzone.on("totaluploadprogress", function(progress) {
+    document.querySelector("#total-progress .progress-bar").style.width = progress + "%"
+  })
+
+  myDropzone.on("sending", function(file) {
+    // Show the total progress bar when upload starts
+    document.querySelector("#total-progress").style.opacity = "1"
+    // And disable the start button
+    file.previewElement.querySelector(".start").setAttribute("disabled", "disabled")
+  })
+
+  // Hide the total progress bar when nothing's uploading anymore
+  myDropzone.on("queuecomplete", function(progress) {
+    document.querySelector("#total-progress").style.opacity = "0"
+  })
+
+  // Setup the buttons for all transfers
+  // The "add files" button doesn't need to be setup because the config
+  // `clickable` has already been specified.
+  document.querySelector("#actions .start").onclick = function() {
+    myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED))
+  }
+  document.querySelector("#actions .cancel").onclick = function() {
+    myDropzone.removeAllFiles(true)
+  }
+  // DropzoneJS Demo Code End
+</script>
+    {%endblock%}

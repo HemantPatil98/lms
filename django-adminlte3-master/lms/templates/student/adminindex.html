@@ -124,7 +124,7 @@
                 <a href="{%url 'addnotice'%}" class="icon"><i class="fas fa-bell"></i></a>
               </div>
               <a href="{%url 'addnotice'%}" class="small-box-footer">
-                Notice <i class="fas fa-arrow-circle-right"></i>
+                View Notice <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
           </div>
@@ -137,16 +137,34 @@
                 <p>Certificate Requests</p>
               </div>
               <div class="icon">
-                <a href="{%url 'addcertificate'%}" class="icon"><i class="fas fa-bell"></i></a>
+                <a href="{%url 'addcertificate'%}" class="icon"><i class="fas fa-file-alt"></i></a>
               </div>
               <a href="{%url 'viewcertificate'%}" class="small-box-footer">
                 Certificate Issue <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
           </div>
+          <div class="col-lg-3 col-6">
+            <!-- small card -->
+            <div class="small-box bg-danger">
+              <div class="inner">
+                <h3>44</h3>
+
+                <p>Add Question</p>
+              </div>
+              <div class="icon">
+                <a href="{% url 'add_questions' %}" class="icon"><i class="fas fa-question"></i></a>
+              </div>
+              <a href="{% url 'view_questions' pageno=1%}" class="small-box-footer">
+                View Questions <i class="fas fa-arrow-circle-right"></i>
+              </a>
+            </div>
+          </div>
         </div>
        
       </div><!--/. container-fluid -->
+  </div>
+  <div>
   </div>
     </section>
     

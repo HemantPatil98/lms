@@ -49,8 +49,8 @@ service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
 
 def startsheet():
-    print("hi")
-    print(extra_data.objects.all())
+    # print("hi")
+    # print(extra_data.objects.all())
     if not extra_data.objects.filter(name='student_performance'):
         # print("start")
 
@@ -85,7 +85,7 @@ def startsheet():
         ex = extra_data(name='student_performance',value=SPREADSHEET_ID)
         ex.save()
 
-    if not os.path.exists('student_profile.txt'):
+    if not extra_data.objects.filter(name='student_profile'):
         # print("start")
 
         student_profile = []
@@ -102,19 +102,22 @@ def startsheet():
 
         SPREADSHEET_ID = createsheet('Student Profile',student_profile)
 
-        fp = open('student_profile.txt', 'a')
-        fp.write(SPREADSHEET_ID)
-        fp.close()
+        # fp = open('student_profile.txt', 'a')
+        # fp.write(SPREADSHEET_ID)
+        # fp.close()
+        ex = extra_data(name='student_profile', value=SPREADSHEET_ID)
+        ex.save()
     # print(os.path.exists('attendance.txt'))
-    if not os.path.exists('attendance.txt'):
+    if not extra_data.objects.filter(name='attendance'):
         attendance = ["id","name","contact","emailid"]
         SPREADSHEET_ID = createsheet('Attendance',attendance)
         # print("HI")
 
-        fp = open('attendance.txt','a')
-        fp.write(SPREADSHEET_ID)
-        fp.close()
-
+        # fp = open('attendance.txt','a')
+        # fp.write(SPREADSHEET_ID)
+        # fp.close()
+        ex = extra_data(name='attendance', value=SPREADSHEET_ID)
+        ex.save()
 
 #Create Spreadsheet
 def createsheet(name,columns):
