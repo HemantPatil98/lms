@@ -1,0 +1,133 @@
+{%extends 'admin/base.html'%}
+{%load static%}
+{%block style%}
+  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid.min.css'%}">
+  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid-theme.min.css'%}">
+  <style type="text/css">
+  .fix-id{
+     position: sticky;
+  left: 0;
+  z-index: 2;
+  }
+  .fix-name{
+    position: sticky;
+    left: 0px;
+    z-index: 2;
+  }
+  .fix-contact{
+    position: sticky;
+    left: 150px;
+    z-index: 2;
+  }
+</style>
+{%endblock%}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    {%block content_header%}
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Attendance</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Attendance</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </div>
+    {%endblock%}
+
+    <!-- Main content -->
+    {%block content%}
+    <section class="content">
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Student Attendance</h3>
+          <button onclick=markattendance()>Mark Attendance</button>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+          <div id="grid"></div>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </section>
+    {%endblock%}
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+<!-- jQuery -->
+{%block script%}
+<style type="text/css">
+  .hide{
+    display: none;
+  }
+</style>
+<script type="text/javascript" src="{%static 'student/dist/js/attendance.js'%}"></script>
+<script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
+
+<script type="text/javascript">
+$(function () {
+    d = new Date();
+  date = d.getDate();
+  month = d.getMonth()+1;
+  year = d.getFullYear();
+  const currentdate = date+'/'+month+'/'+year;
+    $("#grid").jsGrid({
+        height: "100%",
+        width: "100%",
+
+        filtering: true,
+        editing: false,
+        sorting: true,
+        paging: true,
+        // rowClick: function(args) {
+        //   if(args.item[currentdate]==='p'){
+        //     args.item[currentdate]="";
+        //   }else{
+        //     args.item[currentdate]="p";
+        //   }db.loadData},
+        // editTemplate: function(value, item) { console.log(value) },
+
+        data: db.data,
+
+        fields: [
+            { name: "ID", type: "number", width: 70, css:"",editing:false},
+            { name: "NAME", type: "text", width: 150,css:"fix-name",editing:false},
+            { name: "CONTACT", type: "text", width: 100,css:'fix-contact',editing:false},
+            { name: "EMAIL ID", type: "text",width: 100,editing:false},
+            { name: "Today", type:"checkbox", width:50,editing: true}
+        ]
+    });
+  });
+ present = [];
+function addattendance(x){
+  flag=true;
+  console.log(x);
+  for( var i = 0; i < present.length; i++){ 
+    
+        if ( present[i] === x) { 
+    
+            present.splice(i,1); 
+            flag = false;
+        }
+    
+    }
+    if (flag) {
+      present.push(x);
+    }
+  // present.push(x);
+  console.log(present);
+}
+function markattendance(){
+  console.log('a');
+  db.updateItem(present);
+}
+</script>
+{%endblock%}

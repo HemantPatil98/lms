@@ -1,0 +1,128 @@
+{%extends 'admin/base.html'%}
+{%load admin_menu%}
+{%load static%}
+{%block style%}
+  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid.min.css'%}">
+  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid-theme.min.css'%}">
+  <style type="text/css">
+  .fix-id{
+     position: sticky;
+  left: 0;
+  z-index: 2;
+  }
+  .fix-name{
+    position: sticky;
+    left: 0px;
+    z-index: 2;
+  }
+  .fix-contact{
+    position: sticky;
+    left: 150px;
+    z-index: 2;
+  }
+</style>
+{%endblock%}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    {%block content_header%}
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Student Data</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Student Data</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    {%endblock%}
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    {%block content%}
+    <section class="content">
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Student Profile</h3>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+          <div id="grid"></div>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </section>
+    {%endblock%}
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{%block script%}
+<style type="text/css">
+  .hide{
+    display: none;
+  }
+</style>
+<script type="text/javascript" src="{%static 'student/dist/js/student_profile.js'%}"></script>
+<script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
+
+<script type="text/javascript">
+$(function () {
+
+    $("#grid").jsGrid({
+        height: "100%",
+        width: "100%",
+
+        filtering: true,
+        editing: true,
+        sorting: true,
+        paging: true,
+
+        data: db.data,
+
+        fields: [
+            { name: "ID", type: "number", width: 70, css:""},
+            { name: "DATETIME", type: "text", width: 70, css:"hide"},
+            { name: "CENTER", type: "text", width: 70, css:"hide"},
+            { name: "DATE OF ADMISSION", type: "text",width:100,css:'rol'},
+            { name: "COURSE", type: "text",width:100,css:'rol'},
+            { name: "BATCH START DATE", type: "text",width:100,css:'rol'},
+            { name: "MODULE START DATE", type:"text",width:100},
+            { name: "TRAINING MODE", type: "text",width:100},
+            { name: "NAME", type: "text", width: 150,css:"fix-name"},
+            { name: "ADDRESS", type:"text",width:100,css:"hide"},
+            { name: "DATE OF BIRTH", type:"text",width:100,css:"hide"},
+            { name: "CONTACT", type: "text", width: 100,css:'fix-contact'},
+            { name: "EMAIL ID", type: "text",width:100,css:'rol'},
+            { name: "ALTERNATE CONTACT", type: "text", width: 100,css:''},
+            { name: "EXAMINATION", type:"text",width:100},
+            { name: "STREAM", type:"text",width:100},
+            { name: "COLLEGE NAME", type:"text",width:100},
+            { name: "BOARD NAME", type:"text",width:100},
+            { name: "YEAR OF PASSING", type:"text",width:100},
+            { name: "PERCENTAGE", type:"text",width:100},
+            { name: "FEES", type:"text",width:100},
+            { name: "MODE", type:"text",width:100},
+            { name: "REG AMMOUNT", type:"text",width:100},
+            { name: "INSTALLMENT1", type:"text",width:100},
+            { name: "INSTALLMENT2", type:"text",width:100},
+            { name: "INSTALLMENT3", type:"text",width:100},
+            { name: "REG DATE", type:"text",width:100},
+            { name: "INSTALLMENT1 DATE", type:"text",width:100},
+            { name: "INSTALLMENT2 DATE", type:"text",width:100},
+            { name: "INSTALLMENT3 DATE", type:"text",width:100},
+            { name: "REMARK", type:"text",width:100}
+        ]
+    });
+  });
+</script>
+{%endblock%}
+
+
+

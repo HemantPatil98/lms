@@ -1,0 +1,285 @@
+{%extends 'base.html'%}
+
+				<div class="row" style="height: 30%;font-size: 20px;">
+					{%if st.course == "EDGE" or st.course == "Web Development"%}
+					<div>
+						<h2 style="width: max-content;display: contents;">EDGE</h2>
+						<input type="text" name="search" placeholder="Search..." class="form-control" style="width: 200px;float: right;" onkeyup="filter()">
+					</div>
+					
+					<div class="col-sm-12 col-md-5 tabs" style="background-color: #7b9ac6;" {%if allowcourse.c %} data="c" {%endif%}>
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/c.png'%}" class="icons">
+							</div>
+							<div class="col-7">
+								<h4>C Language</h4>
+								
+							    {%if per.c == 100%}
+							    <a href="{{notes.c}}" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.c < 20%}20{%else%}{{per.c}}{%endif%}%;">Download
+					                    <div id="progress-value" class="progress-value">{{per.c}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+					<div class="col-sm-12 col-md-5 tabs" style="background-color: #ffc107e0;" {%if allowcourse.sql %} data="sql" {%endif%}>
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/sql.jpg'%}" class="icons">
+							</div>
+							<div class="col-7">
+								<h4>Sql / plsq</h4>
+								
+								{%if per.sql == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.sql < 20%}20{%else%}{{per.sql}}{%endif%}%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.sql}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+					<div class="col-sm-12 col-md-4 tabs" style="background-color: #e44d26bd;" {%if allowcourse.html %} data="html" {%endif%}>
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/html.png'%}" class="icons">
+							</div>
+							<div class="col-7">
+								<h4>HTML 5</h4>
+								
+								{%if per.html == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.html < 20%}20{%else%}{{per.html}}{%endif%}%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.html}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+					<div class="col-sm-12 col-md-3 tabs" style="background-color: #f9fafb;" {%if allowcourse.css %} data="css" {%endif%}>
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/css.png'%}" class="icons">
+							</div>
+							<div class="col-7">
+								<h4>CSS 3</h4>
+								
+								{%if per.css == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.css < 20%}20{%else%}{{per.css}}{%endif%}%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.css}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+					<div class="col-sm-12 col-md-4 tabs" style="background-color: #721fe9b0;" {%if allowcourse.bootstrap %} data="bootstrap" {%endif%}>
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/bootstrap.jpg'%}" class="icons">
+							</div>
+							<div class="col-7">
+								<h4>Bootstrap</h4>
+								
+								{%if per.bootstrap == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.bootstrap < 20%}20{%else%}{{per.bootstrap}}{%endif%}%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.bootstrap}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+					<div class="col-sm-12 col-md-5 tabs" style="background-color: #f2c32dde;" {%if allowcourse.javascript %} data="javascript" {%endif%}>
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/jsi.jpg'%}" class="icons">
+							</div>
+							<div class="col-7">
+								<h4>JavaScript</h4>
+								
+								{%if per.javascript == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.javascript < 20%}20{%else%}{{per.javascript}}{%endif%}%;%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.javascript}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+					<div class="col-sm-12 col-md-5 tabs" style="background-color: #6297c5;" {%if allowcourse.jquery %} data="jquery" {%endif%}>
+						<div class="row">
+							<div class="col-6">
+								<img src="{%static 'New/jquery.png'%}" class="icons">
+							</div>
+							<div class="col-6">
+								<h4>Jquery</h4>
+								
+								{%if per.jquery == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.jquery < 20%}20{%else%}{{per.jquery}}{%endif%}%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.jquery}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+					{%endif%}
+					<h2>Your Domain</h2>
+					{%if st.python%}
+					<h4>Python</h4>
+					{%if True %}
+					<div class="col-sm-12 col-md-5 tabs" style="background-color: #9c36a5bd;">
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/python.jpg'%}" class="icons">
+							</div>
+							<div class="col-7">
+								<h4>Python</h4>
+								
+								{%if per.python == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.python < 20%}20{%else%}{{per.python}}{%endif%}%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.python}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+
+					{%endif%}
+					{%if st.flask %}
+					<div class="col-sm-12 col-md-5 tabs" style="background-color: #00000000;">
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/flask.png'%}" class="icons" style="width: 100%;">
+							</div>
+							<div class="col-7">
+								<h4>Flask</h4>
+								
+								{%if per.flask == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.flask < 20%}20{%else%}{{per.flask}}{%endif%}%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.flask}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+
+					{%endif%}
+					{%if st.django %}
+					<div class="col-sm-12 col-md-5 tabs" style="background-color: #0b7b4fe8;">
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/django.png'%}" class="icons">
+							</div>
+							<div class="col-7">
+								<h4>Django</h4>
+								
+								{%if per.django == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.django < 20%}20{%else%}{{per.django}}{%endif%}%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.django}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+
+					{%endif%}
+					
+				</div>
+				{%endif%}
+				{%if st.php%}
+				<h4>PHP</h4>
+				<div class="col-sm-12 col-md-5 tabs" style="background-color: #5786ffeb;">
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/php.png'%}" class="icons">
+							</div>
+							<div class="col-7">
+								<h4>PHP</h4>
+								
+								{%if per.php == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.php < 20%}20{%else%}{{per.php}}{%endif%}%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.php}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+				{%endif%}
+				{%if st.java%}
+				<h4>JAVA</h4>
+				<div class="col-sm-12 col-md-5 tabs" style="background-color: #2a73c6a1;">
+						<div class="row">
+							<div class="col-5">
+								<img src="{%static 'New/java.png'%}" class="icons">
+							</div>
+							<div class="col-7">
+								<h4>Java</h4>
+								
+								{%if per.java == 100%}
+							    <a href="" class="btn btn-primary" title="Download will available after Ending of this Module" style="height:45px;"><i class="fas fa-download"></i> Notes</a>
+							    {%else%}
+							    <div class="progress blue" style="margin:0px;" title="Download will be available after 100%">
+					                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per.java < 20%}20{%else%}{{per.java}}{%endif%}%;" >Download
+					                    <div id="progress-value" class="progress-value">{{per.java}}%</div>
+					                </div>
+					            </div>
+							    {%endif%}
+							</div>
+						</div>
+						
+					</div>
+				{%endif%}
+		</div>
+	</div>

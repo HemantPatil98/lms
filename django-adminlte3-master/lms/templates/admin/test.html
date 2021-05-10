@@ -1,0 +1,202 @@
+{%extends 'admin/base.html'%}
+{%load static%}
+{%block style%}
+  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid.min.css'%}">
+  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid-theme.min.css'%}">
+{%endblock%}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    {%block content_header%}
+
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>jsGrid</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">jsGrid</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </div>
+    {%endblock%}
+    <!-- Main content -->
+    {%block content%}
+
+    <section class="content">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">jsGrid</h3>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+          <div id="grid"></div>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </section>
+    <div id="data" style="display: none;">{{data}}</div>
+    {%endblock%}
+
+    <!-- /.content -->
+  </div>
+
+{%block script%}
+<script src="{%static 'student/dist/js/student_performance.js'%}"></script>
+<script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
+<style type="text/css">
+  .fix-id{
+     position: sticky;
+  left: 0;
+  z-index: 2;
+  }
+  .fix-name{
+    position: sticky;
+    left: 50px;
+    z-index: 2;
+  }
+
+</style>
+<!-- Page specific script -->
+<script>
+  
+  $(function () {
+    // window.db = db;
+ // c = $('#data').text().replaceAll("'",'"');
+ // // console.log(JSON.parse(c));
+ // db.data = JSON.parse(c);
+    $("#grid").jsGrid({
+        height: "100%",
+        width: "100%",
+
+        filtering: true,
+        editing: true,
+        sorting: true,
+        paging: true,
+
+        data: db.data,
+
+        fields: [
+            { name: "id", type: "number", width: 50, css:"fix-id"},
+            { name: "name", type: "text", width: 150,css:"fix-name"},
+            { name: "contact", type: "text", width: 100,css:'rol'},
+            { name: "emailid", type: "text",width:100,css:'rol'},
+            { name: "dateofadmission", type: "text",width:100,css:'rol'},
+            { name: "trainingmode", type: "text",width:100,css:'rol'},
+            { name: "batchstartdate", type: "text",width:100,css:'rol'},
+            { name: "course", type: "text",width:100,css:'rol'},
+            { name: "startcourse", type: "text",width:100,css:'rol'},
+            { name: "currentmodule", type: "text",width:100,css:'rol'},
+            { name: "ctrainername", type: "text",width:100,css:'rol'},
+            { name: "cmodulestartdate", type: "text",width:100,css:'rol'},
+            { name: "cmoduleenddate", type: "text",width:100,css:'rol'},
+            { name: "ctheory", type: "number",width:100,css:'rol'},
+            { name: "cpracticle", type: "number",width:100,css:'rol'},
+            { name: "coral", type: "number",width:100,css:'rol'},
+            { name: "ctotal", type: "number",width:100,css:'rol'},
+            { name: "sqltrainername", type: "text",width:100,css:'rol'},
+            { name: "sqlmodulestartdate", type: "text",width:100,css:'rol'},
+            { name: "sqlmoduleenddate", type: "text",width:100,css:'rol'},
+            { name: "sqltheory", type: "number",width:100,css:'rol'},
+            { name: "sqlpracticle", type: "number",width:100,css:'rol'},
+            { name: "sqloral", type: "number",width:100,css:'rol'},
+            { name: "sqltotal", type: "number",width:100,css:'rol'},
+            { name: "wdtrainername", type: "text",width:100,css:'rol'},
+            { name: "wdmodulestartdate", type: "text",width:100,css:'rol'},
+            { name: "wdmoduleenddate", type: "text",width:100,css:'rol'},
+            // { name: "wdtheory", type: "number",width:50},
+            { name: "wdpracticle", type: "number",width:100,css:'rol'},
+            { name: "wdoral", type: "number",width:100,css:'rol'},
+            { name: "wdtotal", type: "number",width:100,css:'rol'},
+            { name: "portfoliolink", type: "text",width:100,css:'rol'},
+            { name: "mock1", type: "number",width:100,css:'rol'},
+            { name: "coretrainername", type: "text",width:100,css:'rol'},
+            { name: "coremodulestartdate", type: "text",width:100,css:'rol'},
+            { name: "coremoduleenddate", type: "text",width:100,css:'rol'},
+            { name: "coretheory", type: "number",width:100,css:'rol'},
+            { name: "corepracticle", type: "number",width:100,css:'rol'},
+            { name: "coreoral", type: "number",width:100,css:'rol'},
+            { name: "coretotal", type: "number",width:100,css:'rol'},
+            { name: "mock2", type: "text",width:100,css:'rol'},
+            { name: "advtrainername", type: "text",width:100,css:'rol'},
+            { name: "advmodulestartdate", type: "text",width:100,css:'rol'},
+            { name: "advmoduleenddate", type: "text",width:100,css:'rol'},
+            { name: "advtheory", type: "number",width:100,css:'rol'},
+            { name: "advpracticle", type: "number",width:100,css:'rol'},
+            { name: "advoral", type: "number",width:100,css:'rol'},
+            { name: "advtotal", type: "number",width:100,css:'rol'},
+            { name: "fullcourseenddate", type: "text",width:100,css:'rol'},
+            { name: "cravitaprojectstartdate", type: "text",width:100,css:'rol'},
+            { name: "mock3", type: "text",width:100,css:'rol'},
+            { name: "softskillsmarks", type: "number",width:100,css:'rol'},
+            { name: "finalmock", type: "text",width:100,css:'rol'},
+            { name: "totalmarks", type: "number",width:100,css:'rol'},
+            { name: "eligibleforplacement", type: "text",width:100,css:'rol'},
+            { name: "remark", type: "text",width:100,css:'rol'},
+
+
+        ]
+
+        // fields: [
+        //     { name: "id", type: "text", width: 150 },
+        //     { name: "name", type: "number", width: 50 },
+        //     { name: "contact", type: "text", width: 200},
+        //     { name: "emailid", type: "select", items: db.countries, valueField: "Id", textField: "Name" },
+        //     { name: "dateofadmission", type: "checkbox", title: "Is Married" }
+        // ]
+
+    });
+  });
+// $('input').keypress(function(event){
+//     var keycode = (event.keyCode ? event.keyCode : event.which);
+//     if(keycode == '13'){
+//       // console.log(db.loadData($("#grid").jsGrid("getFilter")));
+//         // db.updateItem('iii');
+//         filter = $("#jsGrid1").jsGrid("getFilter"); 
+//         db.loadData(filter);
+//         // alert(db.updateItem);   
+//     }
+// });
+// alert();
+// function addaction(){
+//   $('.jsgrid-filter-row').children('td').each(function(){
+//         $(this).children('input').attr('onkeypress','filter()');
+//       });
+//     $('.jsgrid-table tbody tr').click(function(){
+//         // $(this).attr('onclick','editing()');
+//         // db.updateItem();
+//         $('.jsgrid-edit-row').attr('onkeypress','editing()');
+//       });
+// // });
+// function editing(){
+//   var keycode = (event.keyCode ? event.keyCode : event.which);
+//   if(keycode == '13'){
+//       edit_row = [];
+//       $('.jsgrid-edit-row').children('td').each(function(){
+//         edit_row.push($(this).children('input').val())
+//       });
+//       db.updateItem(edit_row);
+//     }
+
+// }
+//   function filter(){
+//     var keycode = (event.keyCode ? event.keyCode : event.which);
+//       if(keycode == '13'){
+//         // console.log(typeof($('#jsGrid1').jsGrid("getFilter").name));
+//         a=db.loadData($('#grid').jsGrid("getFilter"));
+//         $('#grid').jsGrid({data:a});
+//       }
+//       $('.jsgrid-filter-row').children('td').each(function(){
+//         $(this).children('input').attr('onkeypress','filter()');
+//       })
+//   }
+// }
+</script>
+
+{%endblock%}
