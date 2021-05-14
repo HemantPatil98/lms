@@ -35,11 +35,12 @@ class notice(models.Model):
             note.title = title
             note.description = description
             note.type = type
-            note.file = file if file is not '' else None
+            note.file = file if file != '' else None
             note.externallink = externallink
             note.save()
         else:
-            note = notice(title=title,description=description,file=file,externallink=externallink,createdby=request.user,type=type)
+            note = notice(title=title,description=description,file=file,externallink=externallink,
+                          createdby=request.user,type=type)
             note.save()
 
 class certificate_request(models.Model):
@@ -54,6 +55,7 @@ class certificate_request(models.Model):
 class user_profile(models.Model):
     user_id = models.OneToOneField(User,on_delete=nothing)
     student_performance_row = models.IntegerField(null=True)
+    student_profile_row = models.IntegerField(null=True)
     otp = models.CharField(max_length=6)
     photo = models.FileField(upload_to='profile_photo/')
     certificate = models.ForeignKey(certificate_request,on_delete=nothing,null=True)

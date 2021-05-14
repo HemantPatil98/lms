@@ -201,7 +201,9 @@ def str_int(val):
 
 @register.filter(name='sub')
 def sub(num1,num2):
-    return int(num1)-int(num2)
+    print(num1,type(num1))
+    print(num2,type(num2))
+    return int(num1)
 
 @register.filter(name='str')
 def strf(str):

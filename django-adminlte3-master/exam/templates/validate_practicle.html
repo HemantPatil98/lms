@@ -48,14 +48,20 @@
     {%block content%}
     <section class="content">
       <div class="card card-primary">
-        <div class="card-header">
-          <h3 class="card-title">Student Profile</h3>
-          <div class="" style="width: max-content;float: right;">
+        <div class="card-header row">
+          <h3 class="card-title col-md-8 col-sm-6">Student Profile</h3>
+          
+          <div class="col-md-4 col-sm-5">
             <!-- <label>Custom Select</label> -->
-            <select name="sheetname" class="custom-select" onchange="load()">
-              {%for sheetname in sheetnames%}
-              <option value="{{sheetname}}">{{sheetname}}</option>
+            <select name="cname" class="custom-select col-6" onchange="load()">
+              {%for course in courses%}
+              <option value="{{course}}">{{course}}</option>
               {%endfor%}
+            </select>
+            <select name="type" class="custom-select col-5" onchange="load()">
+              <option value="MCQ">MCQ</option>
+              <option value="PRACTICLE">PRACTICLE</option>
+              <option value="PROGRAM">PROGRAM</option>
             </select>
           </div>
         </div>
@@ -85,12 +91,14 @@
   var db = {};
   load();
  function load(){
-    var sheetname=$("select[name='sheetname']").val();
-console.log(sheetname);
-  var url = "http://127.0.0.1:8000/getdata/profile/?sheetname="+sheetname;
+    var cname=$("select[name='cname']").val();
+console.log(cname);
+    var type=$("select[name='type']").val();
+console.log(type);
+  var url = "http://127.0.0.1:8000/getdata_practicle/?cname="+cname+"&type="+type;
 $.get(url,function(data,status){
-    // console.log(data);
-    // console.log(JSON.parse(data.replaceAll("'",'"')));
+    console.log(data);
+    console.log(JSON.parse(data.replaceAll("'",'"')));
     // db = {};
     data = data.replaceAll("'",'"');
     db.data=JSON.parse(data);
@@ -109,7 +117,7 @@ $.get(url,function(data,status){
 $(function () {
 
     $("#grid").jsGrid({
-        height: "100%",
+        height: "auto",
         width: "100%",
 
         filtering: true,
@@ -121,30 +129,21 @@ $(function () {
 
         controller: {
           loadData: function(filter) {
-            last = "";
            return $.grep(db.data, function(client) {
                 var flag=false;
-                console.log(last);
-                if(client.rowIndex%4==0)
-                {
-                console.log(client);
-
-                  $.each(Object.keys(client),function(key,val){
+                $.each(Object.keys(client),function(key,val){
                     val=val.toString();
                     val1=client[val].toString();
                     val2=filter[val];
                     if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
-                      last = client.rowIndex;
+
                     flag=true;
                     }else{
                         flag=false;
-                        last="";
                         return false;
                     };
                 })
-                }
-                
-                 if (flag || client.rowIndex-last <4) {
+                 if (flag) {
                     return client;
                 }
             });
@@ -167,37 +166,15 @@ $(function () {
         },
 
         fields: [
-            { name: "ID", type: "number", width: 70, css:""},
-            { name: "DATETIME", type: "text", width: 70, css:"hide"},
-            { name: "CENTER", type: "text", width: 70, css:"hide"},
-            { name: "DATE OF ADMISSION", type: "text",width:100,css:'rol'},
-            { name: "COURSE", type: "text",width:100,css:'rol'},
-            { name: "BATCH START DATE", type: "text",width:100,css:'rol'},
-            { name: "MODULE START DATE", type:"text",width:100},
-            { name: "TRAINING MODE", type: "text",width:100},
-            { name: "NAME", type: "text", width: 150,css:"fix-name"},
-            { name: "ADDRESS", type:"text",width:100,css:"hide"},
-            { name: "DATE OF BIRTH", type:"text",width:100,css:"hide"},
-            { name: "CONTACT", type: "text", width: 100,css:'fix-contact'},
-            { name: "EMAIL ID", type: "text",width:100,css:'rol'},
-            { name: "ALTERNATE CONTACT", type: "text", width: 100,css:''},
-            { name: "EXAMINATION", type:"text",width:100},
-            { name: "STREAM", type:"text",width:100},
-            { name: "COLLEGE NAME", type:"text",width:100},
-            { name: "BOARD NAME", type:"text",width:100},
-            { name: "YEAR OF PASSING", type:"text",width:100},
-            { name: "PERCENTAGE", type:"text",width:100},
-            { name: "FEES", type:"text",width:100},
-            { name: "MODE", type:"text",width:100},
-            { name: "REG AMMOUNT", type:"text",width:100},
-            { name: "INSTALLMENT1", type:"text",width:100},
-            { name: "INSTALLMENT2", type:"text",width:100},
-            { name: "INSTALLMENT3", type:"text",width:100},
-            { name: "REG DATE", type:"text",width:100},
-            { name: "INSTALLMENT1 DATE", type:"text",width:100},
-            { name: "INSTALLMENT2 DATE", type:"text",width:100},
-            { name: "INSTALLMENT3 DATE", type:"text",width:100},
-            { name: "REMARK", type:"text",width:100}
+            { name: "ID", type: "number", width: 70,editing:false,css: "hide"},
+            { name: "NAME", type: "text", width: 70,editing:false},
+            { name: "COURSE", type: "text", width: 70,editing:false},
+            { name: "TYPE", type: "text", width: 70,editing:false},
+            { name: "ATTEMPT", type: "text",width:100,editing:false},
+            { name: "MARKS", type: "text",width:100,editing:true},
+            { name: "PROGRAMS", type: "text",width:100,editing:false,itemTemplate: function(value) {
+        return "<a href='http://127.0.0.1:8000/view/practicle/"+value+"'>Link</a>";
+    },},
         ]
     });
   });

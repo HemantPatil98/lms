@@ -76,8 +76,8 @@ def startsheet():
                                'Soft Skills Marks ( Out of 100 )', 'Final Mock Interview', 'Total Marks ( Out of 700 )',
                                'Eligible For Placement(Y/N)', 'Remark'
                                ]
-
-        SPREADSHEET_ID = createsheet('Student Performance',student_performance)
+        sheetname = "Apr - Mar " +datetime.datetime.now().strftime("%Y")
+        SPREADSHEET_ID = createsheet(name='Student Performance',columns=student_performance,sheetname=sheetname)
 
         # fp = open('student_performance.txt', 'a')
         # fp.write(SPREADSHEET_ID)
@@ -100,7 +100,8 @@ def startsheet():
 
         student_profile = ["id", 'datetime'] + basic + personal_details + educational_details + fees + remark
 
-        SPREADSHEET_ID = createsheet('Student Profile',student_profile)
+        sheetname = "Apr - Mar " +datetime.datetime.now().strftime("%Y")
+        SPREADSHEET_ID = createsheet(name='Student Profile',columns=student_profile,sheetname=sheetname)
 
         # fp = open('student_profile.txt', 'a')
         # fp.write(SPREADSHEET_ID)
@@ -110,7 +111,9 @@ def startsheet():
     # print(os.path.exists('attendance.txt'))
     if not extra_data.objects.filter(name='attendance'):
         attendance = ["id","name","contact","emailid"]
-        SPREADSHEET_ID = createsheet('Attendance',attendance)
+
+        sheetname = "Apr - Mar " +datetime.datetime.now().strftime("%Y")
+        SPREADSHEET_ID = createsheet(name='Attendance',columns=attendance,sheetname=sheetname)
         # print("HI")
 
         # fp = open('attendance.txt','a')
@@ -119,10 +122,21 @@ def startsheet():
         ex = extra_data(name='attendance', value=SPREADSHEET_ID)
         ex.save()
 
+    # if not extra_data.objects.filter(name='mcq'):
+    #     attendance = ["Question","Option1","Option2","Option3","Option4","Answer"]
+    #     SPREADSHEET_ID = createsheet('MCQ',attendance)
+    #     # print("HI")
+    #
+    #     # fp = open('attendance.txt','a')
+    #     # fp.write(SPREADSHEET_ID)
+    #     # fp.close()
+    #     ex = extra_data(name='MCQ', value=SPREADSHEET_ID)
+    #     ex.save()
+
 #Create Spreadsheet
-def createsheet(name,columns):
+def createsheet(name,columns,sheetname):
     # print("create")
-    sheetname = "Apr - Mar " +datetime.datetime.now().strftime("%Y")
+    # sheetname = "Apr - Mar " +datetime.datetime.now().strftime("%Y")
     spreadsheet = {
         'properties': {
             'title': name

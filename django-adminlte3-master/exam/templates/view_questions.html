@@ -133,25 +133,47 @@
 				              <!-- form start -->
 				                <div class="card-body" id="body">
 				                {%for que in ques_set%}
-                        <div class='question' id='{{que.question.id}}'>
+                        <div class='question' id='{{que.id}}'>
                          <div>
                             <div class="form-group">
-                                <label for="question">Question #{{que.question.id}}</label>
+                                <label for="question">Question #{{forloop.counter}}</label>
                                 <!-- <textarea name="question" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea> -->
-                                <div class="form-control">{{que.question.question}}</div>
+                                <div class="form-control">{{que.question}}</div>
                             </div>
                             <div id="choice" class="row">
-                            {%for opt in que.options%}
+                            
                             <div class="form-group col-md-6">
                                 <div class="input-group">
                                   <div class="input-group-append">
-                                      <div class="input-group-text"><input type="checkbox" id="customCheckbox{{opt.id}}" name="ans{{que.question.id}}" {%if opt.status%}checked{%endif%} value="{{opt.id}}" disabled=""></div>
+                                      <div class="input-group-text"><input type="radio" id="option1{{que.id}}" name="ans{{que.id}}" value="{{que.option1}}" {%if que.option1 == que.answer%} checked {%endif%} disabled></div>
                                 </div>
-                                <label for="customCheckbox{{opt.id}}" class="form-control {%if opt.status%}bg-success{%endif%}">{{opt.option}}</label>
-                                
+                                <label for="option1{{que.id}}" qno={{que.id}} class="form-control {%if que.option1 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option1}}</label>  
                               </div>
                               </div>
-                            {%endfor%}
+                            <div class="form-group col-md-6">
+                                <div class="input-group">
+                                  <div class="input-group-append">
+                                      <div class="input-group-text"><input type="radio" id="option2{{que.id}}" name="ans{{que.id}}" value="{{que.option2}}" {%if que.option2 == que.answer%} checked {%endif%} disabled></div>
+                                </div>
+                                <label for="option2{{que.id}}" qno={{que.id}} class="form-control {%if que.option2 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option2}}</label>  
+                              </div>
+                              </div>
+                              <div class="form-group col-md-6">
+                                <div class="input-group">
+                                  <div class="input-group-append">
+                                      <div class="input-group-text"><input type="radio" id="option3{{que.id}}" name="ans{{que.id}}" value="{{que.option3}}" {%if que.option3 == que.answer%} checked {%endif%} disabled></div>
+                                </div>
+                                <label for="option3{{que.id}}" qno={{que.id}} class="form-control {%if que.option3 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option3}}</label>  
+                              </div>
+                              </div>
+                              <div class="form-group col-md-6">
+                                <div class="input-group">
+                                  <div class="input-group-append">
+                                      <div class="input-group-text"><input type="radio" id="option4{{que.id}}" name="ans{{que.id}}" value="{{que.option4}}" {%if que.option4 == que.answer%} checked {%endif%} disabled></div>
+                                </div>
+                                <label for="option4{{que.id}}" qno={{que.id}} class="form-control {%if que.option4 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option4}}</label>  
+                              </div>
+                              </div>
                           </div>
                         </div>
                     </div>

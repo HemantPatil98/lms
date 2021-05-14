@@ -23,7 +23,8 @@ def log_in(request):
             # Redirect to a success page.
             # response = redirect('index')
             print('success')
-            if us.last_login != "":
+            print(us.last_login)
+            if us.last_login !=None:
                 return redirect(index)
             else:
                 return redirect(reset_password)
@@ -39,7 +40,7 @@ def log_out(request):
     return redirect(login_form)
 
 def login_form(request):
-    return  render(request,'student/login_form.html')
+    return render(request,'student/login_form.html')
 
 def reset_password(request):
     # print(user_profile.objects.all().filter(user_id=request.user.id)[0].otp)
@@ -71,8 +72,10 @@ def index(request):
         # sheetid = fp.read()
         # fp.close()
         sheetid = extra_data.objects.get(name='student_profile').value
-        row = int(request.user.username.split(':')[1])
-        range = "!A" + str(row) + ":AS" + str(row + 3)
+        # row = int(request.user.username.split(':')[1])
+        up = user_profile.objects.get(user_id=request.user)
+        performance_row = up.student_performance_row
+        range = "!A" + str(performance_row) + ":AS" + str(performance_row + 3)
         # print(range)
         values = sheetsapi.sheetvalues(SPREADSHEET_ID=sheetid, sheetname='Apr - Mar 2021', range=range)
         print(values)
@@ -163,7 +166,7 @@ def addstudent(request):
         # print(filledaddstudentform)
         # print(addstudentform)
 
-        row = sheetsapi.appendsheet(sheetid, [index, ""] + filledaddstudentform)
+        profile_row = sheetsapi.appendsheet(sheetid, [index, ""] + filledaddstudentform)
         sheetsapi.appendsheet(sheetid, ["", ""] + [""] * 12 + acced[0])
         sheetsapi.appendsheet(sheetid, ["", ""] + [""] * 12 + acced[1])
         sheetsapi.appendsheet(sheetid, ["", ""] + [""] * 12 + acced[2])
@@ -217,14 +220,14 @@ def addstudent(request):
         # print(filledaddstudentform)
         student_performance = [x for x in student_performance.values()]
 
-        sheetsapi.appendsheet(sheetid,student_performance)
+        performance_row = sheetsapi.appendsheet(sheetid,student_performance)
 
 
-        username = request.POST['email']
+        username = request.POST['emailid']
         password = randomstring(request)
-
+        print(username)
         us = User.objects.create_user(username=username,first_name=request.POST['name'],
-                  password=password,email=request.POST['contact'])
+                  password=password,email=request.POST['emailid'],last_name=request.POST['contact'])
         us.save()
         try:
             file = request.FILES['photo']
@@ -232,9 +235,12 @@ def addstudent(request):
         except:
             file = ""
         from .models import user_profile
-        us_profile = user_profile.objects.all().filter(user_id=us.id)
-        if len(us_profile)==0 and file != "":
-            us_profile = user_profile(user_id=us,student_performance_row=str(int(row)+1),photo=file)
+        us_profile = user_profile.objects.filter(user_id=us.id)
+        if len(us_profile)==0:
+            us_profile = user_profile(user_id=us,student_performance_row=(int(performance_row)+1),
+                                      student_profile_row=(int(profile_row)+1))
+            if file!=0:
+                us_profile.photo = file
             us_profile.save()
         else:
             us_profile.update(photo=file)
@@ -254,20 +260,20 @@ def viewstudent(request):
     # fp = open('student_profile.txt', 'r')
     # sheetid = fp.read()
     # fp.close()
-    sheetid = extra_data.objects.get(name='student_profile').value
-    student_profile = ["center", "dateofadmission", "course", "batchstartdate", "startcourse","trainingmode",
-                       "name", "address", "dateofbirth", "contact", "emailid","alternatecontact",
-                       'examination', 'stream', 'collegename', 'boardname', 'yearofpassing','percentage',
-                       "fees", "mode", "regammount", "installment1", "installment2", "installment3", "regdate",
-                       "installment1date", "installment2date", "installment3date",
-                       "remark"]
-    sheetname = "Apr - Mar "+datetime.datetime.now().strftime("%Y")
-    data = sheetsapi.sheetvalues(sheetid,sheetname)
-    print(data)
+    # sheetid = extra_data.objects.get(name='student_profile').value
+    # student_profile = ["center", "dateofadmission", "course", "batchstartdate", "startcourse","trainingmode",
+    #                    "name", "address", "dateofbirth", "contact", "emailid","alternatecontact",
+    #                    'examination', 'stream', 'collegename', 'boardname', 'yearofpassing','percentage',
+    #                    "fees", "mode", "regammount", "installment1", "installment2", "installment3", "regdate",
+    #                    "installment1date", "installment2date", "installment3date",
+    #                    "remark"]
+    # sheetname = "Apr - Mar "+datetime.datetime.now().strftime("%Y")
+    # data = sheetsapi.sheetvalues(sheetid,sheetname)
+    # print(data)
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
     SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
     SHEET_NAMES = sheetsapi.getsheetnames(SPREADSHEET_ID=SPREADSHEET_ID)
-    return render(request,'student/view_data.html',{'data':data,'up':up,'sheetnames':SHEET_NAMES})
+    return render(request,'student/view_data.html',{'up':up,'sheetnames':SHEET_NAMES})
 
 def viewperformance(request):
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
@@ -463,7 +469,8 @@ def viewprofile(request):
     # sheetid = fp.read()
     # fp.close()
     sheetid = extra_data.objects.get(name='student_profile').value
-    row = user_profile.objects.all().filter(user_id=request.user.id)[0].student_performance_row
+    up = user_profile.objects.get(user_id=request.user.id)
+    row = up.student_performance_row
     range = "!A"+str(row)+":AS"+str(row+3)
     # print(range)
     values = sheetsapi.sheetvalues(SPREADSHEET_ID=sheetid,sheetname='Apr - Mar 2021',range=range)
@@ -474,8 +481,11 @@ def viewprofile(request):
               "installment3","regdate","installment1date","installment2date","installment3date",'remark']
     # import json
     profile = [dict(zip(fields,values[0])),dict(zip(fields,values[1])),dict(zip(fields,values[2])),dict(zip(fields,values[3]))] #list data to object
-    up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-    rc = certificate_request.objects.filter(student_id=request.user.id)[0]
+    up = user_profile.objects.get(user_id=request.user.id)
+    try:
+        rc = certificate_request.objects.get(student_id=request.user.id)
+    except:
+        rc = ""
     return render(request,'student/profile.html',{'profile':profile,'up':up,'rc':rc})
 
 def editprofile(request):

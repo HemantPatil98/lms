@@ -24,6 +24,19 @@
     -ms-user-select: none;
     user-select: none;
 }
+  .sticky{
+    top: 50;
+    position: sticky;
+  }
+  #timer{
+    z-index: 1000;
+    background-color: #76ee768c;
+    position: fixed;
+    right: 0;
+    font-size: 15px;
+    color: #f900ff;
+    padding: 5px;
+  }
 </style>
 {%endblock%}
 {%load static%}
@@ -50,6 +63,7 @@
 
     <!-- Main content -->
     {%block content%}
+    <span id="timer"><i class="fas fa-stopwatch" aria-hidden="true"></i> <span></span></span>
     <section class="content">
       <div class="container-fluid">
         <div class="row">
@@ -131,25 +145,47 @@
 				              <!-- form start -->
 				                <div class="card-body" id="body" style="height: 800px;overflow: auto;">
 				                {%for que in ques_set%}
-                        <div class='question' id='{{que.question.id}}'>
+                        <div class='question' id='{{que.id}}'>
                          <div>
                             <div class="form-group">
                                 <label for="question">Question #{{forloop.counter}}</label>
                                 <!-- <textarea name="question" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea> -->
-                                <div class="form-control">{{que.question.question}}</div>
+                                <div class="form-control">{{que.question}}</div>
                             </div>
                             <div id="choice" class="row">
-                            {%for opt in que.options%}
+                            
                             <div class="form-group col-md-6">
                                 <div class="input-group">
                                   <div class="input-group-append">
-                                      <div class="input-group-text"><input type="checkbox" id="customCheckbox{{opt.id}}" name="ans{{que.question.id}}" value="{{opt.id}}"></div>
+                                      <div class="input-group-text"><input type="radio" id="option1{{que.id}}" name="ans{{que.id}}" value="{{que.option1}}"></div>
                                 </div>
-                                <label for="customCheckbox{{opt.id}}" class="form-control" onclick="choice(this)">{{opt.option}}</label>
-                                
+                                <label for="option1{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option1}}</label>  
                               </div>
                               </div>
-                            {%endfor%}
+                            <div class="form-group col-md-6">
+                                <div class="input-group">
+                                  <div class="input-group-append">
+                                      <div class="input-group-text"><input type="radio" id="option2{{que.id}}" name="ans{{que.id}}" value="{{que.option2}}"></div>
+                                </div>
+                                <label for="option2{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option2}}</label>  
+                              </div>
+                              </div>
+                              <div class="form-group col-md-6">
+                                <div class="input-group">
+                                  <div class="input-group-append">
+                                      <div class="input-group-text"><input type="radio" id="option3{{que.id}}" name="ans{{que.id}}" value="{{que.option3}}"></div>
+                                </div>
+                                <label for="option3{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option3}}</label>  
+                              </div>
+                              </div>
+                              <div class="form-group col-md-6">
+                                <div class="input-group">
+                                  <div class="input-group-append">
+                                      <div class="input-group-text"><input type="radio" id="option4{{que.id}}" name="ans{{que.id}}" value="{{que.option4}}"></div>
+                                </div>
+                                <label for="option4{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option4}}</label>  
+                              </div>
+                              </div>
                           </div>
                         </div>
                     </div>
@@ -342,26 +378,31 @@
 {%if crs.type == 'MCQ'%}
 <script type="text/javascript">
   function startTimer(duration, display) {
-    var timer = duration, minutes, seconds;
-    a=setInterval(function () {
-        minutes = parseInt(timer / 60, 10);
+    var timer = duration, hr, minutes, seconds;
+    window.a=setInterval(function () {
+        hr = parseInt(timer/3600,10);
+        minutes = !(timer % 360) ? parseInt( timer/3600, 10) : parseInt((timer/60)%60,10);
         seconds = parseInt(timer % 60, 10);
 
+        hr = hr < 10 ? "0" + hr : hr;
         minutes = minutes < 10 ? "0" + minutes : minutes;
         seconds = seconds < 10 ? "0" + seconds : seconds;
 
-        display.textContent = minutes + ":" + seconds;
+        display.textContent = hr + ":" + minutes + ":" + seconds;
+        $("#timer span").text( hr + ":" + minutes + ":" + seconds);
         if (timer == 60*5){
           $('#time').addClass('text-warning');
+          $('#timer').addClass('text-warning');
         }
 
         if (--timer < 0) {
             // exit();
             // stopTimer(fiveMinutes);
             $('#time').addClass('text-danger');
+            $('#timer').addClass('text-danger');
             $("input[name='submit']").trigger('click');
             // $("input[name='submit']").trigger('click');
-            clearInterval(a);
+            clearInterval(window.a);
             // exit();
         }
     }, 1000);
@@ -373,106 +414,190 @@ window.onload = function () {
         display = document.querySelector("#time");
     startTimer(fiveMinutes, display);
 };
-  function choice(a){
-    $(a).toggleClass('btn-info');
-  }
-  $( "form" ).on( "submit", function( event ) {
-  event.preventDefault();
-  // console.log( $( this ).serialize() );
-  $.post( "http://127.0.0.1:8000/mcq_validate/", $( "form" ).serialize() ).done(function(data){
-    console.log(data);
-    window.marks = parseInt(data);
-    $('#marks').append(marks);
-    if (marks>28) {
-      $('#marks').addClass('text-success');
-    }
-    else{
-      $('#marks').addClass('text-danger');
-    }
-    // $("input[name='submit']").trigger('click');
-  });
-  var q_set = [];
-  $.each($('.question'),function(){
-      // console.log($(this).attr('id'));
-      q_set.push($(this).attr('id'));
-      });
-  // console.log(q_set);
-var q_a_set = [];
-  $.post("http://127.0.0.1:8000/get/answers/",{question_set:q_set}).done(function(data){
-    // console.log(data);
-    window.set=JSON.parse(data);
-    // console.log(q_a_set);
-  });
-  // console.log(window.set);\
-  window.oss = [];
-  $.each(window.set,function(i,it){
-    // console.log(it);
-    question = '#'+it.question+'';      //question
-    o = it.options;       //options of question
-    // console.log(question,o);
-    $.grep(o,function(i,it){
-      // console.log(i.status);
-      if (i.status){
-        window.oss.push(i);
-      }
-    });
-    // console.log(oss);
-    opts = $(question).children().children();
-    // console.log(opts.children(".form-group"));
-    choices = opts.children(".form-group");
-    // choices = choices.children();
-    hint = $(choices).parent().parent();
-    // console.log(it);
-    $.each(choices,function(){
-      label = $(this).children().children('label');
-      c = $(this).children().children('label').attr('for');
-      // c = c.children().children();
-      c = parseInt(c.replace("customCheckbox",''));
-      // console.log(c,oss);
-      flag = false;
-      expl = "";
-      $.each(oss,function(){
-        oid = this.id;
-        // a=this.explanation;
-        expl = this.explanation;
-        // console.log(expl);
-        if (c == oid) {
-          flag = true;
-        }
-        if (flag == true) {
 
-          if ($(label).hasClass('btn-info')) {
-            $(label).removeClass('btn-info');
-            $(label).addClass('btn-success');
-            // $(hint).append(this.explanation);
+  function option(a){
+    qno  = $(a).attr('qno');
+
+    $("label[qno='"+qno+"']").removeClass('btn-info');
+    $(a).addClass('btn-info');
+  }
+
+  $( "form" ).on( "submit", function( event ) {
+    event.preventDefault();
+
+    qno = [];
+    $(".question").each(function(){
+      qno.push($(this).attr('id'));
+      // console.log($("input[name='"+qno+"']"))
+    })
+    clearInterval(window.a);
+    console.log(qno);
+    console.log( $("form" ).serialize()+"&qnos="+qno );
+    $.post( "http://127.0.0.1:8000/mcq_validate/", $( "form" ).serialize()+"&qnos="+qno ).done(function(data){
+    $('form input').attr('disabled','disabled');
+    $('form label').attr('onclick','false');
+    // console.log(data.replaceAll("'",'"'));
+      // console.log(JSON.parse(data.replaceAll("'",'"')));
+      data = JSON.parse(data.replaceAll("'",'"'));
+      console.log(data);
+      window.marks = parseInt(data.marks);
+      $('#marks').append(marks);
+      if(data.attempt == 'Attempts Overed'){
+      $('#marks').append(" (Attempts Overed)");
+
+      }
+      if (marks>28) {
+        $('#marks').addClass('text-success');
+      }
+      else{
+        $('#marks').addClass('text-danger');
+      }
+      // $("input[name='submit']").trigger('click');
+      $.each(data.answers,function(){
+        qno = this.question;
+        console.log(qno);
+          // console.log($("label[for=option1"+qno+"]").text(),this.answer);
+        if($("label[for=option1"+qno+"]").text() == this.answer){
+          if ($("label[for=option1"+qno+"]").hasClass('btn-info')) {
+            $("label[for=option1"+qno+"]").removeClass('btn-info');
+            $("label[for=option1"+qno+"]").addClass('btn-success');
           }
           else{
-            $(label).removeClass('btn-info');
-            $(label).addClass('btn-primary');
-            
+            $("label[for=option1"+qno+"]").addClass('btn-info');
           }
-          
-        }
-        else{
-          if ($(label).hasClass('btn-info') && !$(label).hasClass('btn-primary')) {
-            // $(label).removeClass('btn-info');
-            // $(label).removeClass('btn-sucess');
-            $(label).removeClass('btn-info');
-            $(label).addClass('btn-danger');
+        }else{
+          if($("label[for=option1"+qno+"]").hasClass('btn-info')){
+            $("label[for=option1"+qno+"]").addClass('btn-danger');
+            $("label[for=option1"+qno+"]").removeClass('btn-info');
           }
         }
-        
+        if($("label[for=option2"+qno+"]").text() == this.answer){
+          if ($("label[for=option2"+qno+"]").hasClass('btn-info')) {
+            $("label[for=option2"+qno+"]").removeClass('btn-info');
+            $("label[for=option2"+qno+"]").addClass('btn-success');
+          }
+          else{
+            $("label[for=option2"+qno+"]").addClass('btn-info');
+          }
+        }else{
+          if($("label[for=option2"+qno+"]").hasClass('btn-info')){
+            $("label[for=option2"+qno+"]").addClass('btn-danger');
+            $("label[for=option2"+qno+"]").removeClass('btn-info');
+          }
+        }
+        if($("label[for=option3"+qno+"]").text() == this.answer){
+          if ($("label[for=option3"+qno+"]").hasClass('btn-info')) {
+            $("label[for=option3"+qno+"]").removeClass('btn-info');
+            $("label[for=option3"+qno+"]").addClass('btn-success');
+          }
+          else{
+            $("label[for=option3"+qno+"]").addClass('btn-info');
+          }
+        }else{
+          if($("label[for=option3"+qno+"]").hasClass('btn-info')){
+            $("label[for=option3"+qno+"]").addClass('btn-danger');
+            $("label[for=option3"+qno+"]").removeClass('btn-info');
+          }
+        }
+        if($("label[for=option4"+qno+"]").text() == this.answer){
+          if ($("label[for=option4"+qno+"]").hasClass('btn-info')) {
+            $("label[for=option4"+qno+"]").removeClass('btn-info');
+            $("label[for=option4"+qno+"]").addClass('btn-success');
+          }
+          else{
+            $("label[for=option4"+qno+"]").addClass('btn-info');
+          }
+        }else{
+          if($("label[for=option4"+qno+"]").hasClass('btn-info')){
+            $("label[for=option4"+qno+"]").addClass('btn-danger');
+            $("label[for=option4"+qno+"]").removeClass('btn-info');
+          }
+        }
       });
-      // a = this.explanation;
-            // console.log(hint,a);
-      })
-    hint.append("<div class='bg-warning'>"+expl+"</div>");
+    });
+  // var q_set = [];
+  // $.each($('.question'),function(){
 
-    // console.log();
-      $('input').each(function(){
-    $(this).attr('disabled','disabled');
-  })
-  })
+  //     // console.log($(this).attr('id'));
+  //     q_set.push($(this).attr('id'));
+  //     });
+  // // console.log(q_set);
+  // var q_a_set = [];
+  // $.post("http://127.0.0.1:8000/get/answers/",{question_set:q_set}).done(function(data){
+  //   // console.log(data);
+  //   window.set=JSON.parse(data);
+  //   // console.log(q_a_set);
+  // });
+  // // console.log(window.set);\
+  // window.oss = [];
+  // $.each(window.set,function(i,it){
+  //   // console.log(it);
+  //   question = '#'+it.question+'';      //question
+  //   o = it.options;       //options of question
+  //   // console.log(question,o);
+  //   $.grep(o,function(i,it){
+  //     // console.log(i.status);
+  //     if (i.status){
+  //       window.oss.push(i);
+  //     }
+  //   });
+  //   // console.log(oss);
+  //   opts = $(question).children().children();
+  //   // console.log(opts.children(".form-group"));
+  //   choices = opts.children(".form-group");
+  //   // choices = choices.children();
+  //   hint = $(choices).parent().parent();
+  //   // console.log(it);
+  //   $.each(choices,function(){
+  //     label = $(this).children().children('label');
+  //     c = $(this).children().children('label').attr('for');
+  //     // c = c.children().children();
+  //     c = parseInt(c.replace("customCheckbox",''));
+  //     // console.log(c,oss);
+  //     flag = false;
+  //     expl = "";
+  //     $.each(oss,function(){
+  //       oid = this.id;
+  //       // a=this.explanation;
+  //       expl = this.explanation;
+  //       // console.log(expl);
+  //       if (c == oid) {
+  //         flag = true;
+  //       }
+  //       if (flag == true) {
+
+  //         if ($(label).hasClass('btn-info')) {
+  //           $(label).removeClass('btn-info');
+  //           $(label).addClass('btn-success');
+  //           // $(hint).append(this.explanation);
+  //         }
+  //         else{
+  //           $(label).removeClass('btn-info');
+  //           $(label).addClass('btn-primary');
+            
+  //         }
+          
+  //       }
+  //       else{
+  //         if ($(label).hasClass('btn-info') && !$(label).hasClass('btn-primary')) {
+  //           // $(label).removeClass('btn-info');
+  //           // $(label).removeClass('btn-sucess');
+  //           $(label).removeClass('btn-info');
+  //           $(label).addClass('btn-danger');
+  //         }
+  //       }
+        
+  //     });
+  //     // a = this.explanation;
+  //           // console.log(hint,a);
+  //     })
+  //   hint.append("<div class='bg-warning'>"+expl+"</div>");
+
+  //   // console.log();
+  //     $('input').each(function(){
+  //   $(this).attr('disabled','disabled');
+  // })
+  // })
   // console.log(q_a_set);
 
 });

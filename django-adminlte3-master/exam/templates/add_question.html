@@ -96,21 +96,30 @@
                 		
                 	</div>
                 	<div class="form-group col-md-4">
-                		{%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%}
+                		{%if crs%}
+                		<button type="button" id="add_questions" class="btn btn-success" data-card-widget="collapse" onclick="addquestion()"><i class="fas fa-plus"></i> Add Questions</button>
+                		{%else%}
+                		<br>
+                		{%if courses%}
+                		<button type="button" id="sync" class="btn btn-info" onclick="syncquestions()"><i class="fas fa-sync "></i> Sync Questions</button>
+                		{%endif%}
+                		{%endif%}
                 	</div>
                 	</div>
-                 {%if crs%}
+                 
                  <div>
                  	<hr>
+                 	{%if crs%}
                  	<div id="add_questions_form" class="row hide">
                  		<div class="col-md-12">
-                 			<div class="card ">
+                 			<div class="card ">		
 				              <div class="card-header">
 				                <div class="form-group">
 				                	<i class="fas fa-info text-info"> Instructions</i><br>
 				                	<textarea class="form-control" name="instructions" rows="2" placeholder="Instructions">{{crs.instructions}}</textarea>
 				                </div>
 				              </div>
+				              
 				              <!-- /.card-header -->
 				              <!-- form start -->
 				                <div class="card-body" id="body" style="height: auto;">
@@ -121,9 +130,9 @@
 				            </div>
                  		</div>
                  	</div>
+                 	{%endif%}
                  </div>
                   
-                 {%endif%}
                 <!-- /.card-body -->
             	</div>
                 <div class="card-footer">
@@ -142,13 +151,29 @@
   <!-- /.content-wrapper -->
 
     {%block script%}
+<script type="text/javascript">
+	
+$('#sync').hover(function(){
+	$('.fa-sync').addClass('fa-spin');
+},function(){
+	$('.fa-sync').removeClass('fa-spin');
+});
+
+function syncquestions(){
+	$('.fa-sync').addClass('fa-spin');
+	url = "http://127.0.0.1:8000/sync/questions/";
+	$.get(url,function(data){
+
+	}).done($('.fa-sync').removeClass('fa-spin'));
+};
+
+</script>
 {%if crs.type == 'MCQ'%}
 <script type="text/javascript">
 
 	var qcount = 0;
 	var ccount = 4;
 	function validate(){
-		qv = [];
 		console.log('validate');
 			for (i=1;i<=qcount;i++){
 			flag = false;
@@ -156,39 +181,32 @@
 					console.log(this);
 					if(this.checked){
 						console.log(this);
-						flag = true;
+						return true;
+					}
+					else{
+						return false;
 					}
 				});
-				if (!flag){
-					qv.push(i);
-				}
 			}
-			console.log(qv);
-			if (!qv.length){
-				return true;
-			}
-			else{
-				return false;
-			}	
 	}
 
-	function addchoice(a){
-		var b = $($(a).parent().parent().children()[0]).children()[1];
-	console.log($($(a).parent().parent().children()[0]).children()[1]);
-	var qno = $(a).parent().parent().attr('id');
-		ccount +=1;
-		var choice=	`<div class="form-group col-md-6">
-	                    <label>Choice `+ccount+`</label>
-	                    <div class="input-group">
-	                    <input type="input" class="form-control" name="choice`+qno+`" placeholder="Choice `+ccount+`">
-					    <div class="input-group-append">
-	                          <div class="input-group-text"><input type="checkbox" name="ans" value="`+ccount+`"></div>
-	                      </div>
-	                  </div>
-	                </div>`;
-		$(b).append(choice);
-		// console.lag(ccount);
-	}
+	// function addchoice(a){
+	// 	var b = $($(a).parent().parent().children()[0]).children()[1];
+	// console.log($($(a).parent().parent().children()[0]).children()[1]);
+	// var qno = $(a).parent().parent().attr('id');
+	// 	ccount +=1;
+	// 	var choice=	`<div class="form-group col-md-6">
+	//                     <label>Choice `+ccount+`</label>
+	//                     <div class="input-group">
+	//                     <input type="input" class="form-control" name="choice`+qno+`" placeholder="Choice `+ccount+`">
+	// 				    <div class="input-group-append">
+	//                           <div class="input-group-text"><input type="checkbox" name="ans" value="`+ccount+`"></div>
+	//                       </div>
+	//                   </div>
+	//                 </div>`;
+	// 	$(b).append(choice);
+	// 	// console.lag(ccount);
+	// }
 
 	explanation_flag = true;
 
@@ -228,7 +246,7 @@
 			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 1">
 							    <div class="input-group-append">
 			                          <div class="input-group-text">
-			                          	<input type="checkbox" name="ans`+qcount+`" value='1'>
+			                          	<input type="checkbox" name="ans`+qcount+`" value='0' onclick="selectoption(this)">
 			                          </div>
 			                    </div>
 			                  </div>
@@ -238,7 +256,9 @@
 			                    <div class="input-group">
 			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 2">
 							    <div class="input-group-append">
-			                          <div class="input-group-text"><input type="checkbox" name="ans`+qcount+`" value='2'></div>
+			                          <div class="input-group-text">
+			                          <input type="checkbox" name="ans`+qcount+`" value='1' onclick="selectoption(this)">
+			                          </div>
 			                      </div>
 			                  </div>
 			                </div>
@@ -247,7 +267,9 @@
 			                    <div class="input-group">
 			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 3">
 							    <div class="input-group-append">
-			                          <div class="input-group-text"><input type="checkbox" name="ans`+qcount+`" value='3'></div>
+			                          <div class="input-group-text">
+			                          <input type="checkbox" name="ans`+qcount+`" value='2' onclick="selectoption(this)">
+			                          </div>
 			                      </div>
 			                  </div>
 			                </div>
@@ -256,16 +278,15 @@
 			                    <div class="input-group">
 			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 4">
 							    <div class="input-group-append">
-			                          <div class="input-group-text"><input type="checkbox" name="ans`+qcount+`" value='4'></div>
+			                          <div class="input-group-text">
+			                          <input type="checkbox" name="ans`+qcount+`" value='3' onclick="selectoption(this)">
+			                          </div>
 			                      </div>
 			                  </div>
 			                </div>
 	                  </div>
 	                </div>
 	                <div class'actions>
-	                  <a class="btn" onclick="addchoice(this)">
-	                	<i class="fas fa-plus" style="color: green"></i> Add Choice
-	                	</a>
 	                	<a class="btn" onclick="addexplanation(this)">
 	                	<i class="fas fa-lightbulb" style="color: grey"></i> Add explanation
 	                	</a>
@@ -274,6 +295,13 @@
 	                <hr>`;
 
 		$('#body').append(question);
+	}
+
+	function selectoption(a){
+		var name = $(a).attr('name');
+		$("input[name='"+name+"']").prop('checked', false);
+		console.log(name,$("input[name='"+name+"']"));
+		$(a).prop('checked', true);
 	}
 </script>
 {%elif crs.type == 'PROGRAM'%}
@@ -295,10 +323,6 @@
 	}
 </script>
 {%endif%}
-
-
-
-
 
 
 <script>
