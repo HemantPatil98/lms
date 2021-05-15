@@ -50,6 +50,7 @@ def reset_password(request):
             up = user_profile.objects.get(user_id=us.id)
         except:
             print("user not found")
+            messages.info(request,'User not found')
             return redirect(reset_password)
         # up = user_profile.objects.all().filter(user_id=User.objects.all().filter(username=request.POST['username'])[0])
         if up.otp==request.POST['otp']:
@@ -58,9 +59,11 @@ def reset_password(request):
             us.save()
             login(request,us)
             print("success")
+            messages.info(request,'Password reset succesful')
             return redirect('index')
         else:
             print("failed")
+            messages.info(request,'Failed to reset password')
             return redirect(reset_password)
     return render(request,'student/reset_password.html')
 
@@ -255,6 +258,7 @@ def addstudent(request):
         # up = user_profile.objects.all().filter(user_id=request.user.id)[0]
         notice1 = notice.objects.all().order_by('-generateddate')
 
+        messages.info(request,'Student added successfully')
     return render(request,'student/add_student.html',{'notice':notice1[0:5]})
 
 def viewstudent(request):
@@ -296,6 +300,7 @@ def addgroups(request):
         if not Group.objects.filter(name=gname):
             gp=Group(name=gname)
             gp.save()
+            messages.info(request,'Group created')
             SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
             attendance = ["id", "name", "contact", "emailid"]
             sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,columns=attendance)
@@ -328,6 +333,7 @@ def addgroups(request):
                         index = 1
                     values = [index,values.first_name,values.email]
                     sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,values=values)
+                    messages.info(request,gname+"is added")
                 else:
                     i.groups.remove(Group.objects.all().filter(name=request.POST['gname'])[0].id)
 
@@ -385,7 +391,7 @@ def addusers(request):
         if not request.POST['username']:
             us = User(username=randomstring(request),first_name=fname,last_name=lname,email=email,password=randomstring(request),is_staff=True)
             us.save()
-
+            messages.info(request,"User added successfully")
             # message to be sent
             header = 'To:' + us.email + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
 
@@ -634,7 +640,7 @@ def studentupdate(request):
         else:
             us_profile.update(photo=file)
 
-
+        messages.inof(request,'profile updated')
         return redirect(viewprofile)
     else:
         sheetsapi.updatesheet(SPREADSHEET_ID,row,col,value,cell)
@@ -642,6 +648,7 @@ def studentupdate(request):
         # sheetid = fp.read()
         # fp.close()
         # sheetsapi.updatesheet(SPREADSHEET_ID,idvalue,col,value,cell)
+        messages.inof(request,'profile updated')
         return redirect(viewstudent)
 
     return HttpResponse("")
@@ -686,6 +693,7 @@ def request_certificate(request):
     us = user_profile.objects.get(user_id=request.user.id)
     us.certificate=cr
     us.save()
+    messages.info(request,'certificate saved Successfully')
     return redirect('index')
 
 def addcertificate(request):
@@ -709,12 +717,16 @@ def randomstring(request):
 
 def mail(reciver,message):
     import smtplib
-    s = smtplib.SMTP('smtp.gmail.com', 587)
-    s.starttls()
-    s.login("paniket281@gmail.com", "jswwqzmaxpxdjpnb")
-    s.sendmail("paniket281@gmail.com", reciver, message)
-    s.quit()
-
+    try:
+        s = smtplib.SMTP('smtp.gmail.com', 587)
+        s.starttls()
+        s.login("paniket281@gmail.com", "jswwqzmaxpxdjpnb")
+        s.sendmail("paniket281@gmail.com", reciver, message)
+        s.quit()
+        # messages.info(request,"Email send")
+    except:
+        # messages.info(request,"Email failed")
+        pass
 
 
 
@@ -757,7 +769,7 @@ def student_performance_in(request):
     # fp = open('student_performance.txt', 'r')
     # sheetid = fp.read()
     # fp.close()
-    sheetis = extra_data.objects.get(name='student_performance').value
+    sheetid = extra_data.objects.get(name='student_performance').value
     sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
     values = sheetsapi.sheetvalues(sheetid, sheetname)
     # print(data)
@@ -848,6 +860,7 @@ def get_data(request,table):
                 dict[s] = ''
         data.append(dict)
     # print(values)
+    messages.info(request,'Data fetch successfully')
     return HttpResponse(str(data))
 
 def set_data(request,table):
@@ -917,6 +930,7 @@ def set_data(request,table):
             row = row/26
         print(a)
         sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,values=present,sheetname=SHEET_NAME,range='!'+a+':'+a+'',dimension="COLUMNS")
+        messages.info(request,'Data saved successfully')
     return HttpResponse("")
 
 def sendotp(request):
@@ -939,8 +953,10 @@ def sendotp(request):
         print(message)
 
         mail(us[0].username,message)
+        messages.info(request,'Otp send successfully')
         return HttpResponse("otp send successufully")
     else:
+        messages.info(request,'Username not found')
         return HttpResponse("username not found")
 
 def get_user(request):
@@ -976,6 +992,7 @@ def set_user(request):
     us.is_staff = val['is_staff'].capitalize()
     us.is_active = val['is_active'].capitalize()
     us.save()
+    messages.info(request,'Changes saved successfully')
     return HttpResponse('succcess')
 
 def test(request):

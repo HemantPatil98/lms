@@ -73,6 +73,14 @@
 {%endblock%}
 </body>
 <!-- Page specific script -->
+{%for message in messages%}
+<script type="text/javascript">
+  // $('.toastrDefaultSuccess').click(function() {
+      toastr.success('{{message}}')
+    // });
+</script>
+{%endfor%}
+
 <script>
   function push(){
     $('[data-widget="pushmenu"]').PushMenu('toggle');
