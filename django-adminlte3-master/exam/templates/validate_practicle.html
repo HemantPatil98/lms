@@ -50,7 +50,7 @@
       <div class="card card-primary">
         <div class="card-header row">
           <h3 class="card-title col-md-8 col-sm-6">Student Profile</h3>
-          
+
           <div class="col-md-4 col-sm-5">
             <!-- <label>Custom Select</label> -->
             <select name="cname" class="custom-select col-6" onchange="load()">
@@ -60,7 +60,7 @@
             </select>
             <select name="type" class="custom-select col-5" onchange="load()">
               <option value="MCQ">MCQ</option>
-              <option value="PRACTICLE">PRACTICLE</option>
+              <option value="PRACTICAL">PRACTICAL</option>
               <option value="PROGRAM">PROGRAM</option>
             </select>
           </div>
@@ -96,6 +96,45 @@ console.log(cname);
     var type=$("select[name='type']").val();
 console.log(type);
   var url = "http://127.0.0.1:8000/getdata_practicle/?cname="+cname+"&type="+type;
+  if (type=='MCQ') {
+   var field= [
+            { name: "ID", type: "number", width: 70,editing:false,css: "hide"},
+            { name: "NAME", type: "text", width: 70,editing:false},
+            { name: "COURSE", type: "text", width: 70,editing:false},
+            { name: "TYPE", type: "text", width: 70,editing:false},
+            { name: "ATTEMPT", type: "text",width:70,editing:false},
+            { name: "MARKS", type: "text",width:100,editing:true},
+        ];
+  }
+  else if(type=='PRACTICAL'){
+     var field= [
+            { name: "ID", type: "number", width: 70,editing:false,css: "hide"},
+            { name: "NAME", type: "text", width: 70,editing:false},
+            { name: "COURSE", type: "text", width: 70,editing:false},
+            { name: "TYPE", type: "text", width: 70,editing:false},
+            { name: "ATTEMPT", type: "text",width:70,editing:false},
+            { name: "MARKS", type: "text",width:100,editing:false},
+            { name: "PROGRAMS", type: "text",width:100,editing:false,itemTemplate: function(value) {
+              return "<a class='btn btn-success' href='http://127.0.0.1:8000/view/practicle/"+value+"'><i class='fa fa-eye'></i> OPEN</a>";},},
+        ]
+  }
+  else if(type=='PROGRAM'){
+     var field= [
+            { name: "ID", type: "number", width: 70,editing:false,css: "hide"},
+            { name: "NAME", type: "text", width: 70,editing:false},
+            { name: "COURSE", type: "text", width: 70,editing:false},
+            { name: "TYPE", type: "text", width: 70,editing:false},
+            { name: "ATTEMPT", type: "text",width:70,editing:false},
+            { name: "MARKS", type: "text",width:100,editing:true},
+            { name: "QUATION", type: "text",width:100,editing:false},
+            { name: "FILE", type: "text",width:100,editing:false,itemTemplate: function(value) {
+              return "<a class='btn btn-success' href='/media/"+value+"'><i class='fa fa-download'></i> DOWNLOAD</a>";},},
+        ]
+  }
+
+
+    $('#grid').jsGrid({fields:field});
+
 $.get(url,function(data,status){
     console.log(data);
     console.log(JSON.parse(data.replaceAll("'",'"')));
@@ -152,9 +191,9 @@ $(function () {
           updateItem: function(item) {
             // console.log(Object.values(item));
             // console.log(item);
-            sheetname = $("select[name='sheetname']").val();
-            console.log(sheetname);
-            Url = 'http://127.0.0.1:8000/setdata/profile/?rowv='+Object.values(item)+'&sheetname='+sheetname;
+            // sheetname = $("select[name='sheetname']").val();
+            // console.log(sheetname);
+            Url = 'http://127.0.0.1:8000/setprogrammarks/?id='+item.ID+'&value='+item.MARKS;
             data={
                 row:item,
             }
@@ -172,9 +211,8 @@ $(function () {
             { name: "TYPE", type: "text", width: 70,editing:false},
             { name: "ATTEMPT", type: "text",width:100,editing:false},
             { name: "MARKS", type: "text",width:100,editing:true},
-            { name: "PROGRAMS", type: "text",width:100,editing:false,itemTemplate: function(value) {
-        return "<a href='http://127.0.0.1:8000/view/practicle/"+value+"'>Link</a>";
-    },},
+            // { name: "PROGRAMS", type: "text",width:100,editing:false,itemTemplate: function(value) {
+            //   return "<a href='http://127.0.0.1:8000/view/practicle/"+value+"'>Link</a>";},},
         ]
     });
   });

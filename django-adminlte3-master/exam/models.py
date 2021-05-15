@@ -20,7 +20,7 @@ class exam_attempts(models.Model):
     student = models.ForeignKey(User,on_delete=models.CASCADE)
     course = models.ForeignKey(course,on_delete=models.CASCADE)
     attempt = models.IntegerField()
-    marks = models.IntegerField(blank=True)
+    marks = models.IntegerField(null=True)
 
     class Meta:
         unique_together = (('student', 'course','attempt'),)
@@ -68,3 +68,13 @@ class program_ans(models.Model):
 
     class Meta:
         unique_together = (('student', 'course','program','attempt'),)
+
+class program_file(models.Model):
+    student = models.ForeignKey(User,on_delete=models.CASCADE)
+    course = models.ForeignKey(course,on_delete=models.CASCADE)
+    program = models.ForeignKey(program,on_delete=models.CASCADE)
+    file = models.FileField(upload_to='programs/')
+    attempt = models.IntegerField()
+
+    class Meta:
+        unique_together = (('student', 'course','attempt'),)

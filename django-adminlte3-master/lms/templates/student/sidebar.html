@@ -16,7 +16,7 @@
           {%if not request.user.is_staff%}<img src="/media/{{request.session.ab.photo}}" class="img-circle elevation-2" alt="User Image">{%endif%}
         </div>
         <div class="info">
-          <a href="{%url 'viewprofile'%}" class="d-block">{{request.user.first_name}} {{request.user.last_name}}</a>
+          <a href="{%url 'viewprofile'%}" class="d-block">{{request.user.first_name}}</a>
         </div>
          </div>
 

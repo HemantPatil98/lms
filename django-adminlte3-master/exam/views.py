@@ -4,6 +4,18 @@ import random
 from django.core.paginator import Paginator
 from lms import models,sheetsapi
 # Create your views here.
+
+student_performance = {'id':"A",'name':"B",'contact':"C",'emailid':"D",'dateofadmission':"E",'trainingmode':"F",'coursestartdate':"G",'course':"H",
+                       'coursestartfrom':"I",'currentmodule':"J",
+                       'ctrainername':"K",'cmodulestart':"L",'cmoduleend':"M",'ctheory':14,'cpractical':15,'coral':16,'ctotal':17,
+                       'sqltrainername':18,'sqlmodulestart':19,'sqlmoduleend':20,'sqltheory':21,'sqlpractical':22,'sqloral':23,'sqltotal':24,
+                       'wdtrainername':25,'wdmodulestart':26,'wdmoduleend':27,'wdpractical':8,'wdoral':29,'wdtotal':30,'portfoliolink':31,
+                       'mock1':32,'projectguid':33,'miniproject':34,
+                       'coretrainername':35,'coremodulestart':36,'coremoduleend':37,'coretheory':38,'corepractical':39,'coreoral':40,'coretotal':41,'mock2':42,
+                       'advtrainername':43,'advmodulestart':44,'advmoduleend':45,'advtheory':46,'advpractical':47,'advoral':48,'advtotal':49,
+                       'fullcoursseend':"AX",'cravitaprojectstart':"AY",'mock3':"AZ",'softskill':"BA",'finalmock':"BB",'totalmarks':"BC",'eligiableforplacement':"BD",
+                       'remark':"BE"}
+
 def add_questions(request):
     if request.method == 'POST':
         print(request.POST)
@@ -26,19 +38,23 @@ def add_questions(request):
             except:
                 if type == 'MCQ':
                     fields = ["Question","Option1","Option2","Option3","Option4","Answer"]
-                else:
-                    fields = ["program"]
+                elif type == 'PRACTICLE':
+                    fields = ["Program"]
+                elif type == 'PROGRAM':
+                    fields = ["Program"]
                 SPREADSHEET_ID = sheetsapi.createsheet(name=type,columns=fields,sheetname=cname)
                 ext = models.extra_data(name=type, value=SPREADSHEET_ID)
                 ext.save()
-                ext = models.extra_data(name=cname,value=1)
+                ext = models.extra_data(name=cname+"_"+type,value=1)
                 ext.save()
                 print("IN CREATE SHEET")
             else:
                 if type == 'MCQ':
                     fields = ["Question", "Option1", "Option2", "Option3", "Option4", "Answer"]
-                else:
-                    fields = ["program"]
+                elif type == 'PRACTICAL':
+                    fields = ["Program"]
+                elif type == 'PROGRAM':
+                    fields = ["Program"]
                 sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=cname,columns=fields)
                 ext = models.extra_data(name=(cname+"_"+type),value=1)
                 ext.save()
@@ -47,7 +63,7 @@ def add_questions(request):
             crs.save()
         courses = course.objects.all()
 
-        if request.POST['type'] == 'MCQ':
+        if type == 'MCQ':
             for field in request.POST:
                 if field.find('question')==0:
                     qno = field.replace('question','')
@@ -66,7 +82,16 @@ def add_questions(request):
             count = questions.objects.all().filter(course=crs)
             print(len(count))
 
-        elif request.POST['type'] == 'PROGRAM':
+        elif type == 'PRACTICAL':
+            for field in request.POST:
+                print(field)
+                if field.find('question')==0:
+                    p = program(course=crs,programe=request.POST[field])
+                    p.save()
+
+            count = program.objects.all().filter(course=crs)
+
+        elif type == 'PROGRAM':
             for field in request.POST:
                 print(field)
                 if field.find('question')==0:
@@ -77,7 +102,7 @@ def add_questions(request):
 
         return render(request,'add_question.html',{'crs':crs,'courses':courses,'count':count})
 
-    courses = course.objects.all()
+    courses = course.objects.values_list('name', flat=True).distinct()
     return render(request,'add_question.html',{'courses':courses})
 
 def mcq_exam(request):
@@ -88,35 +113,35 @@ def mcq_exam(request):
         type = request.POST['type']
         crs = course.objects.get(name=cname, type=type)
 
-        print(crs.id)
+        print(crs.type)
         if crs.type == 'MCQ':
             ques = questions.objects.all().filter(course=crs)
-            # print(list(ques))
             ques = list(ques)
             random.shuffle(ques)
-            # print(rand_question)
-            # print(ques)
             ques_set = ques[:2]
-            # for q in rand_question:
-            #     a = {}
-            #     a['question']=(q)
-            #     a['options']=(options.objects.all().filter(question=q))
-            #     ques_set.append(a)
-            #     # print(a)
-            # print(ques_set)
-            courses = course.objects.all()
+            courses = course.objects.values_list('name', flat=True).distinct()
             return render(request, 'mcq_exam.html',
                           {'crs': crs, 'count': count, 'courses': courses, 'ques_set': ques_set})
-        elif crs.type == 'PROGRAM':
+        elif crs.type == 'PRACTICAL':
 
             prog = program.objects.all().filter(course=crs.id)
             prog_set = random.sample(set(prog),2)
-            courses = course.objects.all()
+            courses = course.objects.values_list('name', flat=True).distinct()
+
+            print(prog_set)
+
+            return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses, 'prog_set': prog_set})
+
+        elif crs.type == 'PROGRAM':
+
+            prog = program.objects.all().filter(course=crs.id)
+            prog_set = random.sample(set(prog), 2)
+            courses = course.objects.values_list('name', flat=True).distinct()
 
             print(prog_set)
             return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses, 'prog_set': prog_set})
 
-    courses = course.objects.all()
+    courses = course.objects.values_list('name', flat=True).distinct()
     return render(request,'mcq_exam.html',{'courses':courses})
 
 def view_questions(request,pageno=1):
@@ -132,27 +157,14 @@ def view_questions(request,pageno=1):
             # rand_question = random.sample(set(ques), 20)
             # print(rand_question)
             ques_set = ques
-            # for q in ques:
-            #     a = {}
-            #     a['question'] = (q)
-            #     a['options'] = (options.objects.all().filter(question=q))
-            #     ques_set.append(a)
-            #     # print(a)
-            # print(ques_set)
-            # try:
-            #     pageno = request.POST['page']
-            # except:
-            #     pageno = 1
-
-            # if pageno == 1:
             pageno = request.POST['page']
             p = Paginator(ques_set, 20)
             # else:
             #     p = Paginator(ques_set, 12)
             page = p.page(pageno)
-            courses = course.objects.all()
+            courses = course.objects.values_list('name', flat=True).distinct()
             return render(request,'view_questions.html',{'crs':crs,'count':count,'courses':courses,'ques_set':page})
-        courses = course.objects.all()
+        courses = course.objects.values_list('name', flat=True).distinct()
         return render(request,'view_questions.html', {'courses': courses})
     return redirect(request,'index')
 
@@ -176,15 +188,34 @@ def mcq_validate(request):
                 print("Failed")
     print(answers)
     crs = course.objects.get(name=request.POST['cname'],type=request.POST['type'])
-    result = exam_attempts.objects.filter(student=request.user,course=crs, type=request.POST['type'])
+    result = exam_attempts.objects.filter(student=request.user,course=crs)
+
+    SPREADSHEET_ID = models.extra_data.objects.get(name='student_performance').value
+    row = models.user_profile.objects.get(user_id=request.user).student_performance_row
+    row = int(row)
+    print(SPREADSHEET_ID,row)
+    if crs.name == 'C':
+        col = student_performance['ctheory']
+    elif crs.name == 'SQL':
+        col = student_performance['sqltheory']
+    elif crs.name.find('Core')==0:
+        col = student_performance['coretheory']
+    elif crs.name.find('Adv')==0:
+        col = student_performance['advtheory']
+
+    print(col)
     if len(result)==0:
         attempt = 1
         result = exam_attempts(student=request.user,course=crs,attempt=attempt,marks=marks)
         result.save()
+        # SPREADSHEET_ID = models.extra_data.objects.get(name='student_performance').value
+        # sp = user_profile.objects.get(user_id=request.user).student_performance_row
+        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,row=row,value=marks,col=col,cell=True)
     elif len(result)<2:
         attempt = 2
         result = exam_attempts(student=request.user, course=crs, attempt=attempt, marks=marks)
         result.save()
+        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,row=row,value=marks,col=col,cell=True)
     else:
         attempt = "Attempts Overed"
 
@@ -202,23 +233,9 @@ def get_answers(request):
     print("hi")
     print(request.POST)
 
-    # print(request.POST['question-set[]'])
-    # q_a_set = []
-    # for q in request.POST.getlist('question_set[]'):
-    #     dic = {}
-    #     opts = []
-    #     for o in options.objects.filter(question=int(q)):
-    #         # a = vars(o)
-    #         vars(o)['_state'] = "none"
-    #         print(vars(o))
-    #         opts.append(vars(o))
-    #     dic['question'] = q
-    #     dic['options'] = opts
-    #     q_a_set.append(dic)
     q_a_set = questions.objects.filter(id=request.POST.getlist('question_set[]'))
     print(q_a_set)
     return HttpResponse(str(q_a_set).replace("'",'"').replace('False','false').replace('True','true'))
-
 
 def practicle_exam(request):
     return render(request,'practicle.exam')
@@ -294,34 +311,47 @@ def getdata_practicle(request):
     type = request.GET['type']
     crs = course.objects.get(name=cname,type=type)
     print(crs,type)
-    exa = exam_attempts.objects.all().filter(course=crs)
+    exa = exam_attempts.objects.filter(course=crs).order_by('-id')
     # print(exa)
     data = []
     for e in exa:
         a = vars(e)
-        a["_state"] = "NONE"
+        a["_state"] = 'none'
         c = vars(course.objects.get(id=a["course_id"]))
-        c["_state"] = "NONE"
+        c["_state"] = 'none'
         # a["course_id"] = vars(c)
         c['course'] = c['name']
         c.pop('name')
         s = vars(User.objects.get(id=a['student_id']))
         # s.pop("first_name")
         a['name'] = s['first_name']
-        a['programs'] = "?attempt_id="+str(a['id'])
+        id = str(a['id'])
         a.update(c)
+        a = {str(k).upper(): str(v).upper() for k, v in a.items()}
+        a['ID'] = id
+        if type == 'PRACTICAL':
+            a['PROGRAMS'] = "?attempt_id="+id
+        elif type == 'PROGRAM':
+            p = program_file.objects.get(student=a['STUDENT_ID'],course=crs,attempt=a['ATTEMPT'])
+            a['FILE'] = p.file.name
+            a['QUATION'] = p.program.programe
         # a.update(s)
         # print(c,a)
         data.append(a)
     print(data)
-    return HttpResponse(str(data).replace("'",'"').replace('None','"NONE"').upper())
+    print(str(data).replace('None',"'NONE'"))
+    return HttpResponse(str(data).replace('None',"'none'").replace("'",'"'))
+
+def getdata_programs(request):
+    return HttpResponse()
+
 
 def view_practicle(request):
-    attempt = request.GET['ATTEMPT_ID']
+    attempt = request.GET['attempt_id']
     ex = exam_attempts.objects.get(id=int(attempt))
     prog_ans = program_ans.objects.filter(student=ex.student_id,course=ex.course.id,attempt=ex.attempt)
     print(prog_ans)
-    courses = course.objects.all()
+    courses = course.objects.values_list('name', flat=True).distinct()
     crs = courses.get(id=ex.course.id)
     return render(request,'view_practicle.html',{'crs':crs,'courses':courses,'prog_set':prog_ans,'ex':ex})
 
@@ -335,4 +365,78 @@ def marks_practicle(request):
     ex = exam_attempts.objects.get(id=int(attempt))
     ex.marks = marks
     ex.save()
+    crs = ex.course
+    SPREADSHEET_ID = models.extra_data.objects.get(name='student_performance').value
+    row = models.user_profile.objects.get(user_id=request.user).student_performance_row
+    row = int(row)
+    print(SPREADSHEET_ID, row)
+    if crs.name == 'C':
+        col = student_performance['cpractical']
+    elif crs.name == 'SQL':
+        col = student_performance['sqlpractical']
+    elif crs.name.find('Core') == 0:
+        col = student_performance['corepractical']
+    elif crs.name.find('Adv') == 0:
+        col = student_performance['advpractical']
+
+    print(col)
+
+    sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=marks, col=col, cell=True)
+    return HttpResponse("")
+
+def saveprogram(request):
+    print(request.FILES)
+    print(request.POST)
+    crs = course.objects.get(name=request.POST['cname'],type=request.POST['type'])
+    for field in request.FILES:
+        if field.find('file')==0:
+            file = request.FILES[field]
+            print(file)
+
+            pno = field.replace('file', '')
+            # answer = request.POST[field]
+            prog = program.objects.get(id=pno)
+
+            result = exam_attempts.objects.filter(student=request.user, course=crs)
+            print(result)
+            if len(result) == 0:
+                attempt = 1
+                file._name = request.user.first_name + str(attempt) +"."+ file._name.split('.')[1]
+                prf = program_file(student=request.user, course=crs, program=prog, file=file, attempt=attempt)
+                prf.save()
+            elif len(result) < 2:
+                attempt = 2
+                file._name = request.user.first_name + str(attempt) +"."+ file._name.split('.')[1]
+                prf = program_file(student=request.user, course=crs, program=prog, file=file, attempt=attempt)
+                prf.save()
+            else:
+                attempt = "Attempts Overed"
+            if attempt != "Attempts Overed":
+                result = exam_attempts(student=request.user, course=crs, attempt=attempt)
+                result.save()
+        return redirect('index')
+
+
+    return HttpResponse("")
+
+def setprogrammarks(request):
+    print(request.GET)
+    id = request.GET['id']
+    value = request.GET['value']
+    ex = exam_attempts.objects.get(id=id)
+    ex.marks = value
+    ex.save()
+
+    crs = ex.course
+    SPREADSHEET_ID = models.extra_data.objects.get(name='student_performance').value
+    row = models.user_profile.objects.get(user_id=request.user).student_performance_row
+    row = int(row)
+    print(SPREADSHEET_ID, row)
+
+    if crs.name.find('Adv') == 0:
+        col = student_performance['advpractical']
+        print(col)
+        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=value, col=col, cell=True)
+
+
     return HttpResponse("")

@@ -1,5 +1,40 @@
 {%extends 'student/base.html'%}
 {%load static%}
+{%block style%}
+<style type="text/css">
+  .knob{
+    font-size: 35px!important;
+  }
+  .card.maximized-card{
+    height: max-content%!important;
+    width: 50%!important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+  }
+    .card-title{
+    font-size: x-large;
+  }
+  .expand_title{
+    font-size: xxx-large;
+  }
+  .expandbody{
+    height: max-content;
+  }
+  @media only screen and (max-width: 600px) {
+  .card.maximized-card{
+    height: max-content%!important;
+    width: 100%!important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+  }
+  .expand_title{
+    font-size: xx-large;
+  }
+}
+</style>
+{%endblock%}
 {%load admin_menu%}
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -35,7 +70,13 @@
                        src="/media/{{request.session.ab.photo}}"
                        alt="User profile picture">
                 </div>
+                <br>
+                <div class="text-center">
+                    <input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90"
+                           data-fgColor="#00a65a" readonly="true">
 
+                    <div class="knob-label">Average Performance</div>
+                  </div>
                 <h3 class="profile-username text-center">{{profile.0.name}}</h3>
 
                 <p class="text-muted text-center">{{profile.0.course}} - Developer</p>
@@ -61,8 +102,267 @@
                 <a href="{%url 'request_certificate'%}" class="btn btn-primary btn-block"><b>Request for Certificate</b></a>
               </div>
           </div>
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
+          <div class="col-md-9">
+            <div class="row">
+              <div class="col-md-3">
+              <div class="card card-danger shadow-lg">
+                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.c','#cbody')">
+                  <div class="row">
+                    <div class="col-sm-12 c">
+                      <img src="{%static 'courses/c.png'%}" width="150px"> 
+                    </div>
+                    <div class="col-sm-12 c">
+                      <h3 class="card-title">C Programinig</h3>   
+                    </div>
+                  </div>
+
+                  <div class="card-tools" id="#c">
+                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                    </button>
+                  </div>
+                  <!-- /.card-tools -->
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body expandbody">
+                  Expand Card For More Features
+                  <div id="cbody" class="collapse">
+                    <div class="row">
+                      <div class="col-sm-4">
+                        <a href="{%url 'mcq_exam'%}">
+                        <img src="{%static 'courses/exam2.png'%}" width="150px">
+                        <h2>Exam</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/video.png'%}" width="150px">
+                        <h2>Videos</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/notes.png'%}" width="150px">
+                        <h2>Notes</h2>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            </div>
+            <div class="col-md-3">
+              <div class="card card-danger shadow-lg">
+                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.sql','#sqlbody')">
+                  <div class="row">
+                    <div class="col-sm-12 sql">
+                  <img src="{%static 'courses/sql.png'%}" width="150px">
+                      <!-- <i class="fas fa-database" style="width: 100%;font-size: 100px;"></i> -->
+                    </div>
+                    <div class="col-sm-12 sql">
+                  <h3 class="card-title">SQL</h3>
+                      
+                    </div>
+                  </div>
+
+                  <div class="card-tools" id="#sql">
+                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                    </button>
+                  </div>
+                  <!-- /.card-tools -->
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body expandbody">
+                  Expand Card For More Features
+                  <div id="sqlbody" class="collapse">
+                    <div class="row">
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/exam2.png'%}" width="150px">
+                        <h2>Exam</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/video.png'%}" width="150px">
+                        <h2>Videos</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/notes.png'%}" width="150px">
+                        <h2>Notes</h2>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            </div>
+              <div class="col-md-3">
+              <div class="card card-danger shadow-lg">
+                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.wd','#wdbody')">
+                  <div class="row">
+                    <div class="col-sm-12 wd">
+                  <img src="{%static 'courses/wd.png'%}" width="150px">
+                      
+                    </div>
+                    <div class="col-sm-12 wd">
+                  <h3 class="card-title">Web Designing</h3>
+                      
+                    </div>
+                  </div>
+
+                  <div class="card-tools" id="#wd">
+                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                    </button>
+                  </div>
+                  <!-- /.card-tools -->
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body expandbody">
+                  Expand Card For More Features
+                  <div id="wdbody" class="collapse">
+                    <div class="row">
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/exam2.png'%}" width="150px">
+                        <h2>Exam</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/video.png'%}" width="150px">
+                        <h2>Videos</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/notes.png'%}" width="150px">
+                        <h2>Notes</h2>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            </div>
+            <div class="col-md-3">
+              <div class="card card-danger shadow-lg">
+                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.core','#corebody')">
+                  <div class="row">
+                    <div class="col-sm-12 core">
+                  <img src="{%static 'courses/c.png'%}" width="150px">
+                      
+                    </div>
+                    <div class="col-sm-12 core">
+                  <h3 class="card-title">Core Domain</h3>
+                      
+                    </div>
+                  </div>
+
+                  <div class="card-tools" id="#core">
+                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                    </button>
+                  </div>
+                  <!-- /.card-tools -->
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body expandbody">
+                  Expand Card For More Features
+                  <div id="corebody" class="collapse">
+                    <div class="row">
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/exam2.png'%}" width="150px">
+                        <h2>Exam</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/video.png'%}" width="150px">
+                        <h2>Videos</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/notes.png'%}" width="150px">
+                        <h2>Notes</h2>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            </div>
+            <div class="col-md-3">
+              <div class="card card-danger shadow-lg">
+                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.adv','#advbody')">
+                  <div class="row">
+                    <div class="col-sm-12 adv">
+                  <img src="{%static 'courses/sql.png'%}" width="150px">
+                      
+                    </div>
+                    <div class="col-sm-12 adv">
+                  <h3 class="card-title">Advance Domain</h3>
+                      
+                    </div>
+                  </div>
+
+                  <div class="card-tools" id="#adv">
+                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                    </button>
+                  </div>
+                  <!-- /.card-tools -->
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body expandbody">
+                  Expand Card For More Features
+                  <div id="advbody" class="collapse">
+                    <div class="row">
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/exam2.png'%}" width="150px">
+                        <h2>Exam</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/video.png'%}" width="150px">
+                        <h2>Videos</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/notes.png'%}" width="150px">
+                        <h2>Notes</h2>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            </div>
+          </div>
+        </div>
+
+
+          <!-- <div class="col-lg-3 col-6">
+            
             <div class="small-box bg-info">
               <div class="inner">
                 <h3>44</h3>
@@ -78,7 +378,7 @@
             </div>
           </div>
 
-          <div class="col-1"></div>
+          <div class="col-1"></div> -->
         </div>
        
       </div><!--/. container-fluid -->
@@ -88,3 +388,112 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
+{%block script%}
+<script>
+  $(function () {
+    /* jQueryKnob */
+
+    $('.knob').knob({
+      /*change : function (value) {
+       //console.log("change : " + value);
+       },
+       release : function (value) {
+       console.log("release : " + value);
+       },
+       cancel : function () {
+       console.log("cancel : " + this.value);
+       },*/
+      draw: function () {
+
+        // "tron" case
+        console.log(this);
+        if (this.$.data('skin') == 'tron') {
+
+          var a   = this.angle(this.cv)  // Angle
+            ,
+              sa  = this.startAngle          // Previous start angle
+            ,
+              sat = this.startAngle         // Start angle
+            ,
+              ea                            // Previous end angle
+            ,
+              eat = sat + a                 // End angle
+            ,
+              r   = true
+
+          this.g.lineWidth = this.lineWidth
+
+          this.o.cursor
+          && (sat = eat - 0.3)
+          && (eat = eat + 0.3)
+
+          if (this.o.displayPrevious) {
+            ea = this.startAngle + this.angle(this.value)
+            this.o.cursor
+            && (sa = ea - 0.3)
+            && (ea = ea + 0.3)
+            this.g.beginPath()
+            this.g.strokeStyle = this.previousColor
+            this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, sa, ea, false)
+            this.g.stroke()
+          }
+
+          this.g.beginPath()
+          this.g.strokeStyle = r ? this.o.fgColor : this.fgColor
+          this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, sat, eat, false)
+          this.g.stroke()
+
+          this.g.lineWidth = 2
+          this.g.beginPath()
+          this.g.strokeStyle = this.o.fgColor
+          this.g.arc(this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false)
+          this.g.stroke()
+
+          return false
+        }
+      }
+    });
+    $({
+        value: 0
+    }).animate({
+        value: 80
+    }, {
+        duration: 950,
+        easing: 'swing',
+        progress: function () {
+            $('.knob').val(Math.round(this.value)).trigger('change');
+            if (this.value<40){
+              $('.knob').attr('data-fgColor','#ff0b0b');
+            }
+        }
+    });
+
+    /* END JQUERY KNOB */
+
+    //INITIALIZE SPARKLINE CHARTS
+    // var sparkline1 = new Sparkline($('#sparkline-1')[0], { width: 240, height: 70, lineColor: '#92c1dc', endColor: '#92c1dc' })
+    // var sparkline2 = new Sparkline($('#sparkline-2')[0], { width: 240, height: 70, lineColor: '#f56954', endColor: '#f56954' })
+    // var sparkline3 = new Sparkline($('#sparkline-3')[0], { width: 240, height: 70, lineColor: '#3af221', endColor: '#3af221' })
+
+    // sparkline1.draw([1000, 1200, 920, 927, 931, 1027, 819, 930, 1021])
+    // sparkline2.draw([515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921])
+    // sparkline3.draw([15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21])
+
+  })
+</script>
+<script type="text/javascript">
+  function onexpand(a,x){
+    b=$(a)[0];
+    $(b).toggleClass('col-sm-4');
+    $(b).toggleClass('col-sm-12');
+    b=$(a)[1];
+    $(b).toggleClass('col-sm-8');
+    $(b).toggleClass('col-sm-12');
+    $(b).css('align-self','center')
+    c=$(b).children('h3');
+    c.toggleClass('expand_title');
+    $(x).toggleClass('collapse');
+    }
+</script>
+<!-- <script type="text/javascript" src=""></script> -->
+{%endblock%}

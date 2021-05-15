@@ -28,11 +28,13 @@
           <a href="#" class="dropdown-item {%if note.type == 'Placement'%}{%endif%}">
             <!-- Message Start -->
             <div class="media">
-              <img src="{%static 'student/dist/img/user1-128x128.jpg'%}" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+              <!-- <img src="{%static 'student/dist/img/user1-128x128.jpg'%}" alt="User Avatar" class="img-size-50 mr-3 img-circle"> -->
+              <!-- <i class="fas fa-file "></i> -->
+              <span class="img-size-50 mr-3" style="font-size: x-large; text-align-last: center;align-self: center;"><i class="fas fa-link" onclick="window.location.href='{{note.externalink}}'"></i></span>
               <div class="media-body">
                 <h3 class="dropdown-item-title">
                   {{note.title}}
-                  <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                  <span class="float-right text-sm "><i class="fas fa-file" onclick="window.location.href='/static/{{note.file}}'"></i></span>
                 </h3>
                 <p class="text-sm">{{note.description}}</p>
                 <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> {{note.generateddate}}</p>
@@ -42,7 +44,7 @@
           </a>
           <div class="dropdown-divider"></div>
           {%endfor%}
-          <a href="{%url 'addnotice'%}" class="dropdown-item dropdown-footer">See All Messages</a>
+          <a href="{%url 'viewnotice'%}" class="dropdown-item dropdown-footer">See All Messages</a>
         </div>
       </li>
 
