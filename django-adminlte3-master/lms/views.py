@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from . import sheetsapi
 import datetime
-from django.contrib.auth.models import User,Group,Permission,GroupManager
+from django.contrib.auth.models import User,Group,Permission
 from .models import notice,user_profile,extra_data,certificate_request
 from django.core.paginator import Paginator
 # Create your views here.
@@ -14,22 +14,26 @@ def log_in(request):
         us = authenticate(request, username=username, password=password)
         print(us)
         if us is not None:
-            login(request, us)
-            ab = user_profile.objects.filter(user_id=us.id)[0]
-            vars(ab)['_state'] = None
-            print(vars(ab))
-            request.session['ab']=vars(ab)
+            try:
+                ab = user_profile.objects.filter(user_id=us.id)[0]
+                vars(ab)['_state'] = None
+                print(vars(ab))
+                request.session['ab']=vars(ab)
+            except:
+                pass
             messages.info(request, "Successfully Log In")
             # Redirect to a success page.
             # response = redirect('index')
             print('success')
             print(us.last_login)
             if us.last_login !=None:
+                login(request, us)
                 return redirect(index)
             else:
+                login(request, us)
                 return redirect(reset_password)
         else:
-            messages.info(request, "Log In Failed")
+            messages.info(request, "Username and password not match")
             response = redirect(login_form)
             return response
 
@@ -40,7 +44,11 @@ def log_out(request):
     return redirect(login_form)
 
 def login_form(request):
-    return render(request,'student/login_form.html')
+    try:
+        if request.has_key(user):
+            return redirect('index')
+    except:
+        return render(request,'student/login_form.html')
 
 def reset_password(request):
     # print(user_profile.objects.all().filter(user_id=request.user.id)[0].otp)
@@ -68,8 +76,19 @@ def reset_password(request):
     return render(request,'student/reset_password.html')
 
 def index(request):
+    try:
+        flag=request.user
+    except:
+        return redirect('login_form')
     if request.user.is_staff:
-        return render(request,'student/adminindex.html')
+        notice1 = ""
+        try:
+            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        except:
+            notice1 = ""
+
+        # stat = {'ucount':len(user.objects.all()),'gcount':len(Group.objects.all())}
+        return render(request,'student/adminindex.html',{'notice':notice1})
     else:
         # fp = open('student_profile.txt', 'r')
         # sheetid = fp.read()
@@ -94,13 +113,18 @@ def index(request):
                    dict(zip(fields, values[3]))]  # list data to object
         print(profile[1])
         from .models import notice
-        notice1 = notice.objects.all().order_by('-generateddate')
+        notice1 = ""
+        try:
+            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        except:
+            notice1 = ""
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-        return render(request, 'student/index.html', {'profile': profile,'notice':notice1[0:5],'up':up})
+        return render(request, 'student/index.html', {'profile': profile,'notice':notice1,'up':up})
 
 
 def addstudent(request):
     if request.method == 'POST':
+        # print(request.POST)
         Basic = {"center": "", "dateofadmission": "", "course": "", "batchstartdate": "", "startcourse": "",
                  "trainingmode": ""}
         Personal_details = {"name": "", "address": "", "dateofbirth": "", "contact": "", "emailid": "",
@@ -256,32 +280,50 @@ def addstudent(request):
 
         mail(us.email,message)
         # up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-        notice1 = notice.objects.all().order_by('-generateddate')
-
         messages.info(request,'Student added successfully')
-    return render(request,'student/add_student.html',{'notice':notice1[0:5]})
+
+        return redirect('index')
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
+
+    return render(request,'student/add_student.html',{'notice':notice1})
 
 def viewstudent(request):
-    up = user_profile.objects.all().filter(user_id=request.user.id)[0]
+    up = user_profile.objects.get(user_id=request.user.id)
     SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
     SHEET_NAMES = sheetsapi.getsheetnames(SPREADSHEET_ID=SPREADSHEET_ID)
-    notice1 = notice.objects.all().order_by('-generateddate')
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
 
-    return render(request,'student/view_data.html',{'up':up,'sheetnames':SHEET_NAMES,'notice':notice[0:5]})
+    return render(request,'student/view_data.html',{'up':up,'sheetnames':SHEET_NAMES,'notice':notice1})
 
 def viewperformance(request):
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
     SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
     SHEET_NAMES = sheetsapi.getsheetnames(SPREADSHEET_ID=SPREADSHEET_ID)
-    notice1 = notice.objects.all().order_by('-generateddate')
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
 
-    return render(request,'student/view_performance.html',{'up':up,'sheetnames':SHEET_NAMES,'notice':notice1[0:5]})
+    return render(request,'student/view_performance.html',{'up':up,'sheetnames':SHEET_NAMES,'notice':notice1})
 
 def admin(request):
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-    notice1 = notice.objects.all().order_by('-generateddate')
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
 
-    return render(request, 'student/index.html',{'up':up,'notice':notice1[0:5]})
+    return render(request, 'student/index.html',{'up':up,'notice':notice1})
     if request.method == 'POST':
         us = authenticate(username=request.POST['username'],password=request.POST['password'])
         if us is not None:
@@ -295,53 +337,63 @@ def admin(request):
         return render(request, 'student/login.html')
 
 def addgroups(request):
+    print(request.POST)
     if request.method == 'POST':
         gname = request.POST['gname']
-        if not Group.objects.filter(name=gname):
+        gp = Group.objects.filter(name=gname)
+        if len(gp) == 0:
             gp=Group(name=gname)
             gp.save()
             messages.info(request,'Group created')
             SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
-            attendance = ["id", "name", "contact", "emailid"]
+            attendance = ["id","user_id", "name", "contact", "emailid"]
             sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,columns=attendance)
+            messages.info(request, gname + " is added in sheet")
         else:
-            gp=Group.objects.filter(name=gname)[0]
+            gp=gp[0]
 
         for permission in request.POST.getlist('permissions'):
             gp.permissions.add(permission)
 
-        pre = []
-        for i in gp.permissions.all():
-            pre.append(i.id)
+        pre = gp.permissions.all()
 
-        groups = Group.objects.all()
-        members = User.objects.all()
-        memb = []  #group existing members
+        groups = Group.objects.all().order_by('-id')
+        members = User.objects.all().order_by('-id')
+
+        request_member = [int(x) for x in request.POST.getlist('members')]
+        print(request_member)
         for m in members:
-            if m.groups.all().filter(name=gname):
-                memb.append(m.id)
-
-        for m in request.POST.getlist('members'):
-            for i in members.filter(id=int(m)):
-                if groups.filter(name=gname)[0] not in i.groups.all():
-                    i.groups.add(groups.filter(name=gname)[0].id)
+            if gp in m.groups.all():
+                if m.id not in request_member:
+                    m.groups.remove(gp.id)
+                    messages.info(request,m.first_name+" is removed")
+            else:
+                if m.id in request_member:
+                    m.groups.add(gp.id)
                     SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
-                    values = User.objects.get(id=int(m))
-                    print(values)
+                    # print(us)
                     index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
                     if sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname=gname) is None:
                         index = 1
-                    values = [index,values.first_name,values.email]
+                    values = [index,m.id,m.first_name,m.last_name,m.email]
                     sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,values=values)
-                    messages.info(request,gname+"is added")
-                else:
-                    i.groups.remove(Group.objects.all().filter(name=request.POST['gname'])[0].id)
+                    messages.info(request,m.first_name+" is added")
 
-        notice1 = notice.objects.all().order_by('-generateddate')
+        memb_pre = []  # group existing members
+        for m in members:
+            if len(m.groups.filter(name=gname))==1:
+                memb_pre.append(m)
+
+        notice1 = ""
+        try:
+            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        except:
+            notice1 = ""
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
+        # print(memb)
         return render(request,'student/add_groups.html',{'gname':gp,'permissions':Permission.objects.all(),'pre':pre,
-                                                        'members':members,'memb_pre':memb,'up':up,'groups':groups,
-                                                         'notice':notice1[0:5]})
+                                                        'members':members,'memb_pre':memb_pre,'up':up,'groups':groups,
+                                                         'notice':notice1})
     groups = Group.objects.all()
 
     # up = user_profile.objects.all().filter(user_id=request.user.id)[0]
@@ -351,33 +403,38 @@ def addgroups(request):
 
 def viewgroups(request):
     if request.method == "POST":
-        gp = Group.objects.filter(name=request.POST['gname'])[0]
+        gp = Group.objects.get(name=request.POST['gname'])
         gp_per = [gp_per.id for gp_per in gp.permissions.all()]
         print(gp_per)
-        add_per = [int(add_per) for add_per in request.POST.getlist('permissions')]
-        print(request.POST['submit'] == 'submit')
-        if request.POST['submit']:
-            for per in add_per:
-                if per not in gp_per:
-                    gp.permissions.add(per)
-            for per in gp_per:
-                if per not in add_per:
-                    gp.permissions.remove(per)
-        print(add_per)
-        gp_per = [gp_per.id for gp_per in gp.permissions.all()]
-        groups = Group.objects.all()
-        members = User.objects.all()
-        memb_grp = {member.id: {'grp_id': group.id, 'grp_name': group.name} for member in members for group in groups}
+        # add_per = [int(add_per) for add_per in request.POST.getlist('permissions')]
 
-        notice1 = notice.objects.all().order_by('-generateddate')
+        gp_per = [gp_per.id for gp_per in gp.permissions.all()]
+        groups = Group.objects.all().order_by('-id')
+        members = User.objects.all().order_by('-id')
+        # members = User.objects.all()
+        memb_pre = []  #group existing members
+        for m in members:
+            if m.groups.filter(id=gp.id):
+                memb_pre.append(m)
+        # memb_grp = {member.id: {'grp_id': group.id, 'grp_name': group.name} for member in members for group in groups}
+
+        notice1 = ""
+        try:
+            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        except:
+            notice1 = ""
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
         return render(request,'student/view_groups.html',{'groups':Group.objects.all(),'gname':gp.name,
-                                                          'group_per':gp_per,'permissions':Permission.objects.all(),
-                                                          'members':members,'up':up,'notice':notice1[0:5]})
+                                                          'group_per':gp_per,'memb_pre':memb_pre,'permissions':Permission.objects.all(),
+                                                          'members':members,'up':up,'notice':notice1})
 
-    notice1 = notice.objects.all().order_by('-generateddate')
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-    return render(request, 'student/view_groups.html', {'groups': Group.objects.all(),'up':up,'notice':notice1[0:5]})
+    return render(request, 'student/view_groups.html', {'groups': Group.objects.all(),'up':up,'notice':notice1})
 
 def addusers(request):
     if request.method == "POST":
@@ -389,7 +446,7 @@ def addusers(request):
         email = request.POST['email']
         print(request.POST['username'])
         if not request.POST['username']:
-            us = User(username=randomstring(request),first_name=fname,last_name=lname,email=email,password=randomstring(request),is_staff=True)
+            us = User(username=email,first_name=fname,last_name=lname,email=email,password=randomstring(request),is_staff=True)
             us.save()
             messages.info(request,"User added successfully")
             # message to be sent
@@ -427,21 +484,33 @@ def addusers(request):
         perm = {'group_per':gp_per,'user_per':usr_per}
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
 
-        notice1 = notice.objects.all().order_by('-generateddate')
+        notice1 = ""
+        try:
+            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        except:
+            notice1 = ""
         return render(request, 'student/add_users.html', {'groups': Group.objects.all(),'gname':gp.name,'perm':perm,
                                                           'permissions':Permission.objects.all(),'member':us,'up':up,
-                                                          'notice':notice1[0:5]})
+                                                          'notice':notice1})
 
-    notice1 = notice.objects.all().order_by('-generateddate')
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-    return render(request,'student/add_users.html',{'groups':Group.objects.all(),'up':up,'notice':notice1[0:5]})
+    return render(request,'student/add_users.html',{'groups':Group.objects.all(),'up':up,'notice':notice1})
 
 def viewmembers(request):
     groups = Group.objects.all()
     gnames = []
     for g in groups:
         gnames.append(g.name)
-    notice1 = notice.objects.all().order_by('-generateddate')
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
     return render(request, 'student/view_users.html', {'sheetnames': gnames,'notice':notice1})
 
 
@@ -467,13 +536,29 @@ def viewprofile(request):
         rc = certificate_request.objects.get(student_id=request.user.id)
     except:
         rc = ""
-    notice1 = notice.objects.all().order_by('-generateddate')
-    return render(request,'student/profile.html',{'profile':profile,'up':up,'rc':rc,'notice':notice1[0:5]})
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+            notice1 = ""
+
+    # sheetid = extra_data.objects.get(name='student_performance').value
+    # up = user_profile.objects.get(user_id=request.user.id)
+    # row = up.student_performance_row
+    # range = "!A" + str(row) + ":AS" + str(row)
+    # # print(range)
+    # values = sheetsapi.sheetvalues(SPREADSHEET_ID=sheetid,sheetname='Apr - Mar 2021',range=range)
+    # print(values,values[4])
+    return render(request,'student/profile.html',{'profile':profile,'up':up,'rc':rc,'notice':notice1})
 
 def editprofile(request):
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-    notice1 = notice.objects.all().order_by('-generateddate')
-    return redirect(request,'index',{'up':up,'notice':notice1[0:5]})
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
+    return redirect(request,'index',{'up':up,'notice':notice1})
 
 def viewnotice(request):
     data = notice.objects.all().order_by('-generateddate')
@@ -490,16 +575,23 @@ def viewnotice(request):
 
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
 
-    notice1 = notice.objects.all().order_by('-generateddate')
-    return render(request,'student/view_notice.html',{'up':up,'data':page,'notice':notice1[0:5]})
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
+    return render(request,'student/view_notice.html',{'up':up,'data':page,'notice':notice1})
 
 def studentupdate(request):
     # fp = open('student_profile.txt', 'r')
     # SPREADSHEET_ID = fp.read()
     # fp.close()
+    from .models import user_profile as ap
     SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
     cell = 'False'
-    row = request.user.username.split(':')[1]
+    up = ap.objects.get(user_id=request.user.id)
+    # row = request.user.username.split(':')[1]
+    row = up.student_profile_row
     value = ''
     col = 0
     if cell=="False":
@@ -565,11 +657,11 @@ def studentupdate(request):
         import math
         if sheetsapi.sheetvalues(SPREADSHEET_ID, sheetname) is None:
             index = 1
-        index = math.ceil((int(request.user.username.split(':')[1])-1)/4)
+        index = math.ceil(up.student_performance_row)
 
         # print(filledaddstudentform)
 
-        rowv = int(request.user.username.split(":")[1])
+        rowv = int(row)
         performance_row = sheetsapi.updatesheet(SPREADSHEET_ID,rowv, [index, ""] + filledaddstudentform,col, cell=False)
         sheetsapi.updatesheet(SPREADSHEET_ID,rowv+1, ["", ""] + [""] * 12 + acced[0], col, cell=False)
         sheetsapi.updatesheet(SPREADSHEET_ID,rowv+2, ["", ""] + [""] * 12 + acced[1], col, cell=False)
@@ -610,7 +702,7 @@ def studentupdate(request):
         # index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
         # if sheetsapi.sheetvalues(sheetid, sheetname) is None:
         #     index = 1
-        index = math.ceil((int(request.user.username.split(':')[1])-1)/4)
+        index = math.ceil(up.student_profile_row)
 
         student_performance['id'] = index
 
@@ -623,13 +715,13 @@ def studentupdate(request):
         # print(filledaddstudentform)
         student_performance = [x for x in student_performance.values()]
         # import math
-        print(math.ceil((int(request.user.username.split(':')[1])-1)/4))
-        row = math.ceil((int(request.user.username.split(':')[1])-1)/4)+1
+        # print(math.ceil((int(request.user.username.split(':')[1])-1)/4))
+        row = up.student_performance_row
         sheetsapi.updatesheet(sheetid,row,student_performance)
 
         try:
             file = request.FILES['photo']
-            file._name = str(request.user.username.split(':')[0]) +"."+ file._name.split('.')[1]
+            file._name = str(request.user.username) +"."+ file._name.split('.')[1]
         except:
             file = ""
         from .models import user_profile
@@ -640,7 +732,7 @@ def studentupdate(request):
         else:
             us_profile.update(photo=file)
 
-        messages.inof(request,'profile updated')
+        messages.info(request,'profile updated')
         return redirect(viewprofile)
     else:
         sheetsapi.updatesheet(SPREADSHEET_ID,row,col,value,cell)
@@ -648,7 +740,7 @@ def studentupdate(request):
         # sheetid = fp.read()
         # fp.close()
         # sheetsapi.updatesheet(SPREADSHEET_ID,idvalue,col,value,cell)
-        messages.inof(request,'profile updated')
+        messages.info(request,'profile updated')
         return redirect(viewstudent)
 
     return HttpResponse("")
@@ -657,8 +749,12 @@ def attendance(request):
     SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
     SHEET_NAMES = sheetsapi.getsheetnames(SPREADSHEET_ID=SPREADSHEET_ID)
 
-    notice1 = notice.objects.all().order_by('-generateddate')
-    return render(request,'student/attendance.html',{'sheetnames':SHEET_NAMES,'notice':notice1[0:5]})
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
+    return render(request,'student/attendance.html',{'sheetnames':SHEET_NAMES,'notice':notice1})
 
 
 def addnotice(request):
@@ -684,8 +780,12 @@ def addnotice(request):
     # print(data)
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
 
-    notice1 = notice.objects.all().order_by('-generateddate')
-    return render(request,'student/add_notice.html',{'data':page,'up':up,'notice':notice1[0:5]})
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
+    return render(request,'student/add_notice.html',{'data':page,'up':up,'notice':notice1})
 
 def request_certificate(request):
     cr = certificate_request(student_id=request.user)
@@ -697,8 +797,12 @@ def request_certificate(request):
     return redirect('index')
 
 def addcertificate(request):
-    notice1 = notice.objects.all().order_by('-generateddate')
-    return render(request,'student/add_certificate.html',{'notice':notice1[0:5]})
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
+    return render(request,'student/add_certificate.html',{'notice':notice1})
 
 def viewcertificate(request):
     return HttpResponse("")
@@ -935,11 +1039,11 @@ def set_data(request,table):
 
 def sendotp(request):
     otp = randomstring(request)
-    # print(otp)
+    print(request.GET)
     us = User.objects.all().filter(username=request.GET['username'])
     if len(us)==1:
-        up = user_profile.objects.all().filter(user_id=us[0])
-        if len(us)==0:
+        up = user_profile.objects.all().filter(user_id=us[0].id)
+        if len(up)==0:
             up = user_profile(user_id=request.user,otp=otp)
         else:
             up=up[0]
@@ -975,10 +1079,10 @@ def get_user(request):
         key = [k.upper() for k in key]
         memb.append(dict(zip(key,memb1)))
         # pint(m)
-        abc.append(m[0])
+        abc.append(m)
     memb = str(memb).lstrip('_').replace('"','').replace('FIRST_NAME','NAME').replace("True","true").replace("False",'')
     # print(memb)
-    return HttpResponse(str(abc))
+    return HttpResponse(str(memb))
 
 
 def set_user(request):
@@ -996,11 +1100,62 @@ def set_user(request):
     return HttpResponse('succcess')
 
 def test(request):
-    groups = Group.objects.all()
-    gnames = []
-    for g in groups:
-        gnames.append(g.name)
-    return render(request,'student/test.html', {'sheetnames': gnames})
+    # print(request.POST)
+    import itertools
+    profile = [['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-4)+1)',""],["",""],["",""],["",""]]
+    for field in itertools.islice(request.POST,2,None):
+        val = request.POST.getlist(field)
+        for i in range(0,4):
+            try:
+                profile[i].append(val[i])
+            except:
+                profile[i].append("")
+
+    performance = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)',profile[0][8],profile[0][11]+"/"+profile[0][12]
+        ,profile[0][13],profile[0][3],profile[0][7],profile[0][5],profile[0][4],profile[0][6]]
+    print(performance)
+
+    SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
+
+    performance_row = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,values=[performance])
+
+    SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
+
+    profile_row = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=profile)
+
+    username = request.POST['emailid']
+    password = randomstring(request)
+    # print(username)
+    us = User.objects.create_user(username=username, first_name=request.POST['name'],
+                                  password=password, email=request.POST['emailid'], last_name=request.POST['contact'])
+    us.save()
+    try:
+        file = request.FILES['photo']
+        file._name = str(request.POST['name']) + "." + file._name.split('.')[1]
+    except:
+        file = ""
+    from .models import user_profile
+    us_profile = user_profile.objects.filter(user_id=us.id)
+    if len(us_profile) == 0:
+        us_profile = user_profile(user_id=us, student_performance_row=(int(performance_row) + 1),
+                                  student_profile_row=(int(profile_row) + 1))
+        if file != 0:
+            us_profile.photo = file
+        us_profile.save()
+    else:
+        us_profile.update(photo=file)
+        # user_profile.save()
+    # message to be sent
+    header = 'To:' + us.username + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
+
+    message = header + '\n Username: ' + username + '\n Password: ' + password + ' \n\n'
+    print(message)
+
+    mail(us.email, message)
+    # up = user_profile.objects.all().filter(user_id=request.user.id)[0]
+    messages.info(request, 'Student added successfully')
+
+    return render(request,'student/test.html', )
 
 
 def getcertificate(request):

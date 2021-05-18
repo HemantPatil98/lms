@@ -46,6 +46,7 @@
               </p>
             </a>
           </li>
+          {%if request.user.is_staff%}
           <li class="nav-item">
             <a href="" class="nav-link">
               <i class="nav-icon fas fa-plus-square"></i>
@@ -65,12 +66,6 @@
                 <a href="{% url 'addgroups' %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Groups</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'addusers' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Members</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -116,6 +111,7 @@
               </li>
             </ul>
           </li>
+          {%endif%}
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-bell"></i>
@@ -137,6 +133,40 @@
                 <a href="{%url 'viewnotice'%}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>View notice</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fas fa-video"></i>
+              <p>
+                Videos
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{%url 'attendance'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Watch Video Lectues</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fas fa-video"></i>
+              <p>
+                Exam
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{%url 'mcq_exam'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Exam</p>
                 </a>
               </li>
             </ul>

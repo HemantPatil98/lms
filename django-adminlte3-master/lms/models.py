@@ -29,7 +29,7 @@ class notice(models.Model):
         except:
             file = ''
         # print(file._name)
-        if request.POST['id']:
+        try:
             id = request.POST['id']
             note = notice.objects.all().get(id=id)
             note.title = title
@@ -38,7 +38,7 @@ class notice(models.Model):
             note.file = file if file != '' else None
             note.externallink = externallink
             note.save()
-        else:
+        except:
             note = notice(title=title,description=description,file=file,externallink=externallink,
                           createdby=request.user,type=type)
             note.save()

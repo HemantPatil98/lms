@@ -16,16 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
-from django.views.generic.base import TemplateView
-from . import sheetsapi
 
-sheetsapi.startsheet()
-
-from . import views,sheetsapi
 urlpatterns = [
     path('',include('lms.urls')),
     path('',include('exam.urls')),
-    path('', include('adminlte3_theme.urls')),
+    # path('', include('adminlte3_theme.urls')),
     path('admin/', admin.site.urls),
     # path('admin/include/addstudent/', views.addstudent, name='addstudent'),
     # path('admin/include/view_data/<slug:table>/',views.viewstudent, name='viewstudent'),

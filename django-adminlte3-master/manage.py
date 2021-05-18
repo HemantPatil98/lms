@@ -2,15 +2,11 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-# from .django_adminlte3 import sheetsapi
-# from lms import sheetsapi
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_adminlte3.settings')
     try:
-        # print("hi")
         from django.core.management import execute_from_command_line
-        # sheetsapi.startsheet()
 
     except ImportError as exc:
         raise ImportError(

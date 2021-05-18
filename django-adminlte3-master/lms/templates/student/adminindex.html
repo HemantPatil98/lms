@@ -1,4 +1,11 @@
 {%extends 'student/base.html'%}
+{%block style%}
+<style type="text/css">
+  .inner{
+    height: 100px;
+  }
+</style>
+{%endblock%}
 {%load static%}
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -32,7 +39,7 @@
             <!-- small card -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3>44</h3>
+                <!-- <h3>44</h3> -->
 
                 <p>Add Students</p>
               </div>
@@ -49,7 +56,7 @@
             <!-- small card -->
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3>44</h3>
+                <!-- <h3>44</h3> -->
 
                 <p>Groups Registrations</p>
               </div>
@@ -66,7 +73,7 @@
             <!-- small card -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3>44</h3>
+                <!-- <h3>44</h3> -->
 
                 <p>Add Members</p>
               </div>
@@ -83,7 +90,7 @@
             <!-- small card -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>44</h3>
+                <!-- <h3>44</h3> -->
 
                 <p>Attendance</p>
               </div>
@@ -99,12 +106,12 @@
             <!-- small card -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>44</h3>
+                <!-- <h3>44</h3> -->
 
                 <p>View Performance</p>
               </div>
               <div class="icon">
-                <a href="" class="icon"><i class="fas fa-percentage"></i></a>
+                <a href="{% url 'viewperformance'%}" class="icon"><i class="fas fa-percentage"></i></a>
               </div>
               <a href="{% url 'viewperformance'%}" class="small-box-footer">
                 View Performance <i class="fas fa-arrow-circle-right"></i>
@@ -116,7 +123,7 @@
             <!-- small card -->
             <div class="small-box bg-warning">
               <div class="inner">
-                <h3>44</h3>
+                <!-- <h3>44</h3> -->
 
                 <p>Add Notice</p>
               </div>
@@ -132,14 +139,14 @@
             <!-- small card -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>44</h3>
+                <!-- <h3>44</h3> -->
 
                 <p>Certificate Requests</p>
               </div>
               <div class="icon">
                 <a href="{%url 'addcertificate'%}" class="icon"><i class="fas fa-file-alt"></i></a>
               </div>
-              <a href="{%url 'viewcertificate'%}" class="small-box-footer">
+              <a href="{%url 'addcertificate'%}" class="small-box-footer">
                 Certificate Issue <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
@@ -148,7 +155,7 @@
             <!-- small card -->
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3>44</h3>
+                <!-- <h3>44</h3> -->
 
                 <p>Add Question</p>
               </div>
@@ -164,14 +171,14 @@
             <!-- small card -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3>44</h3>
+                <!-- <h3>44</h3> -->
 
                 <p>Evaluate Practicles</p>
               </div>
               <div class="icon">
                 <a href="{% url 'practicle_validate' %}" class="icon"><i class="fa fa-code" aria-hidden="true"></i></a>
               </div>
-              <a href="{% url 'view_questions' pageno=1%}" class="small-box-footer">
+              <a href="{% url 'practicle_validate'%}" class="small-box-footer">
                 View Marks <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>

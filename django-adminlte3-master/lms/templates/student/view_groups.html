@@ -8,12 +8,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Manage Groups</h1>
+            <h1>View Groups</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Manage Groups</li>
+              <li class="breadcrumb-item active">View Groups</li>
             </ol>
           </div>
         </div>
@@ -30,7 +30,7 @@
             <!-- general form elements -->
             <div class="card card-primary">
               <div class="card-header">
-                <h3 class="card-title">Manage Groups </h3>
+                <h3 class="card-title">View Groups </h3>
               </div>
               <!-- /.card-header -->
               <!-- form start -->
@@ -51,17 +51,17 @@
 
                   {%if gname%}
 
-                    <div class="card card-default">
-                      <div class="card-header">
-                        <h3 class="card-title">Select Perm</h3>
+                    <div class="card card-default collapsed-card" style="width: 100%">
+                      <div class="card-header" style="background-color: #6f42c1cf;color: white">
+                        <h3 class="card-title">View Permission</h3>
 
                         <div class="card-tools">
                           <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
+                            <i class="fas fa-plus"></i>
                           </button>
-                          <button type="button" class="btn btn-tool" data-card-widget="remove">
+                          <!-- <button type="button" class="btn btn-tool" data-card-widget="remove">
                             <i class="fas fa-times"></i>
-                          </button>
+                          </button> -->
                         </div>
                       </div>
                       <!-- /.card-header -->
@@ -69,9 +69,9 @@
                         <div class="row">
                           <div class="col-12">
                             <div class="form-group">
-                              <label>Multiple</label>
-                              <select class="duallistbox" name="permissions" multiple="multiple">
-                                {%for p in members%} 
+                              <label>Permission</label>
+                              <select class="duallistbox" name="permissions" multiple="multiple" disabled>
+                                {%for p in permissions%} 
                                 <option {%if p.id in group_per%} selected="selected" {%endif%} value="{{p.id}}">{{p}}</option>
                                 {%endfor%}
                               </select>
@@ -88,7 +88,43 @@
                       </div>
                     </div>
                     <!-- /.card -->
+                    <!-- /.card -->
+                    <div class="card card-default" class="col-sm-12" style="width: 100%;">
+                      <div class="card-header"  style="background-color: #6f42c1cf;color: white">
+                        <h3 class="card-title">View Users</h3>
 
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <!-- <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                          </button> -->
+                        </div>
+                      </div>
+                      <!-- /.card-header -->
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-12">
+                            <div class="form-group">
+                              <label>View students</label>
+                              <select class="duallistbox" name="members" multiple="multiple">
+                                {%for m in members%}
+                                <option value="{{m.id}}" {%if m in memb_pre%}selected{%endif%}>{{m.first_name}}</option>
+                                {%endfor%}
+                              </select>
+                            </div>
+                            <!-- /.form-group -->
+                          </div>
+                          <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                      </div>
+                      <!-- /.card-body -->
+                      <div class="card-footer">
+
+                      </div>
+                    </div>
                   {%endif%}
 
                 </div>
@@ -173,7 +209,7 @@
     })
 
     //Bootstrap Duallistbox
-    $('.duallistbox').bootstrapDualListbox()
+    $('.duallistbox').bootstrapDualListbox({'filterPlaceHolder':"Search students here",'selectorMinimalHeight':250})
 
     //Colorpicker
     $('.my-colorpicker1').colorpicker()

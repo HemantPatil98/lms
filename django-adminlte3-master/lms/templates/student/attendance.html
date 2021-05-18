@@ -109,8 +109,9 @@ $.get(url,function(data,status){
     window.col = Object.keys(db.data[0]);
     // console.log(col);
     // fields.push({name:col[i],type:'checkbox',editing:true});
-    for(i=col.length-1;i>3;i--){
+    for(i=col.length-1;i>5;i--){
         // console.log(col[i]);
+
         if (col[i]===currentdate) {
         fields.push({name:col[i],type:'checkbox',editing:false});
 
@@ -151,7 +152,7 @@ $(function () {
   const currentdate = date+'/'+month+'/'+year;
   currentdate.replaceAll('"','')
     $("#grid").jsGrid({
-        height: "100%",
+        height: "auto",
         width: "100%",
 
         filtering: true,

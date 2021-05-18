@@ -107,7 +107,14 @@
                 		{%endif%}
                 	</div>
                 	</div>
-                 
+                 {%if not crs%}
+                 <hr>
+                 <div class="row">
+                   <div class="col-md-4"><a href="https://docs.google.com/spreadsheets/d/{{ext.mcq_sheet}}">MCQ Question Sheet</a></div>
+                   <div class="col-md-4"><a href="https://docs.google.com/spreadsheets/d/{{ext.practical_sheet}}">Practical Question Sheet</a></div>
+                   <div class="col-md-4"><a href="https://docs.google.com/spreadsheets/d/{{ext.program_sheet}}">Program Question Sheet</a></div>
+                 </div>
+                 {%endif%}
                  <div>
                  	<hr>
                  	{%if crs%}

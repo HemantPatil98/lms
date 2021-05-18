@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect,HttpResponse
 from .models import *
 import random
+from django.contrib import messages
 from django.core.paginator import Paginator
 from lms import models,sheetsapi
 # Create your views here.
@@ -38,7 +39,7 @@ def add_questions(request):
             except:
                 if type == 'MCQ':
                     fields = ["Question","Option1","Option2","Option3","Option4","Answer"]
-                elif type == 'PRACTICLE':
+                elif type == 'PRACTICAL':
                     fields = ["Program"]
                 elif type == 'PROGRAM':
                     fields = ["Program"]
@@ -100,10 +101,16 @@ def add_questions(request):
 
             count = program.objects.all().filter(course=crs)
 
+        messages.info(request,'Question Added')
         return render(request,'add_question.html',{'crs':crs,'courses':courses,'count':count})
 
+    ext = models.extra_data.objects.all()
+
+    ext = {'mcq_sheet':ext.filter(name='MCQ')[0].value,'practical_sheet':ext.filter(name='PRACTICAL')[0].value,
+           'program_sheet':ext.filter(name='PROGRAM')[0].value}
+
     courses = course.objects.values_list('name', flat=True).distinct()
-    return render(request,'add_question.html',{'courses':courses})
+    return render(request,'add_question.html',{'courses':courses,'ext':ext})
 
 def mcq_exam(request):
     if request.method == 'POST':
@@ -120,8 +127,13 @@ def mcq_exam(request):
             random.shuffle(ques)
             ques_set = ques[:2]
             courses = course.objects.values_list('name', flat=True).distinct()
+
+            attempt = exam_attempts.objects.filter(student=request.user,course=crs)
+
+            attempt = len(attempt)
+
             return render(request, 'mcq_exam.html',
-                          {'crs': crs, 'count': count, 'courses': courses, 'ques_set': ques_set})
+                          {'crs': crs, 'count': count, 'courses': courses, 'ques_set': ques_set, 'attempt':attempt})
         elif crs.type == 'PRACTICAL':
 
             prog = program.objects.all().filter(course=crs.id)
@@ -130,7 +142,12 @@ def mcq_exam(request):
 
             print(prog_set)
 
-            return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses, 'prog_set': prog_set})
+            attempt = exam_attempts.objects.filter(student=request.user,course=crs)
+
+            attempt = len(attempt)
+
+            return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
+                                                           'prog_set': prog_set,'attempt':attempt})
 
         elif crs.type == 'PROGRAM':
 
@@ -139,7 +156,13 @@ def mcq_exam(request):
             courses = course.objects.values_list('name', flat=True).distinct()
 
             print(prog_set)
-            return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses, 'prog_set': prog_set})
+
+            attempt = exam_attempts.objects.filter(student=request.user,course=crs)
+
+            attempt = len(attempt)
+
+            return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
+                                                           'prog_set': prog_set,'attempt':attempt})
 
     courses = course.objects.values_list('name', flat=True).distinct()
     return render(request,'mcq_exam.html',{'courses':courses})
@@ -163,6 +186,8 @@ def view_questions(request,pageno=1):
             #     p = Paginator(ques_set, 12)
             page = p.page(pageno)
             courses = course.objects.values_list('name', flat=True).distinct()
+
+            messages.info('Question Loaded')
             return render(request,'view_questions.html',{'crs':crs,'count':count,'courses':courses,'ques_set':page})
         courses = course.objects.values_list('name', flat=True).distinct()
         return render(request,'view_questions.html', {'courses': courses})
@@ -225,6 +250,7 @@ def mcq_validate(request):
         "attempt": attempt,
         "answers":answers
     }
+    messages.info(request,'Mcq Validated')
     return HttpResponse(str(data))
 
 from django.views.decorators.csrf import csrf_exempt
@@ -260,6 +286,20 @@ def sync_questions(request):
                     q.save()
                 ext_row.value = int(last_update) + len(ques)
                 ext_row.save()
+        elif c.type == "PRACTICAL":
+            SPREADSHEET_ID = models.extra_data.objects.get(name='PRACTICAL').value
+            ext_row = ext.get(name=c.name+"_PRACTICAL")
+            last_update = ext_row.value
+            fetch_from = str(int(last_update)+1)
+            programs = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=c.name,range="!A"+fetch_from+":F")
+            print(programs)
+            if programs:
+                for p in programs:
+                    print(p[0])
+                    p = program(course=c,programe=p[0])
+                    p.save()
+                ext_row.value = int(last_update) + len(programs)
+                ext_row.save()
         elif c.type == "PROGRAM":
             SPREADSHEET_ID = models.extra_data.objects.get(name='PROGRAM').value
             ext_row = ext.get(name=c.name+"_PROGRAM")
@@ -274,6 +314,7 @@ def sync_questions(request):
                     p.save()
                 ext_row.value = int(last_update) + len(programs)
                 ext_row.save()
+    messages.info(request,'Questione Sync Complete')
     return HttpResponse("")
 
 def savepracticle(request):
@@ -299,6 +340,7 @@ def savepracticle(request):
     if attempt != "Attempts Overed":
         result = exam_attempts(student=request.user, course=crs, attempt=attempt)
         result.save()
+    messages.info(request,'Practical saved successfully')
     return redirect('index')
 
 def practicle_validate(request):
@@ -350,10 +392,12 @@ def view_practicle(request):
     attempt = request.GET['attempt_id']
     ex = exam_attempts.objects.get(id=int(attempt))
     prog_ans = program_ans.objects.filter(student=ex.student_id,course=ex.course.id,attempt=ex.attempt)
-    print(prog_ans)
+    # print(prog_ans)
     courses = course.objects.values_list('name', flat=True).distinct()
-    crs = courses.get(id=ex.course.id)
-    return render(request,'view_practicle.html',{'crs':crs,'courses':courses,'prog_set':prog_ans,'ex':ex})
+    crs = course.objects.get(id=ex.course.id)
+    gname = prog_ans[0].student.groups.get(name__startswith=crs.name).name
+    # print(prog_ans[0].student.groups.filter(name_startswith="cname").name)
+    return render(request,'view_practicle.html',{'crs':crs,'courses':courses,'prog_set':prog_ans,'ex':ex,'gname':gname})
 
 def marks_practicle(request):
     print(request.POST)
@@ -382,6 +426,7 @@ def marks_practicle(request):
     print(col)
 
     sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=marks, col=col, cell=True)
+
     return HttpResponse("")
 
 def saveprogram(request):
@@ -414,6 +459,8 @@ def saveprogram(request):
             if attempt != "Attempts Overed":
                 result = exam_attempts(student=request.user, course=crs, attempt=attempt)
                 result.save()
+
+        messages.info(request,'Program saved successfully')
         return redirect('index')
 
 
@@ -437,6 +484,5 @@ def setprogrammarks(request):
         col = student_performance['advpractical']
         print(col)
         sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=value, col=col, cell=True)
-
-
+        messages.info(request,'Program marks saved')
     return HttpResponse("")

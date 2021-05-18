@@ -105,6 +105,15 @@
   })
   
 </script>
-
+{%for message in messages%}
+<script type="text/javascript">
+  // $('.toastrDefaultSuccess').click(function() {
+      toastr.success('{{message}}')
+    // });
+      function push(){
+    $('[data-widget="pushmenu"]').PushMenu('toggle');
+  }
+</script>
+{%endfor%}
 </body>
 </html>

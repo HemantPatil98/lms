@@ -1,27 +1,7 @@
+
 {%extends 'student/base.html'%}
-{%load admin_menu%}
 {%load static%}
-{%block style%}
-  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid.min.css'%}">
-  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid-theme.min.css'%}">
-  <style type="text/css">
-  .fix-id{
-     position: sticky;
-  left: 0;
-  z-index: 2;
-  }
-  .fix-name{
-    position: sticky;
-    left: 0px;
-    z-index: 2;
-  }
-  .fix-contact{
-    position: sticky;
-    left: 150px;
-    z-index: 2;
-  }
-</style>
-{%endblock%}
+{%load admin_menu%}
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -30,42 +10,344 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Student Data</h1>
+            <h1 class="m-0">{%if request.user.is_staff%}Add student{%else%}Profile{%endif%}</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Student Data</li>
+              <li class="breadcrumb-item active">{%if request.user.is_staff%}Add student{%else%}Profile{%endif%}</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
       </div><!-- /.container-fluid -->
     </div>
     {%endblock%}
+
     <!-- /.content-header -->
 
     <!-- Main content -->
     {%block content%}
     <section class="content">
-      <div class="card card-primary">
-        <div class="card-header">
-          <h3 class="card-title">Student Profile</h3>
-          <div class="" style="width: max-content;float: right;">
-            <!-- <label>Custom Select</label> -->
-            <select name="sheetname" class="custom-select" onchange="load()">
-              {%for sheetname in sheetnames%}
-              <option value="{{sheetname}}">{{sheetname}}</option>
-              {%endfor%}
-            </select>
-          </div>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">{%if request.user.is_staff%}Admission Form{%else%}Profile{%endif%}</h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form action="{%if request.user.is_staff%}{%url 'addstudents'%}{%else%}/admin/include/view_data/0/0/0/False/{%endif%}" method="POST" enctype="multipart/form-data">
+                {%csrf_token%}
+                <div class="card-body row">
+                 <div class="form-group row">
+                  <div class="form-group col-md-6"></div>
+                  <div class="form-group col-md-6">
+                    <label for="photo">Profile Photo </label>
+                    <input type="file" name="photo" id="photo" style="height: 100px; width: 100px; border: 2px solid black;float: right;border-radius: 5%;">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="center">Center: </label>
+                    <select name="center" class="custom-select form-control-border" id="center">
+                      <option {%if profile.0.center == 'shivaji Nagar' %}selected{%endif%} {%if not request.user.is_staff%}readonly{%endif%}>Shivaji Nagar</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-sm-6">
+                      <label>Date of Addmission: </label>
+                        <input type="date" name="dateofadmission" class="form-control" value="{{profile.0.dateofadmission}}" {%if not request.user.is_staff%}readonly{%endif%}/>
+                  </div>
+                  <div class="col-sm-6">
+                      <!-- select -->
+                      <div class="form-group">
+                        <label>Course: </label>
+                        <select name="course" class="form-control" {%if not request.user.is_staff%}readonly{%endif%}>
+                          <option {%if profile.0.course == 'Python' %}selected{%endif%}>Python</option>
+                          <option {%if profile.0.course == 'PHP' %}selected{%endif%}>PHP</option>
+                          <option {%if profile.0.course == 'JAVA' %}selected{%endif%}>JAVA</option>
+                          <option {%if profile.0.course == 'Testing' %}selected{%endif%}>Testing</option>
+                        </select>
+                      </div>
+                  </div>
+                  <div class="form-group col-sm-6">
+                      <label>Batch Start Date:</label>
+                        <input type="date" class="form-control" name="batchstartdate" value="{{profile.0.batchstartdate}}" {%if not request.user.is_staff%}readonly{%endif%}/>
+                  </div>
+                  <div class="col-sm-6">
+                      <div class="form-group">
+                        <label>Course Start Module: </label>
+                        <select name="startcourse" class="form-control" {%if not request.user.is_staff%}readonly{%endif%}>
+                          <option {%if profile.0.startcourse == 'C' %}selected{%endif%}>C</option>
+                          <option {%if profile.0.startcourse == 'Sql' %}selected{%endif%}>Sql</option>
+                          <option {%if profile.0.startcourse == 'Web Designing' %}selected{%endif%}>Web Designing</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="form-group">
+                        <label>Course Start Module: </label>
+                        <select name="trainingmode" class="form-control" {%if not request.user.is_staff%}readonly{%endif%}>
+                          <option {%if profile.0.trainingmode == 'Offline' %}selected{%endif%}>Offline</option>
+                          <option {%if profile.0.trainingmode == 'Online' %}selected{%endif%}>Online</option>
+                        </select>
+                      </div>
+                    </div>
+                 <div class="col-md-12">
+                    <label><b>Personal Details: </b></label>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="name">Name</label>
+                    <input name="name" type="text" class="form-control" id="name" placeholder="Enter Name" value="{{profile.0.name}}">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="address">Address</label>
+                    <input name="address" type="text" class="form-control" id="address" placeholder="Enter Name" value="{{profile.0.address}}">
+                  </div>
+                  <div class="form-group col-sm-6">
+                      <label>Date of Birth: </label>
+                       <input type="date" name="dateofbirth" class="form-control" value="{{profile.0.dateofbirth}}"/>
+                  </div>
+                  <div class="form-group col-md-6">
+                      <label for="contact">Contact</label>
+                      <input name="contact" type="tel" class="form-control" id="contact" placeholder="Enter Contact" value="{{profile.0.contact}}" {%if not request.user.is_staff%}readonly{%endif%}>
+                  </div>
+                  <div class="form-group col-md-6">
+                      <label for="alternatecontact">Alternate Contact</label>
+                      <input name="alternatecontact" type="tel" class="form-control" id="alternatecontact" placeholder="Enter Alternate Contact" value="{{profile.0.alternatecontact}}">
+                  </div>
+                  <div class="form-group col-md-6">
+                      <label for="exampleInputEmail1">Email address</label>
+                      <input name="emailid" type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email" value="{{profile.0.emailid}}" {%if not request.user.is_staff%}readonly{%endif%}>
+                  </div>
+                <div class="row">
+                  <div class="col-12">
+                    <div class="card">
+                      <div class="card-header">
+                        <h3 class="card-title"><b>Eduactional Qualification</b></h3>
+                      </div>
+                      <!-- /.card-header -->
+                      <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                          <thead>
+                            <tr>
+                              <th>Examination</th>
+                              <th>Stream</th>
+                              <th>Name of School/College</th>
+                              <th>Board/University</th>
+                              <th>Year of passing</th>
+                              <th>Percentage</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <select name="examination" class="form-control">
+                                <option value="SSC" selected>SSC</option>
+                                </select>
+                              </td>
+                              <td>
+                                <select name="stream" class="form-control">
+                                <option value="Marathi" {%if profile.0.stream == 'Marathi' %}selected{%endif%}>Marathi</option>
+                                <option value="Semi-English" {%if profile.0.stream == 'Semi-English' %}selected{%endif%}>Semi-English</option>
+                                <option value="English" {%if profile.0.stream == 'English' %}selected{%endif%}>English</option>
+                                </select>
+                              </td>
+                              <td>
+                                <input type="text" name="collegename" class="form-control"value="{{profile.0.collegename}}">
+                              </td>
+                              <td>
+                                <input type="text" name="boardname" class="form-control"value="{{profile.0.boardname}}">
+                              </td>
+                              <td>
+                                <input type="number" name="yearofpassing" class="form-control" value="{{profile.0.yearofpassing}}">
+                              </td>
+                              <td>
+                                <input type="number" name="percentage" min="0" max="100" class="form-control" value="{{profile.0.percentage}}">
+                              </td>
+                            </tr>
+                            <tr>
+                            <td>
+                              <select name="examination" class="form-control">
+                              <option value="HSC/Diploma" {%if not profile.1.examination %}selected{%endif%} hidden="">HSC/Diploma</option>
+                              <option value="HSC" {%if profile.1.examination == 'HSC' %}selected{%endif%}>HSC</option>
+                              <option value="Diploma" {%if profile.1.examination == 'Diploma' %}selected{%endif%}>Diploma</option>
+                              </select>
+                            </td>
+                            <td>
+                              <select name="stream" class="form-control">
+                              <option {%if profile.1.stream == 'Arts' %}selected{%endif%}>Arts</option>
+                              <option {%if profile.1.stream == 'Commerce' %}selected{%endif%}>Commerce</option>
+                              <option {%if not profile.1.examination %}selected{%endif%} {%if profile.1.stream == 'Science' %}selected{%endif%}>Science</option>
+                              </select>
+                            </td>
+                            <td>
+                              <input type="text" name="collegename" class="form-control" value="{{profile.1.collegename}}">
+                            </td>
+                            <td>
+                              <input type="text" name="boardname" class="form-control" value="{{profile.1.boardname}}">
+                            </td>
+                            <td>
+                              <input type="number" name="yearofpassing" class="form-control" value="{{profile.1.yearofpassing}}">
+                            </td>
+                            <td>
+                              <input type="number" name="percentage" min="0" max="100" class="form-control" value="{{profile.1.percentage}}">
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><select name="examination" class="form-control">
+                              <option value="B.E/B.Tech/B.Sc/BCA" {%if not profile.2.examination %}selected{%endif%} hidden="">B.E/B.Tech/B.Sc/BCA</option>
+                              <option {%if profile.2.examination == 'B.E' %}selected{%endif%} value="B.E">B.E</option>
+                              <option {%if profile.2.examination == 'B.Tech' %}selected{%endif%} value="B.Tech">B.Tech</option>
+                              <option {%if profile.2.examination == 'B.Sc' %}selected{%endif%} value="B.Sc">B.Sc</option>
+                              <option {%if profile.2.examination == 'B.CA' %}selected{%endif%} value="B.CA">B.CA</option>
+                              </select>
+                            </td>
+                            <td>
+                              <select name="stream" class="form-control">
+                              <option {%if profile.2.stream == 'Computer Science' %}selected{%endif%} value="Computer Science">Computer Science</option>
+                              <option {%if profile.2.stream == 'Mechanical' %}selected{%endif%} value="Mechanical">Mechanical</option>
+                              <option {%if profile.2.stream == 'E&TC' %}selected{%endif%} value="E&TC">E&TC</option>
+                              </select>
+                            </td>
+                            <td>
+                              <input type="text" name="collegename" class="form-control"  value="{{profile.2.collegename}}">
+                            </td>
+                            <td>
+                              <input type="text" name="boardname" class="form-control"
+                               value="{{profile.2.boardname}}">
+                            </td>
+                            <td>
+                              <input type="number" name="yearofpassin" class="form-control" value="{{profile.2.yearofpassing}}">
+                            </td>
+                            <td>
+                              <input type="number" name="percentage" min="0" max="100" class="form-control" value="{{profile.2.percentage}}">
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><select name="examination" class="form-control">
+                              <option value="M.Sc/M.CA" {%if not profile.3.examination %}selected{%endif%} hidden="">M.Sc/M.CA</option>
+                              <option {%if profile.3.examination == 'M.Sc' %}selected{%endif%} value="M.Sc">M.Sc</option>
+                              <option {%if profile.3.examination == 'M.Sc' %}selected{%endif%} value="M.CA">M.Sc</option>
+                              </select>
+                            </td>
+                            <td>
+                              <select name="stream" class="form-control">
+                              <option {%if profile.3.stream == 'Computer Sciennce' %}selected{%endif%} value="Computer Sciennce" selected>Computer Sciennce</option>
+                              <option {%if profile.3.stream == 'Computer Application' %}selected{%endif%} value="Computer Application">Computer Application</option>
+                              </select>
+                            </td>
+                            <td>
+                              <input type="text" name="collegename" class="form-control" value="{{profile.3.collegename}}">
+                            </td>
+                            <td>
+                              <input type="text" name="boardname" class="form-control" value="{{profile.3.boardname}}">
+                            </td>
+                            <td>
+                              <input type="number" name="yearofpassin" class="form-control" value="{{profile.3.yearofpassing}}">
+                            </td>
+                            <td>
+                              <input type="number" name="percentage" min="0" max="100" class="form-control" value="{{profile.3.percentage}}">
+                            </td>
+                          </tr>
+                          
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    <!-- /.card-body -->
+                  </div>
+                </div>
+                </div>
+                <!-- <div class="row"> -->
+                <div class="form-group col-md-4">
+                    <label for="fees">Fees: </label>
+                    <input type="number" class="form-control" name="fees" id="fees" placeholder="Fees" value="{{profile.0.fees}}" {%if not request.user.is_staff%}readonly{%endif%}>
+                </div>
+                <div class="form-group col-md-8">
+                  <label for="fees">Mode Of Payment: </label>
+                    <div class="form-group clearfix">
+                        <div class="icheck-primary d-inline">
+                          <input type="radio" name="mode" id="checkboxPrimary1" value="LumpSum" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                          <label for="checkboxPrimary1">Lump Sum
+                          </label>
+                        </div>
+                      </div>
+
+                      <div class="icheck-primary d-inline">
+                        <input type="radio" name="mode" id="checkboxPrimary2" value="1" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                        <label for="checkboxPrimary2">
+                        </label>
+                      </div>
+                      <div class="icheck-primary d-inline">
+                        <input type="radio" name="mode" id="checkboxPrimary3" value="2" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                        <label for="checkboxPrimary3">
+                        </label>
+                      </div>
+                      <div class="icheck-primary d-inline">
+                        <input type="radio" name="mode" id="checkboxPrimary4" value="3" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                        <label for="checkboxPrimary4">
+                          Installment
+                        </label>
+                      </div>
+                    </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="card">
+                        <div class="card-header">
+                          <h3 class="card-title"><b>Fees Schedule</b></h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0">
+                          <table class="table table-hover text-nowrap" id="installment">
+                            <thead>
+                              <tr>
+                                <th> </th>
+                                <th>Registration Ammount</th>
+                                <th>1st installation</th>
+                                <th>2nd Installation</th>
+                                <th>3rd Installation</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>Fees Payment Breakup</td>
+                                <td><input type="number" name="regammount" class="form-control" value="{{profile.0.regammount}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                <td><input type="number" name="installment1" class="form-control" value="{{profile.0.installment1}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                <td><input type="number" name="installment2" class="form-control" value="{{profile.0.installment2}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                <td><input type="number" name="installment3" class="form-control" value="{{profile.0.installment3}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                              </tr>
+                              <tr>
+                                <td>Dates of Installments</td>
+                                <td><input type="date" name="regdate" class="form-control" value="{{profile.0.regdate}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                <td><input type="date" name="installment1date" class="form-control" value="{{profile.0.installment1date}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                <td><input type="date" name="installment2date" class="form-control" value="{{profile.0.installment2date}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                <td><input type="date" name="installment3date" class="form-control" value="{{profile.0.installment3date}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      
+                        <!-- /.card-body -->
+                      </div>
+                      <div class="form-group col-md-12">
+                          <label for="remark">Remark</label>
+                          <input type="text" name="remark" class="form-control" id="remark" placeholder="Enter Remark" value="{{profile.0.remark}}" {%if not request.user.is_staff%}readonly{%endif%} />
+                        </div>
+                      <!-- /.card -->
+                    </div>
+                 </div>
+
+                </div>
+                <!-- /.card-body -->
+
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </form>
+            </div>
         </div>
-        <!-- /.card-header -->
-        <div class="card-body">
-          <div id="grid"></div>
-        </div>
-        <!-- /.card-body -->
       </div>
-      <!-- /.card -->
+
     </section>
     {%endblock%}
     <!-- /.content -->
@@ -73,103 +355,173 @@
   <!-- /.content-wrapper -->
 {%block script%}
 <style type="text/css">
-  .hide{
-    display: none;
-  }
+  input[readonly="True"] {
+  pointer-events: none;
+}
 </style>
-<!-- <script type="text/javascript" src="{%static 'student/dist/js/student_profile.js'%}"></script> -->
-<script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
+<script>
 
-<script type="text/javascript">
-  // window.db = db;
-  var db = {};
-  load();
- function load(){
-    var sheetname=$("select[name='sheetname']").val();
-console.log(sheetname);
-  var url = "http://127.0.0.1:8000/getuser/?gname="+sheetname;
-$.get(url,function(data,status){
-    // console.log(data);
-    console.log(JSON.parse(data.replaceAll("'",'"')));
-    db = {};
-    data = data.replaceAll("'",'"');
-    db.data=JSON.parse(data);
-    // console.log(db.data);
-    $('#grid').jsGrid({data:db.data});
-// wndow.db=db;
-    // db.loadData;
-    // addaction();
-    $(".jsgrid-grid-body").keypress(function(){var keycode = (event.keyCode ? event.keyCode : event.which);
-          if(keycode == '13'){window.edit_row=this;$('#grid').jsGrid('updateItem')}});
-});
- }
+  $("input[name='mode']").click(function(){
+    mode=$("input[name='mode']:checked").val();
+    if (mode=="LumpSum"){
+        // console.log($(this));
+      $('#installment tbody tr').each(function(){
+        // console.log($(this));
+        $.each($(this).children(),function(){
+          $(this).children('input').attr('readonly','readonly');
+        // console.log($(this).children('input').attr('readonly','readonly'));
 
-</script>
-<script type="text/javascript">
-$(function () {
+        })
+        $("input[name='regammount']").removeAttr('readonly');
+        $("input[name='regdate']").removeAttr('readonly');
+        // console.log($(this).children('td'));
+      })
+    }
+    else{
+      $('#installment tbody tr').each(function(){
+        // console.log($(this));
+        $.each($(this).children(),function(){
+          $(this).children('input').removeAttr('readonly');
+        // console.log($(this).children('input').attr('readonly','readonly'));
 
-    $("#grid").jsGrid({
-        height: "100%",
-        width: "100%",
-
-        filtering: true,
-        editing: true,
-        sorting: true,
-        paging: true,
-
-        data: db.data,
-
-        controller: {
-          loadData: function(filter) {
-           return $.grep(db.data, function(client) {
-                var flag=false;
-                $.each(Object.keys(client),function(key,val){
-                    val=val.toString();
-                    val1=client[val].toString();
-                    val2=filter[val];
-                    if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
-
-                    flag=true;
-                    }else{
-                        flag=false;
-                        return false;
-                    };
-                })
-                 if (flag) {
-                    return client;
-                }
-            });
-        },
-          insertItem: $.noop,
-          updateItem: function(item) {
-            // console.log(Object.values(item));
-            // console.log(item);
-            sheetname = $("select[name='sheetname']").val();
-            console.log(sheetname);
-            console.log(JSON.stringify(item));
-            // console.log(Object.values(item).toString());
-            Url = 'http://127.0.0.1:8000/setuser/?values='+JSON.stringify(item);
-            data={
-                row:item,
-            }
-                $.get(Url,function(data,status){
-                    console.log(data);
-                });
-            },
-          deleteItem: $.noop
-        },
-
-        fields: [
-            { name: "ID", type: "number", width: 70,editing:false},
-            { name: "USERNAME", type: "text", width: 70,editing:false},
-            { name: "NAME", type: "text", width: 70,editing:false},
-            { name: "IS_ACTIVE", type: "checkbox", width: 70},
-            { name: "IS_STAFF", type: "checkbox", width: 70},
-        ]
-    });
+        })
+      })
+    }
+    console.log(mode);
   });
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2()
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    })
+
+    //Datemask dd/mm/yyyy
+    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+    //Datemask2 mm/dd/yyyy
+    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
+    //Money Euro
+    $('[data-mask]').inputmask()
+
+    //Date range picker
+    $('#dateofadmission').datetimepicker({
+        format: 'L'
+    });
+    $('#batchstartdate').datetimepicker({
+        format: 'L'
+    });
+    $('#dateofbirth').datetimepicker({
+        format: 'L'
+    });
+    //Date range picker
+    $('#reservation').daterangepicker()
+    //Date range picker with time picker
+    $('#reservationtime').daterangepicker({
+      timePicker: true,
+      timePickerIncrement: 30,
+      locale: {
+        format: 'MM/DD/YYYY hh:mm A'
+      }
+    })
+    //Date range as a button
+    $('#daterange-btn').daterangepicker(
+      {
+        ranges   : {
+          'Today'       : [moment(), moment()],
+          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate  : moment()
+      },
+      function (start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+      }
+    )
+
+    //Timepicker
+    $('#timepicker').datetimepicker({
+      format: 'LT'
+    })
+
+    //Bootstrap Duallistbox
+    $('.duallistbox').bootstrapDualListbox()
+
+    //Colorpicker
+    $('.my-colorpicker1').colorpicker()
+    //color picker with addon
+    $('.my-colorpicker2').colorpicker()
+
+    $('.my-colorpicker2').on('colorpickerChange', function(event) {
+      $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
+    })
+
+    $("input[data-bootstrap-switch]").each(function(){
+      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+    })
+
+  })
+  // BS-Stepper Init
+  document.addEventListener('DOMContentLoaded', function () {
+    window.stepper = new Stepper(document.querySelector('.bs-stepper'))
+  })
+
+  // DropzoneJS Demo Code Start
+  Dropzone.autoDiscover = false
+
+  // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
+  var previewNode = document.querySelector("#template")
+  previewNode.id = ""
+  var previewTemplate = previewNode.parentNode.innerHTML
+  previewNode.parentNode.removeChild(previewNode)
+
+  var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
+    url: "/target-url", // Set the url
+    thumbnailWidth: 80,
+    thumbnailHeight: 80,
+    parallelUploads: 20,
+    previewTemplate: previewTemplate,
+    autoQueue: false, // Make sure the files aren't queued until manually added
+    previewsContainer: "#previews", // Define the container to display the previews
+    clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
+  })
+
+  myDropzone.on("addedfile", function(file) {
+    // Hookup the start button
+    file.previewElement.querySelector(".start").onclick = function() { myDropzone.enqueueFile(file) }
+  })
+
+  // Update the total progress bar
+  myDropzone.on("totaluploadprogress", function(progress) {
+    document.querySelector("#total-progress .progress-bar").style.width = progress + "%"
+  })
+
+  myDropzone.on("sending", function(file) {
+    // Show the total progress bar when upload starts
+    document.querySelector("#total-progress").style.opacity = "1"
+    // And disable the start button
+    file.previewElement.querySelector(".start").setAttribute("disabled", "disabled")
+  })
+
+  // Hide the total progress bar when nothing's uploading anymore
+  myDropzone.on("queuecomplete", function(progress) {
+    document.querySelector("#total-progress").style.opacity = "0"
+  })
+
+  // Setup the buttons for all transfers
+  // The "add files" button doesn't need to be setup because the config
+  // `clickable` has already been specified.
+  document.querySelector("#actions .start").onclick = function() {
+    myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED))
+  }
+  document.querySelector("#actions .cancel").onclick = function() {
+    myDropzone.removeAllFiles(true)
+  }
+  // DropzoneJS Demo Code End
 </script>
 {%endblock%}
-
-
-

@@ -219,7 +219,7 @@ def getsheetnames(SPREADSHEET_ID):
 
 def appendsheet(SPREADSHEET_ID,values,range='!A:A',dimension='ROWS',sheetname="Apr - Mar "+datetime.datetime.now().strftime("%Y")):
     # SPREADSHEET_ID = sheetid
-    values = [values]
+    # values = [values]
     # sheetname = "Apr - Mar "+datetime.datetime.now().strftime("%Y")
     properties = sheet.get(spreadsheetId=SPREADSHEET_ID).execute().get("sheets")
     print(properties)

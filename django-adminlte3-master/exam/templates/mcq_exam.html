@@ -1,4 +1,5 @@
 {%extends 'student/base.html'%}
+{%load admin_menu%}
 {%block style%}
 <style type="text/css">
 	#add_questions{
@@ -124,9 +125,14 @@
                 		<!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
                     <div class="row">
                       <div class="col-md-6">
-                        <label id='marks'>Marks Scored: </label><br>
+                        <label id='marks-head'>Marks Scored: </label><br>
                         <label>Out Off: 40</label>
                       </div>
+                      <div class="col-md-6">
+                        <label>Attempt: {{attempt}}</label><br>
+                        <label>Total Attempts : 2</label>
+                      </div>
+
                     </div>
                 	</div>
                 	</div>
@@ -213,174 +219,83 @@
             </div>
         </div>
       </div>
-
     </section>
+    <button id="marks" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal">
+      Launch Primary Modal
+    </button>
+
+      <div class="modal fade" id="modal">
+        <div class="modal-dialog">
+          <div class="modal-content bg-success">
+            <div class="modal-header">
+              <h4 class="modal-title" style="margin-right: 35px;">Course : {{crs.name}}</h4>
+              <h4 class="modal-title" style="right: 0;">Type : {{crs.type}}</h4>
+              <button type="button" class="close closelink" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+           
+            <div class="modal-body">
+              <!-- <p>One fine body&hellip;</p> -->
+              
+              <h2 class="modal-title" id="marks-modal">Marks Scored : </h2>
+              <h2 class="modal-title" id="attempts">Attempt remaining: </h2>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-outline-light closelink" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-outline-light reattempt">Re attempt</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- /.modal -->
+<button id="alertbutton" type="button" class="btn btn-primary" data-toggle="modal" data-target="#alert">
+      Launch Primary Modal
+    </button>
+
+      <div class="modal fade" id="alert">
+        <div class="modal-dialog">
+          <div class="modal-content bg-warning">
+            <div class="modal-header">
+              <h4 class="modal-title">Warning! </h4>
+              <!-- <h4 class="modal-title" style="right: 0;">Type : {{crs.type}}</h4> -->
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+           
+            <div class="modal-body" id="alertbody">
+              <!-- <p>One fine body&hellip;</p> -->
+              
+              <h4 class="modal-title">Your are not allowed to leave this page while exam.</h4>
+              <h4 class="modal-title">Next time exam will get automatically submit</h4>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-outline-light">Re attempt</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- /.modal -->
+
     {%endblock%}
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
 
     {%block script%}
-<!-- {%if crs.type == 'MCQ'%}
-<script type="text/javascript">
-
-	var qcount = 0;
-	var ccount = 4;
-	function validate(){
-		qv = [];
-		console.log('validate');
-			for (i=1;i<=qcount;i++){
-			flag = false;
-				$("input[name='ans"+i+"']").each(function(){
-					console.log(this);
-					if(this.checked){
-						console.log(this);
-						flag = true;
-					}
-				});
-				if (!flag){
-					qv.push(i);
-				}
-			}
-			console.log(qv);
-			if (!qv.length){
-				return true;
-			}
-			else{
-				return false;
-			}	
-	}
-
-	function addchoice(a){
-		var b = $($(a).parent().parent().children()[0]).children()[1];
-	console.log($($(a).parent().parent().children()[0]).children()[1]);
-	var qno = $(a).parent().parent().attr('id');
-		ccount +=1;
-		var choice=	`<div class="form-group col-md-6">
-	                    <label>Choice `+ccount+`</label>
-	                    <div class="input-group">
-	                    <input type="input" class="form-control" name="choice`+qno+`" placeholder="Choice `+ccount+`">
-					    <div class="input-group-append">
-	                          <div class="input-group-text"><input type="checkbox" name="ans" value="`+ccount+`"></div>
-	                      </div>
-	                  </div>
-	                </div>`;
-		$(b).append(choice);
-		// console.lag(ccount);
-	}
-
-	explanation_flag = true;
-
-	function addexplanation(a){
-			console.log();
-			var qno = $(a).parent().parent().attr('id');
-
-		if($(a).parent().parent().children().length==2){
-			b = $(a).parent().parent();
-			var exp = `<div class="form-group col-md-12">
-		                    <label>Explanation</label>
-		                    <div class="input-group">
-		                    <input type="input" class="form-control" name="explanation`+qno+`" placeholder="explanation">
-		                  </div>
-		                </div>`;
-			$(b).append(exp);
-			console.log($(a));
-			explanation_flag = false;
-		}
-		
-	}
-
-
-	function addquestion(){
-			qcount +=1;
-
-		question = `<div class='question`+qcount+`' id='`+qcount+`'>
-						<div>
-	                		<div class="form-group">
-			                    <label for="question">Question #`+qcount+`</label>
-			                    <textarea name="question`+qcount+`" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea>
-			                </div>
-	                  	<div id="choice" class="row">
-		                  	<div class="form-group col-md-6">
-			                    <label>Choice 1</label>
-			                    <div class="input-group">
-			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 1">
-							    <div class="input-group-append">
-			                          <div class="input-group-text">
-			                          	<input type="checkbox" name="ans`+qcount+`" value='1'>
-			                          </div>
-			                    </div>
-			                  </div>
-			                </div>
-			                <div class="form-group col-md-6">
-			                    <label>Choice 2</label>
-			                    <div class="input-group">
-			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 2">
-							    <div class="input-group-append">
-			                          <div class="input-group-text"><input type="checkbox" name="ans`+qcount+`" value='2'></div>
-			                      </div>
-			                  </div>
-			                </div>
-			                <div class="form-group col-md-6">
-			                    <label>Choice 3</label>
-			                    <div class="input-group">
-			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 3">
-							    <div class="input-group-append">
-			                          <div class="input-group-text"><input type="checkbox" name="ans`+qcount+`" value='3'></div>
-			                      </div>
-			                  </div>
-			                </div>
-			                <div class="form-group col-md-6">
-			                    <label>Choice 4</label>
-			                    <div class="input-group">
-			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 4">
-							    <div class="input-group-append">
-			                          <div class="input-group-text"><input type="checkbox" name="ans`+qcount+`" value='4'></div>
-			                      </div>
-			                  </div>
-			                </div>
-	                  </div>
-	                </div>
-	                <div class'actions>
-	                  <a class="btn" onclick="addchoice(this)">
-	                	<i class="fas fa-plus" style="color: green"></i> Add Choice
-	                	</a>
-	                	<a class="btn" onclick="addexplanation(this)">
-	                	<i class="fas fa-lightbulb" style="color: grey"></i> Add explanation
-	                	</a>
-	                </div>
-	            </div>
-	                <hr>`;
-
-		$('#body').append(question);
-	}
-</script>
-{%elif crs.type == 'PROGRAM'%}
-<script type="text/javascript">
-	qcount = 0;
-	function addquestion(){
-		qcount += 1;
-
-		var question = `<div class='question`+qcount+`' id='`+qcount+`'>
-							<div>
-		                		<div class="form-group">
-				                    <label for="question">Question #`+qcount+`</label>
-				                    <textarea name="question`+qcount+`" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea>
-				                </div>
-			                </div>
-			            </div>`;
-
-		$('#body').append(question);
-	}
-</script>
-{%endif%} -->
-
 {%if crs%}
 {%if crs.type == 'MCQ'%}
 <script type="text/javascript">
-  function startTimer(duration, display) {
+function startTimer(duration, display) {
     var timer = duration, hr, minutes, seconds;
     window.a=setInterval(function () {
+      setCookie('timer',timer,1);
         hr = parseInt(timer/3600,10);
         minutes = !(timer % 360) ? parseInt( timer/3600, 10) : parseInt((timer/60)%60,10);
         seconds = parseInt(timer % 60, 10);
@@ -407,14 +322,65 @@
             // exit();
         }
     }, 1000);
-}
+  }
 
-window.onload = function () {
+
+    window.onload = function () {
+  if(getCookie('que_ans') != ""){
+    que_ans = JSON.parse(getCookie('que_ans'));
+    keys = Object.keys(que_ans);
+    // console.log(que_ans);
+    // console.log(keys);
+   for (i=0;i<que_ans.length;i++){
+    a = que_ans[i];
+    // console.log(a.pno);
+    program = $('.program')[i];
+    $(program).attr('id','que'+a.pno);
+    $(program).text(a.pro);
+    // console.log($('.program')[i]);
+    // ans = $('.ans')[i];
+    // $(ans).val(a.ans);
+    // $(ans).attr('name','ans'+a.pno);
+   }
+
+  }
+  if(getCookie('timer')==""){
     duration = $("input[name='time']").val();
     var fiveMinutes = 60 * duration,
         display = document.querySelector("#time");
     startTimer(fiveMinutes, display);
-};
+  }
+  else{
+    // duration = $("input[name='time']").val();
+    var fiveMinutes = parseInt(getCookie('timer'),10),
+        display = document.querySelector("#time");
+    startTimer(fiveMinutes, display);
+  }
+    
+  };
+  function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  }
+  function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+
 
   function option(a){
     qno  = $(a).attr('qno');
@@ -442,17 +408,22 @@ window.onload = function () {
       data = JSON.parse(data.replaceAll("'",'"'));
       console.log(data);
       window.marks = parseInt(data.marks);
-      $('#marks').append(marks);
+      // $('#marks-head').append(marks);
+      // $('#marks-modal').append(marks);
       if(data.attempt == 'Attempts Overed'){
-      $('#marks').append(" (Attempts Overed)");
+      $('#marks-head').append(" (Attempts Overed)");
+      $('#attempts').append(" (Attempts Overed)");
 
       }
       if (marks>28) {
-        $('#marks').addClass('text-success');
+        $('#marks-head').addClass('text-success');
+        $('.modal-content').addClass('bg-success');
       }
       else{
-        $('#marks').addClass('text-danger');
+        $('#marks-head').addClass('text-danger');
+        $('.modal-content').addClass('bg-danger');
       }
+      $('#attempts').append(data.attempt);
       // $("input[name='submit']").trigger('click');
       $.each(data.answers,function(){
         qno = this.question;
@@ -514,92 +485,10 @@ window.onload = function () {
             $("label[for=option4"+qno+"]").removeClass('btn-info');
           }
         }
+         document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+      document.cookie = "que_ans=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
       });
     });
-  // var q_set = [];
-  // $.each($('.question'),function(){
-
-  //     // console.log($(this).attr('id'));
-  //     q_set.push($(this).attr('id'));
-  //     });
-  // // console.log(q_set);
-  // var q_a_set = [];
-  // $.post("http://127.0.0.1:8000/get/answers/",{question_set:q_set}).done(function(data){
-  //   // console.log(data);
-  //   window.set=JSON.parse(data);
-  //   // console.log(q_a_set);
-  // });
-  // // console.log(window.set);\
-  // window.oss = [];
-  // $.each(window.set,function(i,it){
-  //   // console.log(it);
-  //   question = '#'+it.question+'';      //question
-  //   o = it.options;       //options of question
-  //   // console.log(question,o);
-  //   $.grep(o,function(i,it){
-  //     // console.log(i.status);
-  //     if (i.status){
-  //       window.oss.push(i);
-  //     }
-  //   });
-  //   // console.log(oss);
-  //   opts = $(question).children().children();
-  //   // console.log(opts.children(".form-group"));
-  //   choices = opts.children(".form-group");
-  //   // choices = choices.children();
-  //   hint = $(choices).parent().parent();
-  //   // console.log(it);
-  //   $.each(choices,function(){
-  //     label = $(this).children().children('label');
-  //     c = $(this).children().children('label').attr('for');
-  //     // c = c.children().children();
-  //     c = parseInt(c.replace("customCheckbox",''));
-  //     // console.log(c,oss);
-  //     flag = false;
-  //     expl = "";
-  //     $.each(oss,function(){
-  //       oid = this.id;
-  //       // a=this.explanation;
-  //       expl = this.explanation;
-  //       // console.log(expl);
-  //       if (c == oid) {
-  //         flag = true;
-  //       }
-  //       if (flag == true) {
-
-  //         if ($(label).hasClass('btn-info')) {
-  //           $(label).removeClass('btn-info');
-  //           $(label).addClass('btn-success');
-  //           // $(hint).append(this.explanation);
-  //         }
-  //         else{
-  //           $(label).removeClass('btn-info');
-  //           $(label).addClass('btn-primary');
-            
-  //         }
-          
-  //       }
-  //       else{
-  //         if ($(label).hasClass('btn-info') && !$(label).hasClass('btn-primary')) {
-  //           // $(label).removeClass('btn-info');
-  //           // $(label).removeClass('btn-sucess');
-  //           $(label).removeClass('btn-info');
-  //           $(label).addClass('btn-danger');
-  //         }
-  //       }
-        
-  //     });
-  //     // a = this.explanation;
-  //           // console.log(hint,a);
-  //     })
-  //   hint.append("<div class='bg-warning'>"+expl+"</div>");
-
-  //   // console.log();
-  //     $('input').each(function(){
-  //   $(this).attr('disabled','disabled');
-  // })
-  // })
-  // console.log(q_a_set);
 
 });
 </script>
@@ -611,6 +500,26 @@ window.onload = function () {
 
 
 <script>
+  var alert = 0;
+  $('.closelink').click(function(){
+    window.location.href = 'http://127.0.0.1:8000/index/';
+  });
+  $('.reattempt').click(function(){
+    window.location.href = 'http://127.0.0.1:8000/mcq/exam/';
+  });
+  {%if crs%}
+  $('html').mouseleave(function(){
+    if (alert==0){
+      $('#alertbutton').trigger('click');
+      alert +=1;
+    }
+    else if(aler==1){
+      $('#alertbutton').trigger('click');
+      $("input[type='submit']").trigger('click');
+    }
+    
+  });
+  {%endif%}
   $(function () {
     //Initialize Select2 Elements
     $('.select2').select2({
