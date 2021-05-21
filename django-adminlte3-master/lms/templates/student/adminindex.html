@@ -183,6 +183,54 @@
               </a>
             </div>
           </div>
+          <div class="col-lg-3 col-6">
+            <!-- small card -->
+            <div class="small-box bg-danger">
+              <div class="inner">
+                <!-- <h3>44</h3> -->
+
+                <p>Timeline Posts</p>
+              </div>
+              <div class="icon">
+                <a href="{% url 'timeline' %}" class="icon"><i class="fas fa-history"></i></i></a>
+              </div>
+              <a href="{% url 'timeline'%}" class="small-box-footer">
+                View Marks <i class="fas fa-arrow-circle-right"></i>
+              </a>
+            </div>
+          </div>
+          <div class="col-lg-3 col-6">
+            <!-- small card -->
+            <div class="small-box bg-primary">
+              <div class="inner">
+                <!-- <h3>44</h3> -->
+
+                <p>Feedback</p>
+              </div>
+              <div class="icon">
+                <a href="{% url 'viewfeedback' %}" class="icon"><i class="fa fa-edit" aria-hidden="true"></i></a>
+              </div>
+              <a href="{% url 'viewfeedback'%}" class="small-box-footer">
+                View Feedbacks <i class="fas fa-arrow-circle-right"></i>
+              </a>
+            </div>
+          </div>
+          <div class="col-lg-3 col-6">
+            <!-- small card -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <!-- <h3>44</h3> -->
+
+                <p>Video Permissions</p>
+              </div>
+              <div class="icon">
+                <a href="{% url 'videopermissions' %}" class="icon"><i class="fa fa-video" aria-hidden="true"></i></a>
+              </div>
+              <a href="{% url 'videopermissions'%}" class="small-box-footer">
+                View Video Permissions <i class="fas fa-arrow-circle-right"></i>
+              </a>
+            </div>
+          </div>
         </div>
        
       </div><!--/. container-fluid -->
@@ -190,7 +238,6 @@
   <div>
   </div>
     </section>
-    
     {%endblock%}
     <!-- /.content -->
   </div>

@@ -9,12 +9,18 @@
 
   {%include 'student/csslinks.html'%}
   {%block style%}
-  <style type="text/css">
+
+  {%endblock%}
+    <style type="text/css">
     .fa-link:hover{
       background-color: blue;
     }
+    .social{
+      font-size: xx-large;
+      font-weight: 400;
+      margin: 9px;
+    }
   </style>
-  {%endblock%}
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
@@ -34,7 +40,7 @@
 
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+  <div class="content-wrapper" style="margin-top: 0px;">
     <!-- Content Header (Page header) -->
     {%block content_header%}
     {%endblock%}
@@ -68,6 +74,131 @@
 {%include 'student/scriptlinks.html'%}
 {%block script%}
 {%endblock%}
+      <div class="modal fade" id="followus">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4>Fortune Cloude Technologies</h4>
+              <button type="button" class="close closelink" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+           
+            <div class="modal-body" style="align-self: center;">
+              <!-- <p>One fine body&hellip;</p> -->
+              
+              <!-- <div class="col-sm-12"></div> -->
+              <a href="https://www.facebook.com/fortunecloudtechnologies/" target="new"><i class="fab fa-facebook-square social" style="color: #1877f2;"></i></a>
+              <a href="https://www.instagram.com/fortunecloud/" target="new"><i class="fab fa-instagram social" style="color: #db3465;"></i></a>
+              <a href="" target="new"><i class="fab fa-twitter social" style="color: #28a9e0;"></i></a>
+              <a href="https://www.linkedin.com/company/fortunecloud/" target="new"><i class="fab fa-linkedin social" style="color: #0077b7"></i></a>
+              <a href="https://www.youtube.com/channel/UCapKgnnZra4mA76FnhL1ZrQ" target="new"><i class="fab fa-youtube social" style="color: red"></i></a>
+            </div>
+            <div class="modal-footer justify-content-between">
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+{%if not crs%}
+    <form action="{%url 'addfeedback'%}" method="POST">
+      {%csrf_token%}
+      <div class="modal fade" id="feedback">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header bg-primary">
+              <h4>Feedback</h4>
+              <button type="button" class="close closelink" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-body row" style="align-self: center;">
+              <div class="form-group col-sm-6">
+                <label> Course Name</label>
+                <input type="text" name="cname" class="form-control" required="">
+              </div>
+              <div class="form-group col-sm-6">
+                <label> Trainer Name</label>
+                <input type="text" name="tname" class="form-control" required>
+              </div>
+              <div class="form-group col-sm-12">
+                <label> Does your class starts on time? if no, tell us the reason</label>
+                <input type="text" name="classlate" class="form-control" required>
+              </div>
+              <div class="form-group col-sm-12">
+              <label> Has your trainer solved all your queries with regards to technical skills?</label>
+                <div class="form-control">
+                  <input type="radio" name="technicalquerysolved" value="Yes" required>&nbsp&nbspYes&nbsp&nbsp
+                  <input type="radio" name="technicalquerysolved" value="No" required>&nbsp&nbspNo&nbsp&nbsp
+                  <input type="radio" name="technicalquerysolved" value="Unsatisfied" required>&nbsp&nbspUnsatisfied&nbsp&nbsp
+                </div>
+              </div>
+              <div class="form-group col-sm-12">
+                <label> Does your mentor gives you practical sessions(task)?</label>
+                <div class="form-control">
+                  <input type="radio" name="practicalsessions" value="Yes" required>&nbsp&nbspYes&nbsp&nbsp
+                  <input type="radio" name="practicalsessions" value="No" required>&nbsp&nbspNo&nbsp&nbsp
+                  <input type="radio" name="practicalsessions" value="Unsatisfied" required>&nbsp&nbspUnsatisfied&nbsp&nbsp
+                </div>
+              </div>
+              <div class="form-group col-sm-12">
+                <label> How much you will rate your Trainer/Mentor?</label>
+                <div class="form-control">
+                  <input type="radio" name="trainerscore" value="1" required>&nbsp&nbsp1&nbsp&nbsp
+                  <input type="radio" name="trainerscore" value="2" required>&nbsp&nbsp2&nbsp&nbsp
+                  <input type="radio" name="trainerscore" value="3" required>&nbsp&nbsp3&nbsp&nbsp
+                  <input type="radio" name="trainerscore" value="4" required>&nbsp&nbsp4&nbsp&nbsp
+                  <input type="radio" name="trainerscore" value="5" required>&nbsp&nbsp5&nbsp&nbsp
+                </div>
+              </div>
+              <div class="form-group col-sm-12">
+                <label> How much you will rate Fortune Cloud Training service?</label>
+                <div class="form-control">
+                  <input type="radio" name="fortunescore" value="1" required>&nbsp&nbsp1&nbsp&nbsp
+                  <input type="radio" name="fortunescore" value="2" required>&nbsp&nbsp2&nbsp&nbsp
+                  <input type="radio" name="fortunescore" value="3" required>&nbsp&nbsp3&nbsp&nbsp
+                  <input type="radio" name="fortunescore" value="4" required>&nbsp&nbsp4&nbsp&nbsp
+                  <input type="radio" name="fortunescore" value="5" required>&nbsp&nbsp5&nbsp&nbsp
+                </div>
+              </div>
+              <div class="form-group col-sm-12">
+                <label> Any suggestions for Trainer & Fortune Cloud Technologies</label>
+                <input type="text" name="suggestin" class="form-control" required>
+              </div>
+              <div class="form-group col-sm-12">
+                <label> Would you like to refer your friend for training at Fortune cloud</label>
+                  <select name="refer" class="form-control" onclick="feedbackform(this)">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="May be">May be</option>
+                  </select>
+              </div>
+              <div class="collapse col-sm-12" id="refer">
+                <div class="row">
+                  <div class="form-group col-sm-6">
+                    <label> Give your friend name</label>
+                    <input type="text" name="fname" class="form-control">
+                  </div>
+                  <div class="form-group col-sm-6">
+                    <label> Contact number</label>
+                    <input type="number" name="fcontact" class="form-control">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <input type="submit" name="submit" value="Submit" class="form-control bg-info" onclick="feedbackcoockie()">
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+    </form>
+{%endif%}
 </body>
 <!-- Page specific script -->
 {%for message in messages%}
@@ -75,11 +206,25 @@
   // $('.toastrDefaultSuccess').click(function() {
       toastr.success('{{message}}')
     // });
-      function push(){
-    $('[data-widget="pushmenu"]').PushMenu('toggle');
-  }
+    //   function push(){
+    // $('[data-widget="pushmenu"]').PushMenu('toggle');
+  // }
 </script>
 {%endfor%}
+<script type="text/javascript">
+    function feedbackform(a){
+    if ($(a).val()=='Yes'){
+      $("#refer").removeClass('collapse');
+    }
+    else{
+      $("#refer").addClass('collapse');
+    }
+  }
 
+  {%if request.session.feedback%}
+    $('#feedbacklink').trigger('click');
+
+  {%endif%}
+</script>
 
 </html>

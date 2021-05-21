@@ -1,6 +1,26 @@
 
 {%extends 'student/base.html'%}
 {%load static%}
+{%block style%}
+<style type="text/css">
+  .hide{
+    display: none;
+  }
+  label[for='photo']{
+    height: 100px;
+    /*width: 100px; */
+    border: 1px solid #a54545cc;
+    float: right;
+    border-radius: 25%;
+    background-image: url('/media/{{request.session.ab.photo}}');
+    background-size: cover;
+    padding: 30px;
+  }
+  .fa-camera:hover{
+    color: #536273;
+  }
+</style>
+{%endblock%}
 {%load admin_menu%}
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -38,14 +58,15 @@
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-              <form action="{%if request.user.is_staff%}{%url 'addstudents'%}{%else%}/admin/include/view_data/0/0/0/False/{%endif%}" method="POST" enctype="multipart/form-data">
+              <form action="{%url 'addstudents'%}" method="POST" enctype="multipart/form-data">
                 {%csrf_token%}
-                <div class="card-body row">
+                <div class="card-body">
                  <div class="form-group row">
                   <div class="form-group col-md-6"></div>
                   <div class="form-group col-md-6">
-                    <label for="photo">Profile Photo </label>
-                    <input type="file" name="photo" id="photo" style="height: 100px; width: 100px; border: 2px solid black;float: right;border-radius: 5%;">
+                    <label>Profile Photo</label>
+                    <label for="photo" style="" onclick="(function(){$('#photo').trigger('click')})()"><i class="fas fa-camera fa-2x" {%if not request.session.ab.photo%} class="hide" id="photohover" {%endif%} style="color:#bfc6ce94"></i></label>
+                    <input type="file" name="photo" id="photo" style="display: none;">
                   </div>
                   <div class="form-group col-md-6">
                     <label for="center">Center: </label>
@@ -119,7 +140,7 @@
                       <label for="exampleInputEmail1">Email address</label>
                       <input name="emailid" type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email" value="{{profile.0.emailid}}" {%if not request.user.is_staff%}readonly{%endif%}>
                   </div>
-                <div class="row">
+                <!-- <div class="row"> -->
                   <div class="col-12">
                     <div class="card">
                       <div class="card-header">
@@ -257,7 +278,7 @@
                     <!-- /.card-body -->
                   </div>
                 </div>
-                </div>
+                <!-- </div> -->
                 <!-- <div class="row"> -->
                 <div class="form-group col-md-4">
                     <label for="fees">Fees: </label>
@@ -290,7 +311,7 @@
                         </label>
                       </div>
                     </div>
-                  <div class="row">
+                  <!-- <div class="row"> -->
                     <div class="col-12">
                       <div class="card">
                         <div class="card-header">
@@ -335,15 +356,16 @@
                         </div>
                       <!-- /.card -->
                     </div>
-                 </div>
+                 <!-- </div> -->
 
                 </div>
                 <!-- /.card-body -->
 
-                <div class="card-footer">
-                  <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
               </form>
+            </div>
+
+            <div class="card-footer">
+              <button type="submit" name="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
       </div>

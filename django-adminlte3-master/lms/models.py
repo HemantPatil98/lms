@@ -70,3 +70,14 @@ class extra_data(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class timeline(models.Model):
+    generator = models.ForeignKey(User,on_delete=nothing)
+    generatedtime = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=100)
+    type = models.CharField(max_length=100)
+    body = models.TextField()
+
+    def __str__(self):
+        return self.title

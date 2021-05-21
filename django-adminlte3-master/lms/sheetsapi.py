@@ -90,7 +90,7 @@ def startsheet():
 
         student_profile = []
         basic = ["center", "dateofadmission", "course", "batchstartdate","module start from","trainingmode"]
-        personal_details = ["name", "address", "dateofbirth", "contact", "emailid", "alternatecontact"]
+        personal_details = ["name", "address", "dateofbirth", "contact", "alternatecontact", "emailid"]
         educational_details = ['examination', 'stream', 'collegename', 'boardname', 'yearofpassing', 'percentage']
         fees = ["fees", "mode", "regammount", "installment1", "installment2", "installment3", "regdate",
                 "installment1date",
@@ -120,6 +120,22 @@ def startsheet():
         # fp.write(SPREADSHEET_ID)
         # fp.close()
         ex = extra_data(name='attendance', value=SPREADSHEET_ID)
+        ex.save()
+
+    if not extra_data.objects.filter(name='feedback'):
+        feedback = ["id","date","student name","contact no","email id","course name","trainer name/mentor name","Does your class starts on time?",
+                    "Has your trainer solved all your queries with regards to technical skills","Does your menotor gives you practical sessoins",
+                    "How much you will rate your trainer/mentor","How much will you rate overall fortune clouds it training service",
+                    "Any suggestions for trainer & fortune Cloud Technologies","would you like to refer friend","friends name","friends contact"]
+
+        sheetname = "Apr - Mar " +datetime.datetime.now().strftime("%Y")
+        SPREADSHEET_ID = createsheet(name='Feedback',columns=feedback,sheetname=sheetname)
+        # print("HI")
+
+        # fp = open('attendance.txt','a')
+        # fp.write(SPREADSHEET_ID)
+        # fp.close()
+        ex = extra_data(name='feedback', value=SPREADSHEET_ID)
         ex.save()
 
     # if not extra_data.objects.filter(name='mcq'):
@@ -279,13 +295,11 @@ def updatesheet(SPREADSHEET_ID,row,value,col=0,cell=False):
                                     valueInputOption="USER_ENTERED", body=body)
     else:
         body = {
-            "values": [
-                value
-            ]
+            "values": value
         }
         print(value)
         request = sheet.values().update(spreadsheetId=SPREADSHEET_ID,
-                                    range="Apr - Mar 2021!A"+str(row)+":BE"+str(row),
+                                    range="Apr - Mar 2021!A"+str(row)+":BE"+str(row+len(value)),
                                     valueInputOption="USER_ENTERED", body=body)
     response = request.execute()
     print(response)

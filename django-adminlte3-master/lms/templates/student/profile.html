@@ -7,13 +7,16 @@
   }
   label[for='photo']{
     height: 100px;
-    width: 100px; 
+    /*width: 100px; */
     border: 1px solid #a54545cc;
     float: right;
     border-radius: 25%;
     background-image: url('/media/{{request.session.ab.photo}}');
     background-size: cover;
     padding: 30px;
+  }
+  .fa-camera:hover{
+    color: #536273;
   }
 </style>
 {%endblock%}
@@ -147,312 +150,313 @@
               
                   <!-- /.tab-pane -->
 
-                  <div class="tab-pane active" id="settings">
-              <form action="{%if request.user.is_staff%}{%url 'addstudents'%}{%else%}/admin/include/studentupdate/{%endif%}" method="POST" enctype="multipart/form-data">
-                {%csrf_token%}
-                  <div class="card-body row">
+              <div class="tab-pane active" id="settings">
+                <form action="{%url 'addstudents'%}" method="POST" enctype="multipart/form-data">
+                  {%csrf_token%}
+                  <div class="card-body">
+                   <div class="form-group row">
                     <div class="form-group col-md-6"></div>
-                  <div class="form-group col-md-6">
-                    <label for="photo" style="" onclick="(function(){$('#photo').trigger('click')})()">{%if not request.session.ab.photo%}<i class="fas fa-camera fa-2x" style="color:#f8f9fa99"></i>{%endif%}<i class="fas fa-camera hide fa-2x" id="photohover" style="color:#f8f9fa99"></i> </label>
-                    <input type="file" name="photo" id="photo" style="display: none;">
-                  </div>
-                	<div class="form-group col-md-6">
-	                  <label for="center">Center: </label>
-	                  <select name="center" class="custom-select form-control-border" id="center">
-	                    <option {%if profile.0.center == 'shivaji Nagar' %}selected{%endif%} {%if not request.user.is_staff%}readonly{%endif%}>Shivaji Nagar</option>
-	                  </select>
-	                </div>
-	                <div class="form-group col-sm-6">
-                  		<label>Date of Addmission: </label>
-                        <input type="date" name="dateofadmission" class="form-control" value="{{profile.0.dateofadmission}}" {%if not request.user.is_staff%}readonly{%endif%}/>
-	                </div>
-	                <div class="col-sm-6">
-                      <!-- select -->
-                      <div class="form-group">
-                        <label>Course: </label>
-                        <select name="course" class="form-control" {%if not request.user.is_staff%}readonly{%endif%}>
-                          <option {%if profile.0.course == 'Python' %}selected{%endif%}>Python</option>
-                          <option {%if profile.0.course == 'PHP' %}selected{%endif%}>PHP</option>
-                          <option {%if profile.0.course == 'JAVA' %}selected{%endif%}>JAVA</option>
-                          <option {%if profile.0.course == 'Testing' %}selected{%endif%}>Testing</option>
-                        </select>
-                      </div>
+                    <div class="form-group col-md-6">
+                      <label>Profile Photo</label>
+                      <label for="photo" style="" onclick="(function(){$('#photo').trigger('click')})()"><i class="fas fa-camera fa-2x" {%if not request.session.ab.photo%} class="hide" id="photohover" {%endif%} style="color:#bfc6ce94"></i></label>
+                      <input type="file" name="photo" id="photo" style="display: none;">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="center">Center: </label>
+                      <select name="center" class="custom-select form-control-border" id="center">
+                        <option {%if profile.0.center == 'shivaji Nagar' %}selected{%endif%} {%if not request.user.is_staff%}readonly{%endif%}>Shivaji Nagar</option>
+                      </select>
                     </div>
                     <div class="form-group col-sm-6">
-                  		<label>Batch Start Date:</label>
-                        <input type="date" class="form-control" name="batchstartdate" value="{{profile.0.batchstartdate}}" {%if not request.user.is_staff%}readonly{%endif%}/>
-	                </div>
-                  <div class="col-sm-6">
-                      <div class="form-group">
-                        <label>Course Start Module: </label>
-                        <select name="startcourse" class="form-control" {%if not request.user.is_staff%}readonly{%endif%}>
-                          <option {%if profile.0.startcourse == 'C' %}selected{%endif%}>C</option>
-                          <option {%if profile.0.startcourse == 'Sql' %}selected{%endif%}>Sql</option>
-                          <option {%if profile.0.startcourse == 'Web Designing' %}selected{%endif%}>Web Designing</option>
-                        </select>
-                      </div>
+                        <label>Date of Addmission: </label>
+                          <input type="date" name="dateofadmission" class="form-control" value="{{profile.0.dateofadmission}}" {%if not request.user.is_staff%}readonly{%endif%}/>
                     </div>
                     <div class="col-sm-6">
-                      <div class="form-group">
-                        <label>Course Start Module: </label>
-                        <select name="trainingmode" class="form-control" {%if not request.user.is_staff%}readonly{%endif%}>
-                          <option {%if profile.0.trainingmode == 'Offline' %}selected{%endif%}>Offline</option>
-                          <option {%if profile.0.trainingmode == 'Online' %}selected{%endif%}>Online</option>
-                        </select>
-                      </div>
-                    </div>
-	               <div class="col-md-12">
-                    <label><b>Personal Details: </b></label>
-                  </div>
-                  <div class="form-group col-md-6">
-                    <label for="name">Name</label>
-                    <input name="name" type="text" class="form-control" id="name" placeholder="Enter Name" value="{{profile.0.name}}">
-                  </div>
-                  <div class="form-group col-md-6">
-                    <label for="address">Address</label>
-                    <input name="address" type="text" class="form-control" id="address" placeholder="Enter Name" value="{{profile.0.address}}">
-                  </div>
-                  <div class="form-group col-sm-6">
-                  		<label>Date of Birth: </label>
-	                     <input type="date" name="dateofbirth" class="form-control" value="{{profile.0.dateofbirth}}"/>
-	                </div>
-	                <div class="form-group col-md-6">
-	                    <label for="contact">Contact</label>
-	                    <input name="contact" type="tel" class="form-control" id="contact" placeholder="Enter Contact" value="{{profile.0.contact}}" {%if not request.user.is_staff%}readonly{%endif%}>
-	                </div>
-                  <div class="form-group col-md-6">
-	                    <label for="alternatecontact">Alternate Contact</label>
-	                    <input name="alternatecontact" type="tel" class="form-control" id="alternatecontact" placeholder="Enter Alternate Contact" value="{{profile.0.alternatecontact}}">
-  	              </div>
-                  <div class="form-group col-md-6">
-                      <label for="exampleInputEmail1">Email address</label>
-                      <input name="emailid" type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email" value="{{profile.0.emailid}}" {%if not request.user.is_staff%}readonly{%endif%}>
-                  </div>
-  			        <div class="row">
-  			          <div class="col-12">
-  			            <div class="card">
-  			              <div class="card-header">
-  			                <h3 class="card-title"><b>Eduactional Qualification</b></h3>
-  			              </div>
-  			              <!-- /.card-header -->
-  			              <div class="card-body table-responsive p-0">
-  			                <table class="table table-hover text-nowrap">
-  			                  <thead>
-  			                    <tr>
-  			                      <th>Examination</th>
-  			                      <th>Stream</th>
-  			                      <th>Name of School/College</th>
-  			                      <th>Board/University</th>
-  			                      <th>Year of passing</th>
-  			                      <th>Percentage</th>
-  			                    </tr>
-  			                  </thead>
-  			                  <tbody>
-            								<tr>
-            									<td>
-            										<select name="secondary" class="form-control">
-            										<option value="SSC" selected>SSC</option>
-            										</select>
-            									</td>
-            									<td>
-            										<select name="stream10" class="form-control">
-            										<option value="Marathi" {%if profile.0.stream == 'Marathi' %}selected{%endif%}>Marathi</option>
-            										<option value="Semi-English" {%if profile.0.stream == 'Semi-English' %}selected{%endif%}>Semi-English</option>
-            										<option value="English" {%if profile.0.stream == 'English' %}selected{%endif%}>English</option>
-            										</select>
-            									</td>
-            									<td>
-            										<input type="text" name="collegename10" class="form-control"value="{{profile.0.collegename}}">
-            									</td>
-            									<td>
-            										<input type="text" name="boardname10" class="form-control"value="{{profile.0.boardname}}">
-            									</td>
-            									<td>
-            										<input type="number" name="yearofpassing10" class="form-control" value="{{profile.0.yearofpassing}}">
-            									</td>
-            									<td>
-            										<input type="number" name="percentage10" min="0" max="100" class="form-control" value="{{profile.0.percentage}}">
-            									</td>
-            								</tr>
-            								<tr>
-          									<td>
-          										<select name="hsecondary" class="form-control">
-          										<option value="HSC/Diploma" {%if not profile.1.examination %}selected{%endif%} hidden="">HSC/Diploma</option>
-          										<option value="HSC" {%if profile.1.examination == 'HSC' %}selected{%endif%}>HSC</option>
-          										<option value="Diploma" {%if profile.1.examination == 'Diploma' %}selected{%endif%}>Diploma</option>
-          										</select>
-          									</td>
-          									<td>
-          										<select name="stream12" class="form-control">
-          										<option {%if profile.1.stream == 'Arts' %}selected{%endif%}>Arts</option>
-          										<option {%if profile.1.stream == 'Commerce' %}selected{%endif%}>Commerce</option>
-          										<option {%if not profile.1.examination %}selected{%endif%} {%if profile.1.stream == 'Science' %}selected{%endif%}>Science</option>
-          										</select>
-          									</td>
-          									<td>
-          										<input type="text" name="collegename12" class="form-control" value="{{profile.1.collegename}}">
-          									</td>
-          									<td>
-          										<input type="text" name="boardname12" class="form-control" value="{{profile.1.boardname}}">
-          									</td>
-          									<td>
-          										<input type="number" name="yearofpassing12" class="form-control" value="{{profile.1.yearofpassing}}">
-          									</td>
-          									<td>
-          										<input type="number" name="percentage12" min="0" max="100" class="form-control" value="{{profile.1.percentage}}">
-          									</td>
-          								</tr>
-          								<tr>
-          									<td><select name="graduation" class="form-control">
-          										<option value="B.E/B.Tech/B.Sc/BCA" {%if not profile.2.examination %}selected{%endif%} hidden="">B.E/B.Tech/B.Sc/BCA</option>
-          										<option {%if profile.2.examination == 'B.E' %}selected{%endif%} value="B.E">B.E</option>
-          										<option {%if profile.2.examination == 'B.Tech' %}selected{%endif%} value="B.Tech">B.Tech</option>
-          										<option {%if profile.2.examination == 'B.Sc' %}selected{%endif%} value="B.Sc">B.Sc</option>
-          										<option {%if profile.2.examination == 'B.CA' %}selected{%endif%} value="B.CA">B.CA</option>
-          										</select>
-          									</td>
-          									<td>
-          										<select name="streamg" class="form-control">
-          										<option {%if profile.2.stream == 'Computer Science' %}selected{%endif%} value="Computer Science">Computer Science</option>
-          										<option {%if profile.2.stream == 'Mechanical' %}selected{%endif%} value="Mechanical">Mechanical</option>
-          										<option {%if profile.2.stream == 'E&TC' %}selected{%endif%} value="E&TC">E&TC</option>
-          										</select>
-          									</td>
-          									<td>
-          										<input type="text" name="collegenameg" class="form-control"  value="{{profile.2.collegename}}">
-          									</td>
-          									<td>
-          										<input type="text" name="boardnameg" class="form-control"
-                               value="{{profile.2.boardname}}">
-          									</td>
-          									<td>
-          										<input type="number" name="yearofpassing" class="form-control" value="{{profile.2.yearofpassing}}">
-          									</td>
-          									<td>
-          										<input type="number" name="percentageg" min="0" max="100" class="form-control" value="{{profile.2.percentage}}">
-          									</td>
-          								</tr>
-          								<tr>
-          									<td><select name="pg" class="form-control">
-          										<option value="M.Sc/M.CA" {%if not profile.3.examination %}selected{%endif%} hidden="">M.Sc/M.CA</option>
-          										<option {%if profile.3.examination == 'M.Sc' %}selected{%endif%} value="M.Sc">M.Sc</option>
-          										<option {%if profile.3.examination == 'M.Sc' %}selected{%endif%} value="M.CA">M.Sc</option>
-          										</select>
-          									</td>
-          									<td>
-          										<select name="streampg" class="form-control">
-          										<option {%if profile.3.stream == 'Computer Sciennce' %}selected{%endif%} value="Computer Sciennce" selected>Computer Sciennce</option>
-          										<option {%if profile.3.stream == 'Computer Application' %}selected{%endif%} value="Computer Application">Computer Application</option>
-          										</select>
-          									</td>
-          									<td>
-          										<input type="text" name="collegenamepg" class="form-control" value="{{profile.3.collegename}}">
-          									</td>
-          									<td>
-          										<input type="text" name="boardnamepg" class="form-control" value="{{profile.3.boardname}}">
-          									</td>
-          									<td>
-          										<input type="number" name="yearofpassinpg" class="form-control" value="{{profile.3.yearofpassing}}">
-          									</td>
-          									<td>
-          										<input type="number" name="percentagepg" min="0" max="100" class="form-control" value="{{profile.3.percentage}}">
-          									</td>
-          								</tr>
-			                    
-			                  </tbody>
-			                </table>
-			              </div>
-                    
-			              <!-- /.card-body -->
-			            </div>
-			          </div>
-  			        </div>
-  			        <!-- <div class="row"> -->
-			        	<div class="form-group col-md-4">
-                    <label for="fees">Fees: </label>
-                    <input type="number" class="form-control" name="fees" id="fees" placeholder="Fees" value="{{profile.0.fees}}" {%if not request.user.is_staff%}readonly{%endif%}>
-              	</div>
-              	<div class="form-group col-md-8">
-              		<label for="fees">Mode Of Payment: </label>
-	              		<div class="form-group clearfix">
-	                      <div class="icheck-primary d-inline">
-	                        <input type="checkbox" name="mode" id="checkboxPrimary1" value="LumpSum" checked {%if not request.user.is_staff%}onclick="return false"{%endif%}>
-	                        <label for="checkboxPrimary1">Lump Sum
-	                        </label>
-	                      </div>
-	                    </div>
-
-                      <div class="icheck-primary d-inline">
-                        <input type="checkbox" name="mode" id="checkboxPrimary1" value="1" {%if not request.user.is_staff%}onclick="return false"{%endif%}>
-                        <label for="checkboxPrimary1">
-                        </label>
-                      </div>
-                      <div class="icheck-primary d-inline">
-                        <input type="checkbox" name="mode" id="checkboxPrimary2" value="2" {%if not request.user.is_staff%}onclick="return false"{%endif%}>
-                        <label for="checkboxPrimary2">
-                        </label>
-                      </div>
-                      <div class="icheck-primary d-inline">
-                        <input type="checkbox" name="mode" id="checkboxPrimary3" value="3" {%if not request.user.is_staff%}onclick="return false"{%endif%}>
-                        <label for="checkboxPrimary3">
-                          Installment
-                        </label>
-                      </div>
-                    </div>
-    			        <div class="row">
-    			          <div class="col-12">
-    			            <div class="card">
-    			              <div class="card-header">
-    			                <h3 class="card-title"><b>Fees Schedule</b></h3>
-    			              </div>
-    			              <!-- /.card-header -->
-    			              <div class="card-body table-responsive p-0">
-    			                <table class="table table-hover text-nowrap">
-    			                  <thead>
-    			                    <tr>
-    			                      <th> </th>
-    			                      <th>Registration Ammount</th>
-    			                      <th>1st installation</th>
-    			                      <th>2nd Installation</th>
-    			                      <th>3rd Installation</th>
-    			                    </tr>
-    			                  </thead>
-    			                  <tbody>
-              								<tr>
-              									<td>Fees Payment Breakup</td>
-                                <td><input type="number" name="regammount" class="form-control" value="{{profile.0.regammount}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
-              									<td><input type="number" name="installment1" class="form-control" value="{{profile.0.installment1}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
-              									<td><input type="number" name="installment2" class="form-control" value="{{profile.0.installment2}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
-              									<td><input type="number" name="installment3" class="form-control" value="{{profile.0.installment3}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
-              								</tr>
-                              <tr>
-                                <td>Dates of Installments</td>
-                                <td><input type="date" name="regdate" class="form-control" value="{{profile.0.regdate}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
-                                <td><input type="date" name="installment1date" class="form-control" value="{{profile.0.installment1date}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
-                                <td><input type="date" name="installment2date" class="form-control" value="{{profile.0.installment2date}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
-                                <td><input type="date" name="installment3date" class="form-control" value="{{profile.0.installment3date}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
-                              </tr>
-    			                  </tbody>
-    			                </table>
-    			              </div>
-                      
-    			              <!-- /.card-body -->
-    			            </div>
-                      <div class="form-group col-md-12">
-                          <label for="remark">Remark</label>
-                          <input type="text" name="remark" class="form-control" id="remark" placeholder="Enter Remark" value="{{profile.0.remark}}" {%if not request.user.is_staff%}readonly{%endif%} />
+                        <!-- select -->
+                        <div class="form-group">
+                          <label>Course: </label>
+                          <select name="course" class="form-control" {%if not request.user.is_staff%}readonly{%endif%}>
+                            <option {%if profile.0.course == 'Python' %}selected{%endif%}>Python</option>
+                            <option {%if profile.0.course == 'PHP' %}selected{%endif%}>PHP</option>
+                            <option {%if profile.0.course == 'JAVA' %}selected{%endif%}>JAVA</option>
+                            <option {%if profile.0.course == 'Testing' %}selected{%endif%}>Testing</option>
+                          </select>
                         </div>
-    			            <!-- /.card -->
-    			          </div>
-			           </div>
+                    </div>
+                    <div class="form-group col-sm-6">
+                        <label>Batch Start Date:</label>
+                          <input type="date" class="form-control" name="batchstartdate" value="{{profile.0.batchstartdate}}" {%if not request.user.is_staff%}readonly{%endif%}/>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                          <label>Course Start Module: </label>
+                          <select name="startcourse" class="form-control" {%if not request.user.is_staff%}readonly{%endif%}>
+                            <option {%if profile.0.startcourse == 'C' %}selected{%endif%}>C</option>
+                            <option {%if profile.0.startcourse == 'Sql' %}selected{%endif%}>Sql</option>
+                            <option {%if profile.0.startcourse == 'Web Designing' %}selected{%endif%}>Web Designing</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="form-group">
+                          <label>Course Start Module: </label>
+                          <select name="trainingmode" class="form-control" {%if not request.user.is_staff%}readonly{%endif%}>
+                            <option {%if profile.0.trainingmode == 'Offline' %}selected{%endif%}>Offline</option>
+                            <option {%if profile.0.trainingmode == 'Online' %}selected{%endif%}>Online</option>
+                          </select>
+                        </div>
+                      </div>
+                   <div class="col-md-12">
+                      <label><b>Personal Details: </b></label>
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="name">Name</label>
+                      <input name="name" type="text" class="form-control" id="name" placeholder="Enter Name" value="{{profile.0.name}}">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="address">Address</label>
+                      <input name="address" type="text" class="form-control" id="address" placeholder="Enter Name" value="{{profile.0.address}}">
+                    </div>
+                    <div class="form-group col-sm-6">
+                        <label>Date of Birth: </label>
+                         <input type="date" name="dateofbirth" class="form-control" value="{{profile.0.dateofbirth}}"/>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="contact">Contact</label>
+                        <input name="contact" type="tel" class="form-control" id="contact" placeholder="Enter Contact" value="{{profile.0.contact}}" {%if not request.user.is_staff%}readonly{%endif%}>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="alternatecontact">Alternate Contact</label>
+                        <input name="alternatecontact" type="tel" class="form-control" id="alternatecontact" placeholder="Enter Alternate Contact" value="{{profile.0.alternatecontact}}">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputEmail1">Email address</label>
+                        <input name="emailid" type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email" value="{{profile.0.emailid}}" {%if not request.user.is_staff%}readonly{%endif%}>
+                    </div>
+                  <!-- <div class="row"> -->
+                    <div class="col-12">
+                      <div class="card">
+                        <div class="card-header">
+                          <h3 class="card-title"><b>Eduactional Qualification</b></h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0">
+                          <table class="table table-hover text-nowrap">
+                            <thead>
+                              <tr>
+                                <th>Examination</th>
+                                <th>Stream</th>
+                                <th>Name of School/College</th>
+                                <th>Board/University</th>
+                                <th>Year of passing</th>
+                                <th>Percentage</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>
+                                  <select name="examination" class="form-control">
+                                  <option value="SSC" selected>SSC</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <select name="stream" class="form-control">
+                                  <option value="Marathi" {%if profile.0.stream == 'Marathi' %}selected{%endif%}>Marathi</option>
+                                  <option value="Semi-English" {%if profile.0.stream == 'Semi-English' %}selected{%endif%}>Semi-English</option>
+                                  <option value="English" {%if profile.0.stream == 'English' %}selected{%endif%}>English</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input type="text" name="collegename" class="form-control"value="{{profile.0.collegename}}">
+                                </td>
+                                <td>
+                                  <input type="text" name="boardname" class="form-control"value="{{profile.0.boardname}}">
+                                </td>
+                                <td>
+                                  <input type="number" name="yearofpassing" class="form-control" value="{{profile.0.yearofpassing}}">
+                                </td>
+                                <td>
+                                  <input type="number" name="percentage" min="0" max="100" class="form-control" value="{{profile.0.percentage}}">
+                                </td>
+                              </tr>
+                              <tr>
+                              <td>
+                                <select name="examination" class="form-control">
+                                <option value="HSC/Diploma" {%if not profile.1.examination %}selected{%endif%} hidden="">HSC/Diploma</option>
+                                <option value="HSC" {%if profile.1.examination == 'HSC' %}selected{%endif%}>HSC</option>
+                                <option value="Diploma" {%if profile.1.examination == 'Diploma' %}selected{%endif%}>Diploma</option>
+                                </select>
+                              </td>
+                              <td>
+                                <select name="stream" class="form-control">
+                                <option {%if profile.1.stream == 'Arts' %}selected{%endif%}>Arts</option>
+                                <option {%if profile.1.stream == 'Commerce' %}selected{%endif%}>Commerce</option>
+                                <option {%if not profile.1.examination %}selected{%endif%} {%if profile.1.stream == 'Science' %}selected{%endif%}>Science</option>
+                                </select>
+                              </td>
+                              <td>
+                                <input type="text" name="collegename" class="form-control" value="{{profile.1.collegename}}">
+                              </td>
+                              <td>
+                                <input type="text" name="boardname" class="form-control" value="{{profile.1.boardname}}">
+                              </td>
+                              <td>
+                                <input type="number" name="yearofpassing" class="form-control" value="{{profile.1.yearofpassing}}">
+                              </td>
+                              <td>
+                                <input type="number" name="percentage" min="0" max="100" class="form-control" value="{{profile.1.percentage}}">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td><select name="examination" class="form-control">
+                                <option value="B.E/B.Tech/B.Sc/BCA" {%if not profile.2.examination %}selected{%endif%} hidden="">B.E/B.Tech/B.Sc/BCA</option>
+                                <option {%if profile.2.examination == 'B.E' %}selected{%endif%} value="B.E">B.E</option>
+                                <option {%if profile.2.examination == 'B.Tech' %}selected{%endif%} value="B.Tech">B.Tech</option>
+                                <option {%if profile.2.examination == 'B.Sc' %}selected{%endif%} value="B.Sc">B.Sc</option>
+                                <option {%if profile.2.examination == 'B.CA' %}selected{%endif%} value="B.CA">B.CA</option>
+                                </select>
+                              </td>
+                              <td>
+                                <select name="stream" class="form-control">
+                                <option {%if profile.2.stream == 'Computer Science' %}selected{%endif%} value="Computer Science">Computer Science</option>
+                                <option {%if profile.2.stream == 'Mechanical' %}selected{%endif%} value="Mechanical">Mechanical</option>
+                                <option {%if profile.2.stream == 'E&TC' %}selected{%endif%} value="E&TC">E&TC</option>
+                                </select>
+                              </td>
+                              <td>
+                                <input type="text" name="collegename" class="form-control"  value="{{profile.2.collegename}}">
+                              </td>
+                              <td>
+                                <input type="text" name="boardname" class="form-control"
+                                 value="{{profile.2.boardname}}">
+                              </td>
+                              <td>
+                                <input type="number" name="yearofpassin" class="form-control" value="{{profile.2.yearofpassing}}">
+                              </td>
+                              <td>
+                                <input type="number" name="percentage" min="0" max="100" class="form-control" value="{{profile.2.percentage}}">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td><select name="examination" class="form-control">
+                                <option value="M.Sc/M.CA" {%if not profile.3.examination %}selected{%endif%} hidden="">M.Sc/M.CA</option>
+                                <option {%if profile.3.examination == 'M.Sc' %}selected{%endif%} value="M.Sc">M.Sc</option>
+                                <option {%if profile.3.examination == 'M.Sc' %}selected{%endif%} value="M.CA">M.Sc</option>
+                                </select>
+                              </td>
+                              <td>
+                                <select name="stream" class="form-control">
+                                <option {%if profile.3.stream == 'Computer Sciennce' %}selected{%endif%} value="Computer Sciennce" selected>Computer Sciennce</option>
+                                <option {%if profile.3.stream == 'Computer Application' %}selected{%endif%} value="Computer Application">Computer Application</option>
+                                </select>
+                              </td>
+                              <td>
+                                <input type="text" name="collegename" class="form-control" value="{{profile.3.collegename}}">
+                              </td>
+                              <td>
+                                <input type="text" name="boardname" class="form-control" value="{{profile.3.boardname}}">
+                              </td>
+                              <td>
+                                <input type="number" name="yearofpassin" class="form-control" value="{{profile.3.yearofpassing}}">
+                              </td>
+                              <td>
+                                <input type="number" name="percentage" min="0" max="100" class="form-control" value="{{profile.3.percentage}}">
+                              </td>
+                            </tr>
+                            
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      <!-- /.card-body -->
+                    </div>
+                  </div>
+                  <!-- </div> -->
+                  <!-- <div class="row"> -->
+                  <div class="form-group col-md-4">
+                      <label for="fees">Fees: </label>
+                      <input type="number" class="form-control" name="fees" id="fees" placeholder="Fees" value="{{profile.0.fees}}" {%if not request.user.is_staff%}readonly{%endif%}>
+                  </div>
+                  <div class="form-group col-md-8">
+                    <label for="fees">Mode Of Payment: </label>
+                      <div class="form-group clearfix">
+                          <div class="icheck-primary d-inline">
+                            <input type="radio" name="mode" id="checkboxPrimary1" value="LumpSum" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                            <label for="checkboxPrimary1">Lump Sum
+                            </label>
+                          </div>
+                        </div>
 
-                </div>
-                <!-- /.card-body -->
+                        <div class="icheck-primary d-inline">
+                          <input type="radio" name="mode" id="checkboxPrimary2" value="1" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                          <label for="checkboxPrimary2">
+                          </label>
+                        </div>
+                        <div class="icheck-primary d-inline">
+                          <input type="radio" name="mode" id="checkboxPrimary3" value="2" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                          <label for="checkboxPrimary3">
+                          </label>
+                        </div>
+                        <div class="icheck-primary d-inline">
+                          <input type="radio" name="mode" id="checkboxPrimary4" value="3" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                          <label for="checkboxPrimary4">
+                            Installment
+                          </label>
+                        </div>
+                      </div>
+                    <!-- <div class="row"> -->
+                      <div class="col-12">
+                        <div class="card">
+                          <div class="card-header">
+                            <h3 class="card-title"><b>Fees Schedule</b></h3>
+                          </div>
+                          <!-- /.card-header -->
+                          <div class="card-body table-responsive p-0">
+                            <table class="table table-hover text-nowrap" id="installment">
+                              <thead>
+                                <tr>
+                                  <th> </th>
+                                  <th>Registration Ammount</th>
+                                  <th>1st installation</th>
+                                  <th>2nd Installation</th>
+                                  <th>3rd Installation</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>Fees Payment Breakup</td>
+                                  <td><input type="number" name="regammount" class="form-control" value="{{profile.0.regammount}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                  <td><input type="number" name="installment1" class="form-control" value="{{profile.0.installment1}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                  <td><input type="number" name="installment2" class="form-control" value="{{profile.0.installment2}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                  <td><input type="number" name="installment3" class="form-control" value="{{profile.0.installment3}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                </tr>
+                                <tr>
+                                  <td>Dates of Installments</td>
+                                  <td><input type="date" name="regdate" class="form-control" value="{{profile.0.regdate}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                  <td><input type="date" name="installment1date" class="form-control" value="{{profile.0.installment1date}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                  <td><input type="date" name="installment2date" class="form-control" value="{{profile.0.installment2date}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                  <td><input type="date" name="installment3date" class="form-control" value="{{profile.0.installment3date}}" {%if not request.user.is_staff%}readonly{%endif%} /></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        
+                          <!-- /.card-body -->
+                        </div>
+                        <div class="form-group col-md-12 hide">
+                            <label for="remark">Remark</label>
+                            <input type="text" name="remark" class="form-control" id="remark" placeholder="Enter Remark" value="{{profile.0.remark}}" {%if not request.user.is_staff%}readonly{%endif%} />
+                        </div>
+                        <!-- /.card -->
+                      </div>
+                   <!-- </div> -->
 
-                <div class="card-footer">
-                  <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-              </form>
+                  </div>
+                  <!-- /.card-body -->
+                <button type="submit" class="btn btn-primary">Submit</button>
+
+                </form>
+
                   </div>
                   <!-- /.tab-pane -->
                 </div>
@@ -474,9 +478,7 @@
   <!-- /.content-wrapper -->
 {%block script%}
 <script type="text/javascript">
-  $("label[for='photo']").hover(function(){
-    $('#photohover').toggleClass('hide');
-  });
+  
 </script>
 <script>
   $(function () {

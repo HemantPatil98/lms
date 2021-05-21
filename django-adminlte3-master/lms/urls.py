@@ -37,8 +37,15 @@ urlpatterns = [
     path('student_profile_in/', views.student_profile_in, name='student_profile_in'),
     path('student_profile_out/', views.student_profile_out, name='student_profile_out'),
     path('admin/include/studentupdate/', views.studentupdate, name='updatesheet'),
+    path('timeline/', views.viewtimeline, name='timeline'),
+    path('timelinedata/', views.timelinedata, name='timelinedata'),
+    path('addtimeline/', views.addtimeline, name='addtimeline'),
+    path('deletetimeline/', views.deletetimeline, name='deletetimeline'),
+    path('addfeedback/', views.addfeedback, name='addfeedback'),
+    path('viewfeedback/', views.viewfeedback, name='viewfeedback'),
     # path('admin/include/view_data/performance/<int:row>/<int:col>/<slug:value>/<slug:cell>/', views.studentpupdate,
     #      name='updatesheet')
+    # path('student/profile/update/',views.addstudent,name='studentprofileupdate')
     path('request_certificate/',views.request_certificate,name='request_certificate'),
     path('getdata/<slug:table>/',views.get_data,name='getdata'),
     path('setdata/<slug:table>/',views.set_data,name='setdata'),

@@ -131,7 +131,7 @@
                   <div id="cbody" class="collapse">
                     <div class="row">
                       <div class="col-sm-4">
-                        <a href="">
+                        <a href="/video/C/">
                         <img src="{%static 'courses/video.png'%}" width="150px">
                         <h2>Videos</h2>
                         </a>
@@ -188,13 +188,13 @@
                   <div id="sqlbody" class="collapse">
                     <div class="row">
                       <div class="col-sm-4">
-                        <a href="">
+                        <a href="/video/SQL">
                         <img src="{%static 'courses/video.png'%}" width="150px">
                         <h2>Videos</h2>
                         </a>
                       </div>
                       <div class="col-sm-4">
-                        <a href="">
+                        <a href="{%url 'mcq_exam'%}">
                         <img src="{%static 'courses/exam2.png'%}" width="150px">
                         <h2>Exam</h2>
                         </a>
@@ -245,13 +245,13 @@
                   <div id="wdbody" class="collapse">
                     <div class="row">
                       <div class="col-sm-4">
-                        <a href="">
+                        <a href="/video/WD/">
                         <img src="{%static 'courses/video.png'%}" width="150px">
                         <h2>Videos</h2>
                         </a>
                       </div>
                       <div class="col-sm-4">
-                        <a href="">
+                        <a href="{%url 'mcq_exam'%}">
                         <img src="{%static 'courses/exam2.png'%}" width="150px">
                         <h2>Exam</h2>
                         </a>
@@ -308,7 +308,7 @@
                         </a>
                       </div>
                       <div class="col-sm-4">
-                        <a href="">
+                        <a href="{%url 'mcq_exam'%}">
                         <img src="{%static 'courses/exam2.png'%}" width="150px">
                         <h2>Exam</h2>
                         </a>
@@ -365,7 +365,7 @@
                         </a>
                       </div>
                       <div class="col-sm-4">
-                        <a href="">
+                        <a href="{%url 'mcq_exam'%}">
                         <img src="{%static 'courses/exam2.png'%}" width="150px">
                         <h2>Exam</h2>
                         </a>
@@ -377,11 +377,69 @@
                         </a>
                       </div>
                       <div class="col-sm-4">
-                        <a href="">
+                        <a href="{%url 'mcq_exam'%}">
                         <img src="{%static 'courses/syllabus4.png'%}" width="150px">
                         <h2>Syllabus</h2>
                         </a>
                       </div>
+                    </div>
+                  </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            </div>
+
+            <div class="col-md-3">
+              <div class="card card-danger shadow-lg">
+                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.softskills','#softskills')">
+                  <div class="row">
+                    <div class="col-sm-12 adv">
+                  <img src="{%static 'courses/softskills.jpg'%}" width="150px" height="180px;">
+                      
+                    </div>
+                    <div class="col-sm-12 adv">
+                  <h3 class="card-title">Soft Skills</h3>
+                      
+                    </div>
+                  </div>
+
+                  <div class="card-tools" id="#softskills">
+                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                    </button>
+                  </div>
+                  <!-- /.card-tools -->
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body expandbody">
+                  Expand Card For More Features
+                  <div id="softskills" class="collapse">
+                    <div class="row">
+                      <div class="col-sm-4">
+                        <a href="{%url 'timeline'%}">
+                        <img src="{%static 'courses/timeline.png'%}" width="150px">
+                        <h2>Timeline</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="{%url 'mcq_exam'%}">
+                        <img src="{%static 'courses/exam2.png'%}" width="150px">
+                        <h2>Exam</h2>
+                        </a>
+                      </div>
+                      <!-- <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/notes.png'%}" width="150px">
+                        <h2>Notes</h2>
+                        </a>
+                      </div>
+                      <div class="col-sm-4">
+                        <a href="">
+                        <img src="{%static 'courses/syllabus4.png'%}" width="150px">
+                        <h2>Syllabus</h2>
+                        </a>
+                      </div> -->
                     </div>
                   </div>
 
@@ -439,7 +497,7 @@
       draw: function () {
 
         // "tron" case
-        console.log(this);
+        // console.log(this);
         if (this.$.data('skin') == 'tron') {
 
           var a   = this.angle(this.cv)  // Angle

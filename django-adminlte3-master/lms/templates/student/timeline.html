@@ -1,0 +1,221 @@
+{%extends 'student/base.html'%}
+{%load static%}
+{%block style%}
+<style type="text/css">
+    select {
+  font-family: 'FontAwesome', 'Second Font name'
+};
+</style>
+<link rel="stylesheet" href="{%static 'student/plugins/summernote/summernote-bs4.min.css'%}">
+<!-- <link rel="stylesheet" href="{%static 'student/plugins/src/bootstrap3-wysihtml5.css'%}"> -->
+
+  <!-- SimpleMDE -->
+  <link rel="stylesheet" href="{%static 'student/plugins/simplemde.min.css'%}">
+{%endblock%}
+{%load admin_menu%}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    {%block content_header%}
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Timeline</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Timeline</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    {%endblock%}
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    {%block content%}
+    <section class="content" onscroll="track(this)">
+<form action="{%url 'addtimeline'%}" method="POST">
+
+      <div class="container-fluid">
+        <!-- Timelime example  -->
+        <div class="row">
+          <div class="col-md-12">
+            <!-- The time line -->
+            <div class="timeline">
+              <!-- timeline time label -->
+              <div class="time-label">
+                <span class="bg-red" id="today"></span>
+              </div>
+              <!-- /.timeline-label -->
+              <!-- timeline item -->
+              {%if request.user.is_staff%}
+              <div>
+                {%csrf_token%}
+                  <select name="type">
+                    <option value="video">Video &#xf03d;</option>
+                    <option value="image">Image &#xf030;</option>
+                    <option value="comment">Comment &#xf086;</option>
+                    <!-- <option>Quote &#xf1dd;</option> -->
+                  </select>
+                <div class="timeline-item">
+                  <span class="time"><!-- <i class="fas fa-clock"></i> 12:05 --></span>
+                  <h3 class="timeline-header"><a ></a>
+                    <input type="text" name="title" class="form-control" placeholder="Title"></h3>
+
+                  <div class="timeline-body">
+                      <div id="new">Add New Post</div>
+                      <textarea name="body" style="display: none;"></textarea>
+                  </div>
+                  <div class="timeline-footer">
+                    <a class="btn btn-primary btn-sm preview" onclick="preview('#new')">Preview</a>
+                    <a class="btn btn-success btn-sm edit" onclick="edit('#new')">Edit</a>
+                    <a class="btn btn-success btn-sm publish" onclick="save()">Publish</a>
+                    <input type="submit" name="submit" style="display: none;">
+                  </div>
+                </div>
+              </div>
+              <!-- END timeline item -->
+              {%endif%}
+<!--               <div>
+                <i class="fas fa-clock bg-gray"></i>
+              </div> -->
+            </div>
+          </div>
+          <!-- /.col -->
+        </div>
+      </div>
+      <!-- /.timeline -->
+</form>
+    </section>
+  {%endblock%}
+    
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{%block script%}
+<script src="{%static 'student/plugins/summernote/summernote-bs4.min.js'%}"></script>
+<!-- <script src="{%static 'student/plugins/src/bootstrap3-wysihtml5.js'%}"></script> -->
+<script type="text/javascript">
+  window.pre = 0;
+  window.endtimeline = true;
+  $(function () {
+
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var d = new Date();
+   day =  d.getDay();
+   month = months[d.getMonth()];
+   year = d.getFullYear();
+    // console.log(day);
+
+
+   $('#today').text(day+" "+month+" "+year);
+    // Summernote
+    $('#new').summernote();
+    load();
+   })
+
+   $(window).scroll(function() {
+   if($(window).scrollTop() + $(window).height() == $(document).height()) {
+    if (window.data != '-1'){
+       load();
+    }
+    else{
+      if (window.endtimeline) {
+        item = `<div>
+                  <i class="fas fa-clock bg-gray"></i>
+                </div>`;
+    $(".timeline").append(item);
+      window.endtimeline = false;
+
+      }
+    }
+   }
+});
+
+  function load(){
+  url = 'http://127.0.0.1:8000/timelinedata/'
+  $.get( url, { pre:pre }).done(function( data ) {
+    window.data = data;
+    // console.log(data,data[431]);
+    data = JSON.parse(data);
+    $.each(data,function(){
+      icon = '';
+      if (this.type == 'video'){
+        icon = '<i class="fas fa-video  bg-maroon"></i>';
+      }
+      else if (this.type == 'image'){
+        icon = '<i class="fas fa-camera bg-purple"></i>';
+      }
+      else if (this.type == 'comment'){
+        icon = '<i class="fas fa-comment bg-yellow"></i>';
+      }
+      item = `<!-- timeline time label -->
+              <div class="time-label">
+                <span class="bg-green">`+this.date+`</span>
+              </div>
+              <!-- /.timeline-label -->
+              <!-- timeline item -->
+              <div>
+                `+icon+`
+                <div class="timeline-item">
+                  <span class="time"><i class="fas fa-clock"></i> `+this.time+` ago</span>
+                  <h3 class="timeline-header"><a href="#">`+this.name+`</a> `+this.title+`</h3>
+                  <div class="timeline-body">
+                    `+this.body+`
+                  </div>{%if request.user.is_staff%}
+                  <div class="timeline-footer">
+                    <a class="btn btn-danger btn-sm publish" onclick="deleteitem(`+this.id+`)">Delete</a>
+
+                  </div>{%endif%}
+                </div>
+              </div>
+              <!-- END timeline item -->`;
+
+    // console.log(item);
+    $(".timeline").append(item);
+    });
+    // console.log(data);
+    window.pre = window.pre + 20;
+    // alert( "Data Loaded: " + data );
+  });
+}
+
+var edit = function(id) {
+  $(id).summernote({focus: true});
+};
+
+var preview = function(id) {
+  var markup = $(id).summernote('code');
+  $(id).summernote('destroy');
+};
+var publish = function(id){
+  type = $("select[name='type']").val();
+  title = $("input[name='title']").val();
+  body = $(id).summernote('code');
+  // console.log(type,body);F
+  url = 'http://127.0.0.1:8000/addtimeline/'
+  $.post( url, { type: type, title: title, body: body })
+  .done(function( data ) {
+    alert( "Data Loaded: " + data );
+  });
+}
+
+var save = function(){
+  $('textarea').text($("#new").summernote('code'));
+  $("input[name='submit']").trigger('click');
+}
+
+var deleteitem = function(id){
+  url = 'http://127.0.0.1:8000/deletetimeline/'
+  $.get( url, { id: id })
+  .done(function( data ) {
+    // alert( "Data Loaded: " + data );
+  });
+}
+</script>
+
+{%endblock%}

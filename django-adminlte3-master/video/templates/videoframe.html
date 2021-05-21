@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+{%load static%}
+<html>
+<head>
+	<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+	 <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+ <script src="https://vjs.zencdn.net/7.11.4/video.min.js"></script>
+	<title>Video Frame</title>
+	<style type="text/css">
+		video,body,html{
+			height: 100%;
+			width: 100%;
+		}
+		.video-js .vjs-big-play-button{
+			top:33%;
+			left: 40%;
+		}
+		div{
+			height: 100%;
+			width: 100%;
+		}
+		.my-video-dimensions{
+			height: 100%!important;
+			width: 100%!important;
+		}
+		body{
+			margin:0px;
+			height:100%;
+			width:100%;
+			overflow: hidden;
+		}
+	</style>
+<script src="{%static 'student/plugins/jquery/jquery.min.js'%}"></script>
+
+	<script type="text/javascript">
+			$(document).bind("contextmenu",function(e){
+	  return false;
+	    });
+			abc = Object.values(window.parent)[1];
+			if (abc.location.pathname=='/videoframe/') {
+				location.replace("http://127.0.0.1:8000/");
+			}
+			// console.log(abc.innerHeight);
+			// $('#my-video').css('height',abc.innerHeight+"!important")
+			// $('#my-video').css('width',abc.innerWidth+"!important")
+
+	</script>
+</head>
+<body>
+<video
+    id="my-video"
+    class="video-js"
+    controls
+    height=100%;
+    width=100%;
+    preload="auto"
+    poster="/media/videos/thumb/{{course}}/{{video}}.jpg"
+    data-setup="{}"
+  >
+    <source src="http://127.0.0.1:8000/v/{{course}}/{{video}}/" type="video/mp4" />
+    <source src="http://127.0.0.1:8000/v/{{course}}/{{video}}/" type="video/webm" />
+    <p class="vjs-no-js">
+      To view this video please enable JavaScript, and consider upgrading to a
+      web browser that
+      <a href="https://videojs.com/html5-video-support/" target="_blank"
+        >supports HTML5 video</a
+      >
+    </p>
+  </video>
+</body>
+</html>

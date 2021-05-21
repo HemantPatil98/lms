@@ -20,6 +20,7 @@ from django.conf.urls import url, include
 urlpatterns = [
     path('',include('lms.urls')),
     path('',include('exam.urls')),
+    path('',include('video.urls')),
     # path('', include('adminlte3_theme.urls')),
     path('admin/', admin.site.urls),
     # path('admin/include/addstudent/', views.addstudent, name='addstudent'),
