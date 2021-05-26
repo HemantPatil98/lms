@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,Group
 from datetime import datetime
 # Create your models here.
 def nothing():
@@ -81,3 +81,13 @@ class timeline(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class groupsinfo(models.Model):
+    group = models.ForeignKey(Group,on_delete=models.CASCADE)
+    course = models.TextField(max_length=15)
+    startdate = models.DateField()
+    enddate = models.DateField()
+
+    def __str__(self):
+        return self.group.name

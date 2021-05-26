@@ -34,6 +34,7 @@
   }
 }
 </style>
+
 {%endblock%}
 {%load admin_menu%}
   <!-- Content Wrapper. Contains page content -->
@@ -71,11 +72,24 @@
                        alt="User profile picture">
                 </div>
                 <br>
-                <div class="text-center">
+                <div class="text-center" id="popupReturn" on hover=>
                     <input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90"
                            data-fgColor="#00a65a" readonly="true">
 
                     <div class="knob-label">Average Performance</div>
+                    <div id="tableContent" style="display:none">
+                        <div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Performance</div>
+                                <div class="panel-body form-inline dept1">
+                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"><br>C</div>
+                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"><br>C</div>
+                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"><br>C</div>
+                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"><br>C</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                   </div>
                 <h3 class="profile-username text-center">{{profile.0.name}}</h3>
 
@@ -102,7 +116,8 @@
                   </li> -->
                 </ul>
 
-                <a href="{%url 'request_certificate'%}" class="btn btn-primary btn-block"><b>Request for Certificate</b></a>
+                <a href="{%url 'request_certificate'%}" class="btn btn-primary btn-block" ><b>Request for Certificate</b></a>
+
               </div>
           </div>
           <div class="col-md-9">
@@ -131,19 +146,19 @@
                   <div id="cbody" class="collapse">
                     <div class="row">
                       <div class="col-sm-4">
-                        <a href="/video/C/">
+                        <a {%if 'video' in per.C%}href="/video/C/"{%endif%}>
                         <img src="{%static 'courses/video.png'%}" width="150px">
                         <h2>Videos</h2>
                         </a>
                       </div>
                       <div class="col-sm-4">
-                        <a href="{%url 'mcq_exam'%}">
+                        <a {%if 'exam' in per.C%}href="{%url 'mcq_exam'%}"{%endif%}>
                         <img src="{%static 'courses/exam2.png'%}" width="150px">
                         <h2>Exam</h2>
                         </a>
                       </div>
                       <div class="col-sm-4">
-                        <a href="">
+                        <a {%if 'notes' in per.C%}href=""{%endif%}>
                         <img src="{%static 'courses/notes.png'%}" width="150px">
                         <h2>Notes</h2>
                         </a>
@@ -188,19 +203,19 @@
                   <div id="sqlbody" class="collapse">
                     <div class="row">
                       <div class="col-sm-4">
-                        <a href="/video/SQL">
+                        <a {%if 'video' in per.SQL%}href="/video/SQL/"{%endif%}>
                         <img src="{%static 'courses/video.png'%}" width="150px">
                         <h2>Videos</h2>
                         </a>
                       </div>
                       <div class="col-sm-4">
-                        <a href="{%url 'mcq_exam'%}">
+                        <a {%if 'video' in per.SQL%}href="{%url 'mcq_exam'%}"{%endif%}>
                         <img src="{%static 'courses/exam2.png'%}" width="150px">
                         <h2>Exam</h2>
                         </a>
                       </div>
                       <div class="col-sm-4">
-                        <a href="">
+                        <a {%if 'video' in per.SQL%}href=""{%endif%}>
                         <img src="{%static 'courses/notes.png'%}" width="150px">
                         <h2>Notes</h2>
                         </a>
@@ -587,4 +602,21 @@
     }
 </script>
 <!-- <script type="text/javascript" src=""></script> -->
+        <script>
+            $().ready(function(e) {
+
+                var popupEvent = function() {
+                  
+                }
+
+                $('#popupReturn').hunterPopup({
+                    width: '320px',
+                    height: 'auto',
+                    title: "Performance",
+                    content: $('#tableContent'),
+                    event: popupEvent
+                });
+
+            });
+        </script>
 {%endblock%}

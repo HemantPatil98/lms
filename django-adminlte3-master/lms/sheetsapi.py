@@ -49,10 +49,8 @@ service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
 
 def startsheet():
-    # print("hi")
-    # print(extra_data.objects.all())
+
     if not extra_data.objects.filter(name='student_performance'):
-        # print("start")
 
         student_performance = ['id', 'Name', 'Contact No', 'Email ID', 'Admission Date', 'Training Mode',
                                'Course Start Date', 'Course',
@@ -79,16 +77,11 @@ def startsheet():
         sheetname = "Apr - Mar " +datetime.datetime.now().strftime("%Y")
         SPREADSHEET_ID = createsheet(name='Student Performance',columns=student_performance,sheetname=sheetname)
 
-        # fp = open('student_performance.txt', 'a')
-        # fp.write(SPREADSHEET_ID)
-        # fp.close()
         ex = extra_data(name='student_performance',value=SPREADSHEET_ID)
         ex.save()
 
     if not extra_data.objects.filter(name='student_profile'):
-        # print("start")
 
-        student_profile = []
         basic = ["center", "dateofadmission", "course", "batchstartdate","module start from","trainingmode"]
         personal_details = ["name", "address", "dateofbirth", "contact", "alternatecontact", "emailid"]
         educational_details = ['examination', 'stream', 'collegename', 'boardname', 'yearofpassing', 'percentage']
@@ -103,9 +96,6 @@ def startsheet():
         sheetname = "Apr - Mar " +datetime.datetime.now().strftime("%Y")
         SPREADSHEET_ID = createsheet(name='Student Profile',columns=student_profile,sheetname=sheetname)
 
-        # fp = open('student_profile.txt', 'a')
-        # fp.write(SPREADSHEET_ID)
-        # fp.close()
         ex = extra_data(name='student_profile', value=SPREADSHEET_ID)
         ex.save()
     # print(os.path.exists('attendance.txt'))
@@ -114,11 +104,7 @@ def startsheet():
 
         sheetname = "Apr - Mar " +datetime.datetime.now().strftime("%Y")
         SPREADSHEET_ID = createsheet(name='Attendance',columns=attendance,sheetname=sheetname)
-        # print("HI")
 
-        # fp = open('attendance.txt','a')
-        # fp.write(SPREADSHEET_ID)
-        # fp.close()
         ex = extra_data(name='attendance', value=SPREADSHEET_ID)
         ex.save()
 
@@ -130,24 +116,21 @@ def startsheet():
 
         sheetname = "Apr - Mar " +datetime.datetime.now().strftime("%Y")
         SPREADSHEET_ID = createsheet(name='Feedback',columns=feedback,sheetname=sheetname)
-        # print("HI")
 
-        # fp = open('attendance.txt','a')
-        # fp.write(SPREADSHEET_ID)
-        # fp.close()
         ex = extra_data(name='feedback', value=SPREADSHEET_ID)
         ex.save()
 
-    # if not extra_data.objects.filter(name='mcq'):
-    #     attendance = ["Question","Option1","Option2","Option3","Option4","Answer"]
-    #     SPREADSHEET_ID = createsheet('MCQ',attendance)
-    #     # print("HI")
-    #
-    #     # fp = open('attendance.txt','a')
-    #     # fp.write(SPREADSHEET_ID)
-    #     # fp.close()
-    #     ex = extra_data(name='MCQ', value=SPREADSHEET_ID)
-    #     ex.save()
+    if not extra_data.objects.filter(name='batch schedule'):
+        attendance = ["time","module name","start date","mentor name","end date",
+                      "upcoming module start date","upcoming module name","mentor name"]
+
+        sheetname = "Sheet 1"
+        SPREADSHEET_ID = createsheet(name='batch schedule',columns=attendance,sheetname=sheetname)
+
+
+        ex = extra_data(name='Batch Schedule', value=SPREADSHEET_ID)
+        ex.save()
+
 
 #Create Spreadsheet
 def createsheet(name,columns,sheetname):

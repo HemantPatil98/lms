@@ -1,8 +1,11 @@
 from django.shortcuts import render,HttpResponse
 from django.views.decorators.clickjacking import xframe_options_sameorigin,xframe_options_exempt
+from django.contrib.auth.models import Permission
 # Create your views here.
+from .models import videos_watched_status
 import os
 from wsgiref.util import FileWrapper
+import math
 def video(request,course):
     videos = "media/videos/courses/"+course
     thumbs = "media/videos/thumb/"+course
@@ -12,7 +15,11 @@ def video(request,course):
     for v in os.listdir(videos):
         videolist.append(v.split(".")[0])
 
-    return render(request,'video.html',{'course':course,'videos':videolist})
+    watch = videos_watched_status.objects.filter(user=request.user,course=course)
+    watch = [x.watched for x in watch]
+    print((len(watch)/len(videolist))*100)
+    per = math.floor((len(watch)/len(videolist))*100)
+    return render(request,'video.html',{'course':course,'videos':videolist,'watched':watch,'per':per})
 
 @xframe_options_sameorigin
 def videoframe(request,course,video):
@@ -36,8 +43,9 @@ def thumb(request):
     thumbp = "media/videos/thumb/"
     for c in os.listdir(courses):
         for v in os.listdir(courses+c):
+            vname = v.split('.')[0]
             video = courses+c+"/"+v
-            t = thumbp+c+"/"+v.split(".")[0]
+            t = thumbp+c+"/"+vname
             # print(video,t)
             cap = cv2.VideoCapture(video)
 
@@ -47,7 +55,26 @@ def thumb(request):
             cap.release()
             cv2.destroyAllWindows()
 
-    return HttpResponse("")
+            try:
+                p = Permission(content_type_id=6,codename=vname,name=vname)
+                p.save()
+            except:
+                pass
+
+    return HttpResponse("Videos Synced Successfully")
 
 def videopermissions(request):
     return render(request,'videopermissions.html')
+
+def blank(request):
+    return HttpResponse("")
+
+def watched_video(request):
+    course = request.GET['course']
+    vid = request.GET['video']
+    print(course,video)
+    if len(videos_watched_status.objects.filter(user=request.user,course=course,watched=vid))==0:
+        status = videos_watched_status(user=request.user,course=course,watched=vid)
+        status.save()
+    return HttpResponse("")
+

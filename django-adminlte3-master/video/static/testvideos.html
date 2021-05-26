@@ -1,0 +1,175 @@
+{%extends 'base.html'%}
+{%load static%}
+{%block link%}
+<link rel="stylesheet" type="text/css" href="{%static 'video.css'%}">
+<script type="text/javascript" src="{%static 'video.js'%}"> </script>
+{%endblock%}
+{%block content%}
+	
+	
+
+	<div id="alert" class="alert alert-info hide" role="alert" style="height: max-content;padding: 0px;z-index: 4;position: absolute;height: max-content;width: 600px;margin-left: 30%;">
+			Notes download will be available after 100% completion of video course			
+	</div>
+	<div class="col-sm-12 col-md-10 pannel" style="">
+		<div class="row up_title" style="position: unset;">
+			<div id="title" class="col-sm-12 col-md-8"></div>
+				<div class="col-sm-12 col-md-4">
+					<div class="row" style="padding: 0px;position: unset;">
+						<div id="progress" class="col-8">
+							<div class="progress blue" style="margin:0px;" >
+				                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per < 20%}20{%else%}{{per}}{%endif%}%;" >Download
+				                    <div id="progress-value" class="progress-value">{{per}}%</div>
+				                </div>
+							</div>
+						</div>
+						<div class="col-4">
+							<a id="notes" href="{{notes}}" class="btn btn-primary" style="height:45px%;margin: 0px;">
+								<i class="fas fa-download" style="font-size: 15px;" title="Notes download will be available after 100% completion of video course">
+								</i> Notes
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+		<div class="row container" style="position: fixed;">
+
+			<div class="col-sm-12 col-md-8 pad0" style="height: max-content">
+				<div id="replay" class="replay hide"  style="">
+					<i class="fas fa-play-circle" style=""></i>
+				</div>
+
+				<div id="video"  style="background-color: #919395;"><!-- #545190b8; -->
+
+				</div>
+			</div>
+
+			<main class="col-sm-12 col-md-4">
+				{% for item in data.items %}
+				<article class="item" {%if not requst.user.username%} data-key="{{item.snippet.resourceId.videoId}}"{%endif%}>
+
+	                                <img src="{{item.snippet.thumbnails.medium.url}}" alt="" class="thumb">
+	                                <div class="details">
+	                                    <span class='title'>{{item.snippet.title}}</span>
+	                                    
+	                                </div>
+
+	                            </article>
+				{%endfor%}
+
+			</main>
+			
+		</div>	
+	</div>
+
+<iframe id="backend" src="" style="display: none;"></iframe>
+<div id="status" style="display: none;">{{status}}</div>
+<div id="course" style="display: none;">{{course}}</div>
+<div id="lenth" style="display: none;">{{lenth}}</div>
+<div id="list" style="display: none;">{{list}}</div>
+<div id="subject" style="display: none;">{{subject}}</div>
+
+<script type="text/javascript">
+	var playlistId = '{{PlaylistId}}';
+
+	var count;
+	var wached;
+	$(document).ready(function() {
+		var status = $("#status").text();
+		var course = $("#course").text();
+		wached = $('#lenth').text();
+
+	})
+	
+	function progress()
+	{
+		var count=$("article").length;
+		var per = ($('#lenth').text()/count)*100;
+        console.log(per);
+        
+        $('article').each(function(){
+        	if ($("#list").text().search($(this).attr("data-key"))>0) {
+        		console.log($(this).attr("data-key"));
+        		$(this).addClass("watched");
+        		$(this).attr("title","Watched Video");
+        	}
+        });
+
+        $("article").click(function(){
+        	$(this).addClass("watched");
+        });
+	}
+$('main').on('click', 'article', function () {
+
+      if (!$(this).hasClass('disabled')) {
+
+        var id = $(this).attr('data-key');
+        player.loadVideoById(id,0, "large");
+        $('#replay').addClass("hide");
+        player.stopVideo();
+        $('#replay').addClass("hide");
+        var title = $(this).find("div .title").text();
+        $("#title").text(title);
+        var subject = $("#subject").text();
+        var link="/vviews/"+subject+"/"+id+"/";
+        console.log(link);
+        document.getElementById("backend").setAttribute("src", link);
+
+      }
+      else{
+        alert("Video is locked");
+      }      
+    });
+	$("#notes").click(function(){
+    	$("#alert").show();
+    	setTimeout(function(){ $("#alert").hide(); }, 3000);
+    });
+
+
+	$(".nav-link").click(function(){
+
+		if($(this).attr('data')=='php'){
+			// alert("");
+			var data=$(this).attr('data');
+	  		var link="/videoself/"+data;
+	  		console.log(link);
+	  		location.replace(link);
+		}
+
+	  	else if($(this).attr('data')){
+	  		var data=$(this).attr('data');
+	  		var link="/video/"+data;
+	  		console.log(link);
+	  		location.replace(link);
+	  	}
+	  	else{
+	  		alert("This module is locked");
+	  	}
+	  });
+
+	$(window).load(function(){
+		// alert($(window).width());
+		if ($(window).width()<600) {
+			$(".logo-nav").parent().removeClass("hide");
+			$('.logout').addClass('hide');
+			// $('.navbar-brand').css({'background-color':'white'});
+		}
+		else{
+			$('.logout').removeClass('hide');
+		}
+	  });
+	$(window).resize(function(){
+		// alert($(window).width());
+		if ($(window).width()<600) {
+			$(".logo-nav").parent().removeClass("hide");
+			$('.logout').addClass('hide');
+		}
+		else{
+			$(".logo-nav").parent().addClass("hide");
+			$('.logout').removeClass('hide');
+		}
+	  });
+	 
+</script>
+{%endblock%}

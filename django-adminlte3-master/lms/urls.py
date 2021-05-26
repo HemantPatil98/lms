@@ -21,10 +21,13 @@ urlpatterns = [
     path('view_data/student/',views.viewstudent,name='viewstudents'),
     path('view_data/performance/', views.viewperformance, name='viewperformance'),
     path('add/groups/',views.addgroups,name='addgroups'),
+    path('view/groups/<slug:view>/',views.addgroups,name='viewsgroups'),
     path('view_data/groups/', views.viewgroups, name='viewgroups'),
     path('add/users/',views.addusers,name='addusers'),
     path('view_data/members/', views.viewmembers, name='viewmembers'),
     path('profile/', views.viewprofile, name='viewprofile'),
+    path('attendance/', views.attendance, name='attendance'),
+    path('studentattendance/', views.studentattendance, name='studentsattendance'),
     path('attendance/', views.attendance, name='attendance'),
     path('add/notice/',views.addnotice,name='addnotice'),
     path('view/notice/',views.viewnotice,name='viewnotice'),
@@ -51,6 +54,12 @@ urlpatterns = [
     path('setdata/<slug:table>/',views.set_data,name='setdata'),
     path('getuser/',views.get_user,name='getuser'),
     path('setuser/',views.set_user,name='setuser'),
-    path('test/',views.test,name='test')
+    path('test/',views.test,name='test'),
+    path('calender/',views.calender,name='calender'),
+    path('getcalenderevents/',views.getcalenderevents,name='getcalenderevents'),
+    path('students_groups/<slug:gname>/',views.students_groups,name='students_groups'),
+    path('students_current_groups/<slug:gname>/',views.students_current_groups,name='students_current_groups'),
+    path('pdftest/',views.pdftest,name='pdftest'),
+    path('render/pdf/', views.Pdf.as_view())
     # path('admin/', admin.site.urls),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

@@ -1,5 +1,180 @@
 {%extends 'student/base.html'%}
 {%load static%}
+{%load admin_menu%}
+{%block style%}
+{%if gname%}
+<link rel="stylesheet" href="{%static 'icon_font/css/icon_font.css'%}">
+<link rel="stylesheet" href="{%static 'css/jquery.transfer.css'%}">
+
+<style type="text/css">
+  .inputGroup {
+     background-color: #fff;
+     display: block;
+     margin: 10px 0;
+     position: relative;
+  }
+   .inputGroup label {
+     padding: 12px 30px;
+     width: 100%;
+     display: block;
+     text-align: left;
+     color: #3c454c;
+     cursor: pointer;
+     position: relative;
+     z-index: 2;
+     transition: color 200ms ease-in;
+     overflow: hidden;
+  }
+   .inputGroup label:before {
+     width: 10px;
+     height: 10px;
+     border-radius: 50%;
+     content: '';
+     background-color: #5562eb;
+     position: absolute;
+     left: 50%;
+     top: 50%;
+     transform: translate(-50%, -50%) scale3d(1, 1, 1);
+     transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+     opacity: 0;
+     z-index: -1;
+  }
+   .inputGroup label:after {
+     width: 32px;
+     height: 32px;
+     content: '';
+     border: 2px solid #d1d7dc;
+     background-color: #fff;
+     background-image: url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.414 11L4 12.414l5.414 5.414L20.828 6.414 19.414 5l-10 10z' fill='%23fff' fill-rule='nonzero'/%3E%3C/svg%3E ");
+     background-repeat: no-repeat;
+     background-position: 2px 3px;
+     border-radius: 50%;
+     z-index: 2;
+     position: absolute;
+     right: 30px;
+     top: 50%;
+     transform: translateY(-50%);
+     cursor: pointer;
+     transition: all 200ms ease-in;
+  }
+   .inputGroup input:checked ~ label {
+     color: #fff;
+  }
+   .inputGroup input:checked ~ label:before {
+     transform: translate(-50%, -50%) scale3d(56, 56, 1);
+     opacity: 1;
+  }
+   .inputGroup input:checked ~ label:after {
+     background-color: #54e0c7;
+     border-color: #54e0c7;
+  }
+   .inputGroup input {
+     width: 32px;
+     height: 32px;
+     order: 1;
+     z-index: 2;
+     position: absolute;
+     right: 30px;
+     top: 50%;
+     transform: translateY(-50%);
+     cursor: pointer;
+     visibility: hidden;
+  }
+   .card{
+    margin: 5px;
+   }
+
+</style>
+<style type="text/css">
+
+  .container {
+      max-width: 640px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 13px;
+  }
+
+  ul.ks-cboxtags {
+      list-style: none;
+      padding: 20px;
+  }
+  ul.ks-cboxtags li{
+    display: inline;
+  }
+  ul.ks-cboxtags li label{
+      display: inline-block;
+      background-color: rgba(255, 255, 255, .9);
+      border: 2px solid rgba(139, 139, 139, .3);
+      color: #adadad;
+      border-radius: 25px;
+      white-space: nowrap;
+      margin: 3px 0px;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: all .2s;
+  }
+
+  ul.ks-cboxtags li label {
+      padding: 8px 12px;
+      cursor: pointer;
+  }
+
+  ul.ks-cboxtags li label::before {
+      display: inline-block;
+      font-style: normal;
+      font-variant: normal;
+      text-rendering: auto;
+      -webkit-font-smoothing: antialiased;
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      font-size: 12px;
+      padding: 2px 6px 2px 2px;
+      content: "\f067";
+      transition: transform .3s ease-in-out;
+  }
+
+  ul.ks-cboxtags li input[type="checkbox"]:checked + label::before {
+      content: "\f00c";
+      transform: rotate(-360deg);
+      transition: transform .3s ease-in-out;
+  }
+
+  ul.ks-cboxtags li input[type="checkbox"]:checked + label {
+      border: 2px solid #1bdbf8;
+      background-color: #12bbd4;
+      color: #fff;
+      transition: all .2s;
+  }
+
+  ul.ks-cboxtags li input[type="checkbox"] {
+    display: absolute;
+  }
+  ul.ks-cboxtags li input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+  }
+  ul.ks-cboxtags li input[type="checkbox"]:focus + label {
+    border: 2px solid #e9a1ff;
+  }
+</style>
+
+{%endif%}
+<style type="text/css">
+  .hide{
+    display: none;
+  }
+  .transfer-double{
+    width: 100%;
+  }
+  .transfer-double-content-left,.transfer-double-content-right{
+    width: 45%;
+  }
+</style>
+{%endblock%}
+{%load static%}
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -38,68 +213,49 @@
                 {%csrf_token%}
                 <div class="card-body row">
 
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Name</label>
-                      <select class="form-control select2" name="gname" style="width: 100%;">
-                        {%for group in groups%}
-                        <option {%if gname == group.name%} selected="selected" {%endif%}>{{group}}</option>
-                        {%endfor%}
-                      </select>
-                    </div>
+                  <div class="form-group col-md-6">
+                    <label>Groups</label>
+                    <select class="form-control select2" style="width: 100%;" name="gname" {%if gname%}readonly{%endif%}>
+                      {%if gname%}
+                      <option selected>{{gname}}</option>
+                      {%else%}
+                      {%for group in groups%}
+                      <option {%if gname == group%}selected{%endif%}>{{group}}</option>
+                      {%endfor%}}
+                      {%endif%}
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
+                    <label>Course</label>
+                    <select class="form-control select2" style="width: 100%;" name="cname" {%if gname%}readonly{%endif%}>
+                      {%if gname%}
+                      <option selected>{{gpinfo.course}}</option>
+                      {%else%}
+                      {%for cname in courses%}
+                      <option {%if cname == group%}selected{%endif%} class="a">{{cname}}</option>
+                      {%endfor%}}
+                      {%endif%}
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
+                    <label>Start Date</label>
+                    <input type="date" name="startdate" class="form-control" value="{{gpinfo.startdate|date:'Y-m-d'}}" {%if gname%}readonly{%endif%}>
+                  </div>
+                  <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
+                    <label>End Date</label>
+                    <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}">
                   </div>
 
                   {%if gname%}
-
-                    <div class="card card-default collapsed-card" style="width: 100%">
+                  
+                    <div class="card card-default">
                       <div class="card-header" style="background-color: #6f42c1cf;color: white">
-                        <h3 class="card-title">View Permission</h3>
-
-                        <div class="card-tools">
-                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-plus"></i>
-                          </button>
-                          <!-- <button type="button" class="btn btn-tool" data-card-widget="remove">
-                            <i class="fas fa-times"></i>
-                          </button> -->
-                        </div>
-                      </div>
-                      <!-- /.card-header -->
-                      <div class="card-body">
-                        <div class="row">
-                          <div class="col-12">
-                            <div class="form-group">
-                              <label>Permission</label>
-                              <select class="duallistbox" name="permissions" multiple="multiple" disabled>
-                                {%for p in permissions%} 
-                                <option {%if p.id in group_per%} selected="selected" {%endif%} value="{{p.id}}">{{p}}</option>
-                                {%endfor%}
-                              </select>
-                            </div>
-                            <!-- /.form-group -->
-                          </div>
-                          <!-- /.col -->
-                        </div>
-                        <!-- /.row -->
-                      </div>
-                      <!-- /.card-body -->
-                      <div class="card-footer">
-
-                      </div>
-                    </div>
-                    <!-- /.card -->
-                    <!-- /.card -->
-                    <div class="card card-default" class="col-sm-12" style="width: 100%;">
-                      <div class="card-header"  style="background-color: #6f42c1cf;color: white">
-                        <h3 class="card-title">View Users</h3>
+                        <h3 class="card-title">Select Permissions</h3>
 
                         <div class="card-tools">
                           <button type="button" class="btn btn-tool" data-card-widget="collapse">
                             <i class="fas fa-minus"></i>
                           </button>
-                          <!-- <button type="button" class="btn btn-tool" data-card-widget="remove">
-                            <i class="fas fa-times"></i>
-                          </button> -->
                         </div>
                       </div>
                       <!-- /.card-header -->
@@ -107,12 +263,19 @@
                         <div class="row">
                           <div class="col-12">
                             <div class="form-group">
-                              <label>View students</label>
-                              <select class="duallistbox" name="members" multiple="multiple">
-                                {%for m in members%}
-                                <option value="{{m.id}}" {%if m in memb_pre%}selected{%endif%}>{{m.first_name}}</option>
-                                {%endfor%}
-                              </select>
+                              <label>Sections</label>
+                              <div class="inputGroup">
+                                <input id="pervideo" name="pervideo" type="checkbox" {%if pre.video %}checked{%endif%}/>
+                                <label for="pervideo">Videos</label>
+                              </div>
+                              <div class="inputGroup">
+                                <input id="perexam" name="perexam" type="checkbox" {%if pre.exam %}checked{%endif%}/>
+                                <label for="perexam">Exam</label>
+                              </div>
+                              <div class="inputGroup">
+                                <input id="pernotes" name="pernotes" type="checkbox" {%if pre.notes %}checked{%endif%}/>
+                                <label for="pernotes">Notes</label>
+                              </div>
                             </div>
                             <!-- /.form-group -->
                           </div>
@@ -125,7 +288,66 @@
 
                       </div>
                     </div>
-                    
+                    <!-- /.card-header -->
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-12">
+                            <div class="form-group">
+                              <!-- <label>Allow and block videos</label>-->
+    
+                              <div class="">
+                                <ul class="ks-cboxtags">
+
+                                  {%for vp in vpermissions%}
+                                  <li><input type="checkbox" name='videopermission' id="{{vp}}" value="{{vp}}" {%if gname.permissions.all|has_per:vp%}checked{%endif%}><label for="{{vp}}">{{vp}}
+                                  </label></li>
+
+                                  {%endfor%}
+                                </ul>
+                                                                  
+                              </div>
+                            </div>
+                            <!-- /.form-group -->
+                          </div>
+                          <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                      </div>
+                      <!-- /.card-body -->
+                      <div class="card-footer">
+
+                      </div>
+                    </div>
+                    <!-- /.card -->
+                    <!-- /.card -->
+                    <div class="card card-default col-sm-12">
+                      <div class="card-header" style="background-color: #6f42c1cf;color: white">
+                        <h3 class="card-title">Select Users</h3>
+
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          
+                        </div>
+                      </div>
+                      <!-- /.card-header -->
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-12">
+                            <div class="form-group">
+                              <label>Add students</label>
+                              <div class="transfer"></div>
+                              <input type="hidden" name="students">
+                            </div>
+                            <!-- /.form-group -->
+                          </div>
+                          <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                      </div>
+                      <!-- /.card-body -->
+
                   {%endif%}
 
                 </div>
@@ -150,6 +372,69 @@
     display: none;
   }
 </style>
+<script src="{%static 'js/jquery.transfer.js'%}"></script>
+<script type="text/javascript">
+
+window.groupData = [];
+url = "http://127.0.0.1:8000/students_groups/{{gname}}"
+$.get(url,{},function(data){
+// console.log(data);
+groupData = JSON.parse(data);
+var settings = {
+    // data item name
+    itemName:"uname",
+    // group data item name
+    groupItemName:"groupName",
+    // group data array name
+    groupArrayName:"groupData",
+    // data value name
+    valueName:"uid",
+    // tab text
+    tabNameText:"Student Groups",
+    // right tab text
+    rightTabNameText:"Selected Students",
+    // search placeholder text
+    searchPlaceholderText:"Search by groups and students names",
+    // items data array
+    // dataArray: languages,
+    // group data array
+    groupDataArray: groupData,
+    // callable:function (data, names) {
+    //         console.log("Selected ID：" + data)
+    //         $("#selectedItemSpan").text(names)
+    //     }
+    callable:function (items) {
+            console.dir(items)
+            // console.log(items)
+            // $.each(items,function(){
+              // console.log($(this).id);
+            // })
+        }
+};
+window.myTransfer = $(".transfer").transfer(settings);
+
+
+console.log(groupData);
+});
+// console.log(window.groupData);
+
+
+</script>
+
+    <script type="text/javascript">
+      var select2children = [];
+      $("select[name='gname'] option").each(function(){ select2children.push($(this).text())})
+      abc = $(".a").length;
+      $("select[name='gname']").change(function(){
+        // console.log($("select[name='gname']"))
+        if (!select2children.includes($("select[name='gname']").val())) {
+          $('.cname').removeClass('hide');
+        }
+        else{
+          $('.cname').addClass('hide');
+        }
+      })
+    </script>
 <script>
   $(function () {
 

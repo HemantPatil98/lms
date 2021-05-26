@@ -22,4 +22,4 @@ urlpatterns = [
     path('get/answers/',views.get_answers,name='get_answers'),
     path('getdata_practicle/',views.getdata_practicle,name='getdata_practicle'),
     path('sync/questions/',views.sync_questions,name='sync_questions'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

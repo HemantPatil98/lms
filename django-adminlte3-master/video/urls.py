@@ -11,4 +11,6 @@ urlpatterns = [
     path('v/<slug:course>/<slug:video>/', views.v, name='v'),
     path('thumb/', views.thumb, name='thumb'),
     path('videopermissons/', views.videopermissions, name='videopermissions'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # path('media/', views.blank, name='blank'),
+    path('watched_video/',views.watched_video, name='watched_video')
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

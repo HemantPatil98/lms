@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+{%load static%}
+<head>
+	<title>Videos</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<script type="text/javascript"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+
+	<link rel="stylesheet" type="text/css" href="{%static 'progress.css'%}">
+
+	<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+
+	<script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+
+	<link rel="stylesheet" type="text/css" href="{%static 'video.css'%}">
+	<link rel="stylesheet" type="text/css" href="{%static 'dashboard.css'%}">
+	
+	{%if data%}
+	<script type="text/javascript" src="{%static 'video.js'%}"> </script>
+	{%endif%}
+	
+</head>
+<body style="background-color: #eee;overflow: hidden;">
+
+	<header>
+		<img src="http://www.fortunecloudindia.com/images/logo/logon.png" alt="" class="logo">
+		<hr style="height: 3px;width: 100%;color: blue;">
+	</header>
+
+	<script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
+
+	<div class="row main">
+		<div class="col-sm-12 col-md-2 menu" style="">
+			<nav class="navbar navbar-expand-lg navbar-light bg-light" style="overflow: auto;">
+			  <a class="navbar-brand hide" href="{url 'dashboard'}" style="font-size: 25px;">
+			  	<img src="http://www.fortunecloudindia.com/images/logo/logon.png" alt="" class="logo logo-nav">
+			  </a>
+			  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+			    <span class="navbar-toggler-icon"></span>
+			  </button>
+			  <div class="collapse navbar-collapse" id="navbarNavDropdown" style="padding-bottom: 10%;background-color: #75a8dc!important;">
+				    <ul class="navbar-nav">
+				    <span class="navbar-brand" href="#">&nbspEDGE</span>
+				      <li class="nav-item {%if subject == 'c'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.c %} href="/videoself/c/" {%endif%}>C language</a>
+				      </li>
+				      <li class="nav-item {%if subject == 'sql'%} select {%endif%}" >
+				        <a class="nav-link" {%if allowcourse.sql %} href="/video/sql/" {%endif%}>SQL/Plsql</a>
+				      </li>
+				      <li class="nav-item {%if subject == 'html'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.html %} href="/video/html/" {%endif%}>HTML 5</a>
+				      </li>
+				      <li class="nav-item {%if subject == 'css'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.css %} href="/video/css/" {%endif%}>CSS 3</a>
+				      </li>
+				      <li class="nav-item {%if subject == 'bootstrap'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.bootstrap %} href="/video/bootstrap/" {%endif%}>Bootstrap</a>
+				      </li>
+				      <li class="nav-item {%if subject == 'javascript'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.javascript %} href="/video/javascript/" {%endif%}>JavaScript</a>
+				      </li>
+				      <li class="nav-item {%if subject == 'jquery'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.jquery %} href="/video/jquery/" {%endif%}>JQuery</a>
+				      </li>
+				      <span class="navbar-brand">&nbspYour Domain</span>
+				      {%if st.python%}
+				      <li class="nav-item {%if subject == 'python'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.python %} href="/video/python/" {%endif%}>Python</a>
+				      </li>
+				      {%endif%}
+				      {%if st.flask%}
+				      <li class="nav-item {%if subject == 'flask'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.flask %} href="/video/flask/" {%endif%}>Flask</a>
+				      </li>
+				      {%endif%}
+				      {%if st.django%}
+				      <li class="nav-item {%if subject == 'django'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.django %} href="/video/django/" {%endif%}>Django</a>
+				      </li>
+				      {%endif%}
+				      {%if st.php%}
+				      <li class="nav-item {%if subject == 'php'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.php %} href="/video/php/" {%endif%}>PHP</a>
+				      </li>
+				      {%endif%}
+				      {%if st.java%}
+				      <li class="nav-item {%if subject == 'java'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.java %} href="/video/java/" {%endif%}>Java</a>
+				      </li>
+				      {%endif%}
+				      {%if st.testing%}
+				      <li class="nav-item {%if subject == 'testing'%} select {%endif%}">
+				        <a class="nav-link" {%if allowcourse.testing %} href="/video/testing/" {%endif%}>Testing</a>
+				      </li>
+				      {%endif%}
+				      <li class="nav-item" style="padding: 10px;text-align: center;margin-bottom: 10px;">
+				        <a class="logout" href="{%url 'logout'%}">Log Out</a>
+				      </li>
+				    </ul>
+			  	</div>
+			</nav>
+			</div>
+	
+	<div id="alert" class="alert alert-info hide" role="alert" style="height: max-content;padding: 0px;z-index: 4;position: absolute;height: max-content;width: 600px;margin-left: 30%;">
+			Notes download will be available after 100% completion of video course			
+	</div>
+	<div class="col-sm-12 col-md-10 pannel" style="margin-top: 0px;">
+		<div class="row up_title" style="position: unset;">
+			<div id="title" class="col-sm-12 col-md-8">{{vidlist.0}}</div>
+				<div class="col-sm-12 col-md-4">
+					<div class="row pad2" style="padding: 0px;position: unset;">
+						<div id="progress" class="col-8">
+							<div class="progress blue" style="margin:0px;" >
+				                <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped active" style="width:{%if per < 20%}20{%else%}{{per}}{%endif%}%;" >Download
+				                    <div id="progress-value" class="progress-value">{{per}}%</div>
+				                </div>
+							</div>
+						</div>
+						<div class="col-4">
+							<a id="notes" {%if per is 100%}href="{{notes}}"{%endif%} class="btn btn-primary" style="height:45px%;margin: 0px;">
+								<i class="fas fa-download" style="font-size: 15px;" title="Notes download will be available after 100% completion of video course">
+								</i> <span>Notes<span></span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+		<div class="row container pad1" style="position: fixed;">
+
+			<div class="col-sm-12 col-md-8 pad0" style="height: max-content">
+				<div id="replay" class="replay hide"  style="">
+					<i class="fas fa-play-circle" style=""></i>
+				</div>
+
+				<div id="video"  style="background-color: #919395;"><!-- #545190b8; -->
+					{%if vidlist%}
+					<iframe src="/videoframe/1-C-Introduction/" width="100%" height="100%"></iframe>
+					{%endif%}
+				</div>
+
+			</div>
+
+			<main class="col-sm-12 col-md-4">
+				{% for item in data.items %}
+				<article class="item" {%if not requst.user.username%} data-key="{{item.snippet.resourceId.videoId}}"{%endif%}>
+
+                    <img src="{{item.snippet.thumbnails.medium.url}}" alt="" class="thumb">
+                    <div class="details">
+                        <span class='title'>{{item.snippet.title}}</span>
+                        
+                    </div>
+
+                </article>
+				{%endfor%}
+
+				{% for item in vidlist %}
+				<article class="item" {%if not requst.user.username%} data-key="{{item}}"{%endif%}>
+
+                    <!-- <img src="{{item}}" alt="" class="thumb"> -->
+                    <video class="thumb">
+						<source src="/static/media/C_Videos/{{item}}" type="video/mp4">
+					</video>
+                    <div class="details">
+                        <span class='title'>{{item}}</span>
+                        
+                    </div>
+
+                </article>
+				{%endfor%}
+			</main>
+			
+		</div>	
+	</div>
+</div>
+
+
+<style type="text/css">
+
+</style>
+<iframe id="backend" src="" style="display: none;"></iframe>
+<div id="status" style="display: none;">{{status}}</div>
+<div id="course" style="display: none;">{{course}}</div>
+<div id="lenth" style="display: none;">{{lenth}}</div>
+<div id="list" style="display: none;">{{list}}</div>
+<div id="subject" style="display: none;">{{subject}}</div>
+
+<script type="text/javascript">
+
+	{%if vidlist%}
+		$("article").click(function(){
+		// alert($(this).children("div").children("span").text());
+		// $(this).children("div").children("span").hide();
+		var link="/static/media/C-Videos/"+$(this).children("div").children("span").text();
+		$("iframe").attr("src",link)
+		$("#title").text($(this).children("div").children("span").text());
+	});
+
+
+        
+		progres();
+	function progres()
+	{
+		var count=$("article").length;
+		var per = ($('#lenth').text()/count)*100;
+        // console.log(per);
+        
+        $('article').each(function(){
+        	var id = $(this).attr("data-key").split('.')[0];
+        	// console.log(id);
+        	if ($("#list").text().search(id)>0) {
+        		console.log($(this).attr("data-key"));
+        		$(this).addClass("watched");
+        		$(this).attr("title","Watched Video");
+        	}
+        });
+
+        $("article").click(function(){
+        	$(this).addClass("watched");
+        });
+	}
+	{%endif%}
+
+$('main').on('click', 'article', function () {
+
+      if (!$(this).hasClass('disabled')) {
+{%if request.user.username%}
+        var id = $(this).attr('data-key');
+        player.loadVideoById(id,0, "large");
+        $('#replay').addClass("hide");
+        player.stopVideo();
+        $('#replay').addClass("hide");
+        var title = $(this).find("div .title").text();
+        $("#title").text(title);
+        var subject = $("#subject").text();
+        var link="/vviews/"+subject+"/"+id+"/";
+        console.log(link);
+        document.getElementById("backend").setAttribute("src", link);
+{%else%}
+alert("Videos is locked");
+{%endif%}
+      }
+      else{
+        alert("Video is locked");
+      }      
+    });
+
+ $(".navbar-toggler").click(function(){
+	  	$("#navbarNavDropdown").toggleClass("collapse");
+	  	$('.logout').toggleClass('hide');
+	  	$('.menu').toggleClass('height');
+	  	// $('nav').toggle(
+	  	// 	function(){$('nav').css({'margin-bottom':'40px'});})
+	  });
+
+
+	var playlistId = '{{PlaylistId}}';
+
+	var count;
+	var wached;
+	$(document).ready(function() {
+		var status = $("#status").text();
+		var course = $("#course").text();
+		wached = $('#lenth').text();
+
+	})
+	function progress()
+	{
+		var count=$("article").length;
+		var per = ($('#lenth').text()/count)*100;
+        console.log(per);
+        
+        $('article').each(function(){
+        	if ($("#list").text().search($(this).attr("data-key"))>0) {
+        		console.log($(this).attr("data-key"));
+        		$(this).addClass("watched");
+        		$(this).attr("title","Watched Video");
+        	}
+        });
+
+        $("article").click(function(){
+        	$(this).addClass("watched");
+        });
+	}
+
+	$("#notes").click(function(){
+    	$("#alert").show();
+    	setTimeout(function(){ $("#alert").hide(); }, 3000);
+    });
+
+
+	$(".nav-link").click(function(){
+
+		// if($(this).attr('data')=='php'){
+		// 	// alert("");
+		// 	// var data=$(this).attr('data');
+	 //  // 		var link="/videoself/"+data;
+	 //  // 		console.log(link);
+	 //  // 		location.replace(link);
+		// }
+
+	 //  	else 
+	 if($(this).attr('href')){
+	  		// var data=$(this).attr('data');
+	  		// var link="/video/"+data;
+	  		// console.log(link);
+	  		// location.replace(link);
+	  	}
+	  	else{
+	  		alert("This module is locked");
+	  	}
+	  });
+
+	$(window).load(function(){
+		// alert($(window).width());
+		if ($(window).width()<600) {
+			$(".logo-nav").parent().removeClass("hide");
+			$('.logout').addClass('hide');
+			$('.pad1').removeClass('container');
+			$('header').addClass('hide');
+			// $('.navbar-brand').css({'background-color':'white'});
+		}
+		else{
+			$('.logout').removeClass('hide');
+			$('.pad1').addClass('container');
+			$('header').removeClass('hide');
+		}
+	  });
+	$(window).resize(function(){
+		// alert($(window).width());
+		if ($(window).width()<600) {
+			$(".logo-nav").parent().removeClass("hide");
+			$('.logout').addClass('hide');
+			$('.pad1').removeClass('container');
+			$('header').addClass('hide');
+		}
+		else{
+			$(".logo-nav").parent().addClass("hide");
+			$('.logout').removeClass('hide');
+			$('.pad1').addClass('container');
+			$('header').removeClass('hide');
+		}
+	  });
+	 
+// $('article').each(function(){
+// 	// if ($("#list").text().search($(this).attr("data-key"))>0) {
+// 		// console.log($(this).attr("data-key"));
+// 		$(this).addClass("disabled");
+// 		// $(this).addClass("watched");
+// 		// $(this).attr("title","Watched Video");
+// 	// }
+// });
+</script>
+
+</body>    
+</html>
+
+
+

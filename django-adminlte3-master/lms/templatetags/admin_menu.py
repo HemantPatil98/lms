@@ -236,3 +236,7 @@ def sub(num1,num2):
 @register.filter(name='range')
 def sub(num):
     return range(1,num+1)
+
+@register.filter(name='has_per')
+def has_per(obj,per):
+    return len(obj.filter(name=per))

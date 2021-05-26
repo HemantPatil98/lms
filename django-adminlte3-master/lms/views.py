@@ -4,11 +4,12 @@ from django.contrib.auth import authenticate,login,logout
 from . import sheetsapi
 import datetime
 from django.contrib.auth.models import User,Group,Permission
-from .models import notice,user_profile,extra_data,certificate_request,timeline
+from .models import notice,user_profile,extra_data,certificate_request,timeline,groupsinfo
 from exam.models import course
 from django.core.paginator import Paginator
 import itertools
 import os
+import math
 
 # Create your views here.
 def log_in(request):
@@ -16,12 +17,12 @@ def log_in(request):
         username = request.POST['username']
         password = request.POST['password']
         us = authenticate(request, username=username, password=password)
-        print(us)
+        # print(us)
         if us is not None:
             try:
                 ab = user_profile.objects.filter(user_id=us.id)[0]
                 vars(ab)['_state'] = None
-                print(vars(ab))
+                # print(vars(ab))
                 request.session['ab']=vars(ab)
 
             except:
@@ -29,10 +30,11 @@ def log_in(request):
             messages.info(request, "Successfully Log In")
             # Redirect to a success page.
             # response = redirect('index')
-            print('success')
-            print(us.last_login)
+            # print('success')
+            # print(us.last_login)
             if us.last_login !=None:
                 login(request, us)
+
                 return redirect(index)
             else:
                 login(request, us)
@@ -50,11 +52,10 @@ def log_out(request):
     return redirect(login_form)
 
 def login_form(request):
-    try:
-        if request.has_key(user):
-            return redirect('index')
-    except:
-        return render(request,'student/login_form.html')
+    if request.user.username != "":
+        return redirect('index')
+    else:
+        return render(request, 'student/login_form.html')
 
 def reset_password(request):
     # print(user_profile.objects.all().filter(user_id=request.user.id)[0].otp)
@@ -98,9 +99,9 @@ def index(request):
         # stat = {'ucount':len(user.objects.all()),'gcount':len(Group.objects.all())}
         return render(request,'student/adminindex.html',{'notice':notice1})
     else:
-        day = datetime.datetime.now()
+        day = datetime.now()
         day = day.strftime("%d")
-        print(request.session.has_key('feedback'))
+        # print(request.session.has_key('feedback'))
 
         if day == "20":
             if not request.session.has_key('feedback'):
@@ -132,6 +133,30 @@ def index(request):
         profile = [dict(zip(fields, values[0])), dict(zip(fields, values[1])), dict(zip(fields, values[2])),
                    dict(zip(fields, values[3]))]  # list data to object
         # print(profile[1])
+
+        us = User.objects.get(id=request.user.id)
+        gps = us.groups.all()
+        print(us.groups.all())
+        per = {'C':[],'SQL':[]}
+        for g in gps:
+            gpinfo = groupsinfo.objects.get(group=g.id)
+            if gpinfo.course == 'C':
+                if len(g.permissions.filter(name="video")):
+                    (per['C']).append('video')
+                if len(g.permissions.filter(name="notes")):
+                    (per['C']).append('notes')
+                if len(g.permissions.filter(name="exam")):
+                    (per['C']).append('exam')
+            if gpinfo.course == 'SQL':
+                if len(g.permissions.filter(name="video")):
+                    (per['SQl']).append('video')
+                if len(g.permissions.filter(name="notes")):
+                    (per['SQL']).append('notes')
+                if len(g.permissions.filter(name="exam")):
+                    (per['SQL']).append('exam')
+            print(gpinfo.course,g.permissions.filter(name="video"))
+            print(per)
+
         from .models import notice
         notice1 = ""
         try:
@@ -139,7 +164,7 @@ def index(request):
         except:
             notice1 = ""
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-        return render(request, 'student/index.html', {'profile': profile,'notice':notice1,'up':up})
+        return render(request, 'student/index.html', {'profile': profile,'notice':notice1,'up':up,'per':per})
 
 
 def addstudent(request):
@@ -256,14 +281,23 @@ def admin(request):
 
     return render(request, 'student/index.html',{'up':up,'notice':notice1})
 
-def addgroups(request):
+def addgroups(request,view='True'):
     print(request.POST)
+    print(view)
     if request.method == 'POST':
         gname = request.POST['gname']
+        # course = request.POST['cname']
+        # cname = ''
         gp = Group.objects.filter(name=gname)
+        # gpinfo = ''
         if len(gp) == 0:
+            cname = request.POST['cname']
+            startdate = request.POST['startdate']
+            enddate = request.POST['enddate']
             gp=Group(name=gname)
             gp.save()
+            gpinfo = groupsinfo(group=gp,course=cname,startdate=startdate,enddate=enddate)
+            gpinfo.save()
             messages.info(request,'Group created')
             SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
             attendance = ["id","user_id", "name", "contact", "emailid"]
@@ -271,33 +305,70 @@ def addgroups(request):
             messages.info(request, gname + " is added in sheet")
         else:
             gp=gp[0]
+            # print(gp.id)
+            gpinfo = groupsinfo.objects.get(group_id=gp.id)
+            try:
+                gpinfo.enddate = request.POST['enddate']
+                gpinfo.save()
+            except:
+                pass
+            cname = request.POST['cname']
 
-        for permission in request.POST.getlist('permissions'):
-            gp.permissions.add(permission)
 
-        pre = gp.permissions.all()
 
+        # print(permissions)
+        if request.POST.get('videopermission'):
+            for p in gp.permissions.all():
+                if p.name not in request.POST.getlist('videopermission'):
+                    gp.permissions.remove(p.id)
+            for p in request.POST.getlist('videopermission'):
+                p = Permission.objects.get(name=p)
+                if p not in gp.permissions.all():
+                    gp.permissions.add(p)
+
+            permissions = {'video': request.POST.get('pervideo'), 'exam': request.POST.get('perexam'),
+                           'notes': request.POST.get('pernotes')}
+            for p in permissions:
+                if permissions.get(p) == 'on':
+                    gp.permissions.add(Permission.objects.get(name=p))
+                else:
+                    gp.permissions.remove(Permission.objects.get(name=p))
+
+        # print(gp.permissions.all())
+        pre = {'video':'','exam':'','notes':''}
+        for p in pre:
+            # print(type(pre))
+            pre[p]=len(gp.permissions.filter(name=p))
+
+        gp_permissions = gp.permissions.all()
+        # print(gp.permissions.filter(name='video'))
         groups = Group.objects.all().order_by('-id')
         members = User.objects.all().order_by('-id')
 
-        request_member = [int(x) for x in request.POST.getlist('members')]
+        # request_member = [int(x) for x in request.POST.getlist('members')]
+        try:
+            request_member = [int(x) for x in request.POST.get('students').split(',')[:-1:]]
+        except:
+            request_member=[]
         # print(request_member)
-        for m in members:
-            if gp in m.groups.all():
-                if m.id not in request_member:
-                    m.groups.remove(gp.id)
-                    messages.info(request,m.first_name+" is removed")
-            else:
-                if m.id in request_member:
-                    m.groups.add(gp.id)
-                    SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
-                    # print(us)
-                    index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
-                    if sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname=gname) is None:
-                        index = 1
-                    values = [index,m.id,m.first_name,m.last_name,m.email]
-                    sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,values=values)
-                    messages.info(request,m.first_name+" is added")
+
+        if request.POST.get('students'):
+            for m in members:
+                if gp in m.groups.all():
+                    if m.id not in request_member:
+                        m.groups.remove(gp.id)
+                        messages.info(request,m.first_name+" is removed")
+                else:
+                    if m.id in request_member:
+                        m.groups.add(gp.id)
+                        SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
+                        # print(us)
+                        # index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
+                        # if sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname=gname) is None:
+                        index = '=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)'
+                        values = [index,m.id,m.first_name,m.last_name,m.email]
+                        sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,values=[values])
+                        messages.info(request,m.first_name+" is added")
 
         memb_pre = []  # group existing members
         for m in members:
@@ -306,13 +377,12 @@ def addgroups(request):
 
         videolist = []
 
-        if (gname.find("C_")==0):
-            videos = "media/videos/courses/" + 'C/'
-            # print(os.listdir(videos))
-            for v in os.listdir(videos):
-                videolist.append(v.split(".")[0])
+        videos = "media/videos/courses/" + cname
+        # print(os.listdir(videos))
+        for v in os.listdir(videos):
+            videolist.append(v.split(".")[0])
 
-        print(videolist)
+        # print(videolist)
         # notice1 = ""
         try:
             notice1 = notice.objects.all().order_by('-generateddate')[0:5]
@@ -321,13 +391,16 @@ def addgroups(request):
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
         # print(memb)
         courses = course.objects.values_list('name', flat=True).distinct()
+        # print(gpinfo)
         return render(request,'student/add_groups.html',{'gname':gp,'permissions':Permission.objects.all()[68::],'pre':pre,
                                                         'members':members,'memb_pre':memb_pre,'up':up,'groups':groups,
-                                                         'notice':notice1,'vpermissions':videolist,'courses':courses})
+                                                         'notice':notice1,'vpermissions':videolist,'courses':courses,
+                                                         'gpinfo':gpinfo,'gp_permissions':gp_permissions,'view':view})
     groups = Group.objects.all()
+    courses = course.objects.values_list('name', flat=True).distinct()
 
     # up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-    return render(request,'student/add_groups.html',{'groups':groups})
+    return render(request,'student/add_groups.html',{'groups':groups,'courses':courses})
 
     # return render(requet,'student/test.html')
 
@@ -347,6 +420,20 @@ def viewgroups(request):
             if m.groups.filter(id=gp.id):
                 memb_pre.append(m)
         # memb_grp = {member.id: {'grp_id': group.id, 'grp_name': group.name} for member in members for group in groups}
+        pre = {'video': '', 'exam': '', 'notes': ''}
+        for p in pre:
+            # print(type(pre))
+            pre[p] = len(gp.permissions.filter(name=p))
+
+        videolist = []
+
+        gpinfo = groupsinfo.objects.get(group_id=gp.id)
+
+
+        videos = "media/videos/courses/" + gpinfo.course
+        # print(os.listdir(videos))
+        for v in os.listdir(videos):
+            videolist.append(v.split(".")[0])
 
         notice1 = ""
         try:
@@ -354,7 +441,7 @@ def viewgroups(request):
         except:
             notice1 = ""
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-        return render(request,'student/view_groups.html',{'groups':Group.objects.all(),'gname':gp.name,
+        return render(request,'student/view_groups.html',{'groups':Group.objects.all(),'gname':gp.name,'pre':pre,
                                                           'group_per':gp_per,'memb_pre':memb_pre,'permissions':Permission.objects.all(),
                                                           'members':members,'up':up,'notice':notice1})
 
@@ -686,6 +773,26 @@ def attendance(request):
         notice1 = ""
     return render(request,'student/attendance.html',{'sheetnames':SHEET_NAMES,'notice':notice1})
 
+def studentattendance(request):
+    us = User.objects.get(id=request.user.id)
+    gps = us.groups.all()
+    data =[]
+    SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
+    for g in gps:
+        c = groupsinfo.objects.get(group=g.id).course
+        value = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=g.name)
+        for v in value:
+            print(us.id,int(v[1]),us.id == int(v[1]))
+            if us.id == int(v[1]):
+                print(len(v)-6,v.count('p'))
+                data.append({'course':c,'per':round(v.count('p')/(len(v)-6)*100,2)})
+    print(data)
+    notice1 = ""
+    try:
+        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+    except:
+        notice1 = ""
+    return render(request,'student/studentattendance.html',{'notice':notice1,'data':data,'gps':gps})
 
 def addnotice(request):
     # data : ""
@@ -898,7 +1005,16 @@ def get_data(request,table):
             else:
                 dict[s] = ''
         data.append(dict)
-    # print(str(data)[508::])
+    # print(data)
+    if table == 'attendance':
+        data1 = []
+        for d in data:
+            print(request.user.id, int(d['USER_ID']))
+            if int(d['USER_ID']) == request.user.id:
+                data1.append(d)
+                break
+    data = data1
+    print(data)
     messages.info(request,'Data fetch successfully')
     return HttpResponse(str(data))
 
@@ -1242,3 +1358,121 @@ def viewfeedback(request):
         notice1 = ""
 
     return render(request, 'student/view_feedback.html', {'up': up, 'sheetnames': SHEET_NAMES, 'notice': notice1})
+
+def students_groups(request,gname):
+    gp = Group.objects.all()
+    data = [{'groupname':'Students'}]
+    nogroup = []
+    for g in gp:
+        data1 = {}
+        data1['groupName']=g.name
+        data2 = []
+        for u in User.objects.filter(groups=g.id):
+            if g.name == gname:
+                data2.append({'uname': u.first_name, 'uid': u.id,'selected':"true"})
+            else:
+                data2.append({'uname':u.first_name,'uid':u.id})
+        data1['groupData'] = data2
+        data.append(data1)
+
+    for u in User.objects.all():
+        if len(u.groups.all())==0:
+            nogroup.append({'uname':u.first_name,'uid':u.id})
+    data[0]={'groupName':'Students',"groupData":nogroup}
+
+    return HttpResponse(str(data).replace("'",'"'))
+
+
+def students_current_groups(request,gname):
+    data = []
+    g = Group.objects.get(name=gname)
+    # print(User.objects.filter(groups=g.id))
+    for u in User.objects.filter(groups=g.id):
+        data.append({'uname': u.first_name, 'uid': u.id,'selected':"true"})
+
+    return HttpResponse(str(data).replace("'",'"'))
+
+def calender(request):
+    SPREADSHEET_ID = extra_data.objects.get(name='batch schedule').value
+    values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname="Sheet 1")
+    # print(values)
+    data = []
+    for v in values:
+        # print(v)
+        event = {}
+        # print(v[1].split('-'))
+        event['title'] = v[1] + " / " + v[3]
+        event['startTime'] = v[0].split('-')[0]
+        event['endTime'] = v[0].split('-')[1]
+        event['start'] = v[2]
+        event['end'] = v[4]
+        # event['daysOfweek'] = ['1', '2', '3', '4', '5', '6']
+        event['dow']= [1, 4]
+        event['allDay'] = False
+        data.append(event)
+    # data = str(data).replace("'", '"').replace('False', 'false')
+    print(data)
+    return render(request,'student/calender.html',{'data':data})
+
+def getcalenderevents(request):
+    SPREADSHEET_ID = extra_data.objects.get(name='batch schedule').value
+    values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname="Sheet 1")
+    # print(values)
+    data = []
+    for v in values:
+        # print(v)
+        event = {}
+        # print(v[1].split('-'))
+        event['title'] = v[1] + " / " + v[3]
+        event['startTime'] = v[0].split('-')[0]
+        event['endTime'] = v[0].split('-')[1]
+        # event['start'] = v[2]
+        # event['end'] = v[4]
+        # event['daysOfweek'] = ['1', '2', '3', '4', '5', '6']
+        # event['dow']= [1, 4]
+        event['allDay']= False
+        data.append(event)
+    data = str(data).replace("'",'"').replace('False','false')
+    print(data)
+    return HttpResponse(data)
+
+def pdftest(request):
+
+    return HttpResponse("")
+
+from io import BytesIO
+from django.http import HttpResponse
+from django.template.loader import get_template
+import xhtml2pdf.pisa as pisa
+
+
+class Render:
+
+    @staticmethod
+    def render(path: str, params: dict):
+        template = get_template(path)
+        html = template.render(params)
+        response = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
+        if not pdf.err:
+            return HttpResponse(response.getvalue(), content_type='application/pdf')
+        else:
+            return HttpResponse("Error Rendering PDF", status=400)
+
+from django.views.generic import View
+from django.utils import timezone
+from .models import *
+# from .render import Render
+
+
+class Pdf(View):
+
+    def get(self, request):
+        # sales = Sales.objects.all()
+        today = timezone.now()
+        params = {
+            'today': today,
+            # 'sales': sales,
+            'request': request
+        }
+        return Render.render('student/pdf.html', params)
