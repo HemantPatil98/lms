@@ -16,12 +16,12 @@
           {%if not request.user.is_staff%}<img src="/media/{{request.session.ab.photo}}" class="img-circle elevation-2" alt="User Image">{%endif%}
         </div>
         <div class="info">
-          <a href="{%url 'viewprofile'%}" class="d-block">{{request.user.first_name}}</a>
+          <a href="{%url 'viewprofile'%}" class="d-block">{{request.user.username}}</a>
         </div>
          </div>
 
       <!-- SidebarSearch Form -->
-<!--       <div class="form-inline">
+      <div class="form-inline">
         <div class="input-group" data-widget="sidebar-search">
           <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
           <div class="input-group-append">
@@ -30,7 +30,7 @@
             </button>
           </div>
         </div>
-      </div> -->
+      </div>
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
@@ -98,7 +98,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'viewgroups' %}" class="nav-link">
+                <a href="{% url 'viewgroups' view='true' %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Groups</p>
                 </a>
@@ -138,7 +138,7 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="" class="nav-link">
               <i class="fas fa-video"></i>
               <p>
                 Videos
@@ -147,11 +147,35 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{%url 'attendance'%}" class="nav-link">
+                <a href="{%url 'video' course='C'%}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Watch Video Lectues</p>
+                  <p>C Programing</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{%url 'video' course='SQL'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>SQL</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{%url 'video' course='WD'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Web Designing</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{%url 'video' course='Core'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Core Domain</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{%url 'video' course='Adv'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Adv Domain</p>
+                </a>
+              </li>v
             </ul>
           </li>
           <li class="nav-item">
@@ -181,7 +205,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{%url 'attendance'%}" class="nav-link">
+                <a href="{%if request.user.is_staff%}{%url 'attendance'%}{%else%}{%url 'studentsattendance'%}{%endif%}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Add / view Attendance</p>
                 </a>

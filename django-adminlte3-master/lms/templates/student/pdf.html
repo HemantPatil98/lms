@@ -1,0 +1,125 @@
+<!doctype html>
+{%load static%}
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Offer Letter | {{name}}</title>
+    <style type="text/css">
+        /*@page {
+            size: A4;
+            margin: 1cm 2.5cm;
+        }*/
+
+        @page {
+        size: A4 portrait;
+        @frame header_frame {           
+            -pdf-frame-content: header_content;
+            left: 50pt; width: 512pt; top: 40pt; height: 100pt;
+        }
+        @frame content_frame {          
+            left: 50pt; width: 512pt; top: 140pt; height: 732pt;
+        }
+        @frame footer_frame {           
+            -pdf-frame-content: footer_content;
+            left: 50pt; width: 512pt; top: 772pt; height: 20pt;
+        }
+    }
+    @frame col1_frame {             /* Content frame 1 */
+            left: 44pt; width: 245pt; top: 90pt; height: 632pt;
+        }
+        @frame col2_frame {             /* Content frame 2 */
+            left: 323pt; width: 245pt; top: 90pt; height: 632pt;
+        }
+
+        .card-body{
+            font-size: 15px;
+        }
+        .card-footer{
+            border: 5px;
+        }
+        .heighlight{
+            font-weight: bold;
+        }
+        .card-header{
+            font-size: 12px;
+        }
+        li{
+            list-style-type: "\27A2";
+        }
+    </style>
+</head>
+<body>
+
+        <div id="header_content" class="card-header" style="display: flex;">
+            <table>
+                <tr>
+                    <td>
+                        <img src="http://127.0.0.1:8000/static/logon.png" style='width: 150pt;height: 80pt;'>
+                    </td>
+                    <td colspan=2 style="color: grey;margin-left: 35px;rg">Fortune Cloud Technologies Group<br>
+                         3rd Floor, Abhinav Apartment, Beside Congress Bhavan,<br>
+                         Shivajinagar, Pune – 411005 | Contact No: +91 - 9766439090<br>
+                         Web: www.fortunecloudindia.com
+                    </td>
+                </tr>
+            </table>
+            
+        </div>
+        <div id="content_frame" class="card-body">
+
+            <p class="heighlight">Ref.: - FC/HR/2020-430</p>
+            <p class="heighlight">{{today}}</p>
+            <p class="heighlight">{{name}}<br>
+            Cell No: +91 - {{contact}}<br>
+            <span style="text-decoration: underline;">Subject: Offer Letter</span><br>
+            Dear {{name}},<br></p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;With reference to the discussions you had with us, we would like to inform you that
+            you have been selected for Internship program with <span class="heighlight">Fortune Cloud Technologies Group,
+            Pune</span>.</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;We are pleased to offer you the position of <span class="heighlight">“Jr. Software Engineer”</span> and you will be
+            posted at Fortune Cloud Technologies, Pune w.e.f. from <span class="heighlight">April 12,2021</span>. Your training is
+            scheduled for a period of 4 months followed by a Live Project/Internship at <span class="heighlight">Cravita
+            Technologies India Private Limited, Pune</span>.</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;As such, your internship will include training / orientation and focus primarily on
+            learning and developing new skills and gaining a deeper understanding of concepts through
+            hands-on application of the knowledge you learned in our Organization.
+            On successful Completion of your Project, you would be entitled for an employment within
+            the organization or with our client/partner organization. Kindly refer to Page 2 for the Terms.</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;We welcome you to Fortune Cloud family and look forward to many years of amutually beneficial association. </p>
+
+            <p>Yours truly,</p>
+            <p>For Fortune Cloud Technologies Group </p>
+            <p>(Authorized Signatory)</p>
+        </div>
+        <div id="footer_content" class="card-footer">
+            Page <b><pdf:pagenumber></b>
+        of <b><pdf:pagecount></b>
+        </div>
+    <pdf:nextpage>
+
+        <div id="content_frame" class="card-body">
+            <span class="heighlight">Terms and Conditions:</span>
+            <p>The Selection for the Job / Offer will be based on the following:</p>
+            <ul>
+                <li>Client Side Interview and Final Selection</li>
+                <li>Project Work/Assignment Completion</li>
+                <li>Technical Competency.</li>
+                <li>You should not indulge in any anti-social activities within the organization and
+                externally.</li>
+                <li>In case you do not attend the interviews (once you apply) or decline the offer, you
+                would be deferred from further employment activities from Fortune Cloud.</li>
+                <li>All communication would be done via email.</li>
+
+            </ul>
+                <hr style="width: 100%;height: 1px;">
+                
+            <p class="heighlight">Declaration by the Candidate</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;I have read the terms and conditions and hereby declare that I have read, understood all the
+                points and abide by the same.</p>
+                <p>Acceptance: ___________________________ Date: _____________ Sign: __________ </p>
+        </div>
+
+        
+
+</body>
+</html>

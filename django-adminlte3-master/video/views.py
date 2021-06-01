@@ -1,11 +1,14 @@
 from django.shortcuts import render,HttpResponse
 from django.views.decorators.clickjacking import xframe_options_sameorigin,xframe_options_exempt
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission,Group
 # Create your views here.
 from .models import videos_watched_status
 import os
 from wsgiref.util import FileWrapper
 import math
+from lms.models import *
+from lms import sheetsapi
+from exam.models import *
 def video(request,course):
     videos = "media/videos/courses/"+course
     thumbs = "media/videos/thumb/"+course
@@ -63,8 +66,71 @@ def thumb(request):
 
     return HttpResponse("Videos Synced Successfully")
 
-def videopermissions(request):
-    return render(request,'videopermissions.html')
+def videopermissions(request,view='false'):
+    print(request.POST)
+    print(view)
+    if request.method == 'POST':
+        gname = request.POST['gname']
+        # course = request.POST['cname']
+        # cname = ''
+        gp = Group.objects.get(name=gname)
+        # gpinfo = ''
+
+        # print(gp.id)
+        gpinfo = groupsinfo.objects.get(group_id=gp.id)
+
+        cname = request.POST['cname']
+
+        if request.POST.getlist('videopermission'):
+            for p in gp.permissions.all():
+                if p.name not in request.POST.getlist('videopermission'):
+                    gp.permissions.remove(p.id)
+            for p in request.POST.getlist('videopermission'):
+                p = Permission.objects.get(name=p)
+                if p not in gp.permissions.all():
+                    gp.permissions.add(p)
+
+            permissions = {'video': request.POST.get('pervideo'), 'exam': request.POST.get('perexam'),
+                           'notes': request.POST.get('pernotes')}
+            for p in permissions:
+                if permissions.get(p) == 'on':
+                    gp.permissions.add(Permission.objects.get(name=p))
+                else:
+                    gp.permissions.remove(Permission.objects.get(name=p))
+        # print(permissions)
+
+        gp_permissions = gp.permissions.all()
+
+        videolist = []
+
+        videos = "media/videos/courses/" + cname
+        # print(os.listdir(videos))
+        for v in os.listdir(videos):
+            videolist.append(v.split(".")[0])
+
+        # print(videolist)
+        # notice1 = ""
+        try:
+            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        except:
+            notice1 = ""
+        up = user_profile.objects.all().filter(user_id=request.user.id)[0]
+        # print(memb)
+        courses = course.objects.values_list('name', flat=True).distinct()
+        print(gpinfo.enddate)
+        return render(request, 'videopermissions.html',
+                      {'gname': gp, 'permissions': Permission.objects.all()[68::],
+                       'up': up, 'notice': notice1, 'vpermissions': videolist, 'courses': courses,
+                       'gpinfo': gpinfo, 'gp_permissions': gp_permissions, 'view': view})
+    groups = Group.objects.all()
+    courses = course.objects.values_list('name', flat=True).distinct()
+
+    # up = user_profile.objects.all().filter(user_id=request.user.id)[0]
+    # return render(request, 'student/videopermissions.html', {'groups': groups, 'courses': courses, 'view': view})
+
+    # return render(requet,'student/test.html')
+
+    return render(request,'videopermissions.html',{'groups': groups, 'courses': courses, 'view': view})
 
 def blank(request):
     return HttpResponse("")

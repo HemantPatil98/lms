@@ -240,3 +240,10 @@ def sub(num):
 @register.filter(name='has_per')
 def has_per(obj,per):
     return len(obj.filter(name=per))
+
+@register.filter(name='key_with_space')
+def key_with_space(obj,key):
+    try:
+        return obj[key]
+    except:
+        return 0

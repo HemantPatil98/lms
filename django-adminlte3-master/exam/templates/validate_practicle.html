@@ -98,7 +98,7 @@ console.log(type);
   var url = "http://127.0.0.1:8000/getdata_practicle/?cname="+cname+"&type="+type;
   if (type=='MCQ') {
    var field= [
-            { name: "ID", type: "number", width: 70,editing:false,css: "hide"},
+            { name: "ID", type: "number", width: 70,editing:false},
             { name: "NAME", type: "text", width: 70,editing:false},
             { name: "COURSE", type: "text", width: 70,editing:false},
             { name: "TYPE", type: "text", width: 70,editing:false},
@@ -108,7 +108,7 @@ console.log(type);
   }
   else if(type=='PRACTICAL'){
      var field= [
-            { name: "ID", type: "number", width: 70,editing:false,css: "hide"},
+            { name: "ID", type: "number", width: 70,editing:false},
             { name: "NAME", type: "text", width: 70,editing:false},
             { name: "COURSE", type: "text", width: 70,editing:false},
             { name: "TYPE", type: "text", width: 70,editing:false},
@@ -120,7 +120,7 @@ console.log(type);
   }
   else if(type=='PROGRAM'){
      var field= [
-            { name: "ID", type: "number", width: 70,editing:false,css: "hide"},
+            { name: "ID", type: "number", width: 70,editing:false},
             { name: "NAME", type: "text", width: 70,editing:false},
             { name: "COURSE", type: "text", width: 70,editing:false},
             { name: "TYPE", type: "text", width: 70,editing:false},
@@ -205,7 +205,7 @@ $(function () {
         },
 
         fields: [
-            { name: "ID", type: "number", width: 70,editing:false,css: "hide"},
+            { name: "ID", type: "number", width: 70,editing:false},
             { name: "NAME", type: "text", width: 70,editing:false},
             { name: "COURSE", type: "text", width: 70,editing:false},
             { name: "TYPE", type: "text", width: 70,editing:false},

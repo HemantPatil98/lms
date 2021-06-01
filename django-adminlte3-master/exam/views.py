@@ -4,6 +4,8 @@ import random
 from django.contrib import messages
 from django.core.paginator import Paginator
 from lms import models,sheetsapi
+from datetime import datetime
+import os
 # Create your views here.
 
 student_performance = {'id':"A",'name':"B",'contact':"C",'emailid':"D",'dateofadmission':"E",'trainingmode':"F",'coursestartdate':"G",'course':"H",
@@ -23,6 +25,7 @@ def add_questions(request):
         cname = request.POST['cname']
         count = 0
         type = request.POST['type']
+        SPREADSHEET_ID = ""
         try:
             crs = course.objects.get(name=cname,type=type)
             try:
@@ -33,12 +36,13 @@ def add_questions(request):
             crs.save()
         except:
             crs = course(name=cname,type=type,time=request.POST['time'])
+            os.mkdir('media/videos/courses/PYTHON')
             # crs.save()
             try:
                 SPREADSHEET_ID = models.extra_data.objects.get(name=type).value
             except:
                 if type == 'MCQ':
-                    fields = ["Question","Option1","Option2","Option3","Option4","Answer"]
+                    fields = ["Question","Option1","Option2","Option3","Option4","Answer",'Explanation']
                 elif type == 'PRACTICAL':
                     fields = ["Program"]
                 elif type == 'PROGRAM':
@@ -51,7 +55,7 @@ def add_questions(request):
                 print("IN CREATE SHEET")
             else:
                 if type == 'MCQ':
-                    fields = ["Question", "Option1", "Option2", "Option3", "Option4", "Answer"]
+                    fields = ["Question", "Option1", "Option2", "Option3", "Option4", "Answer",'Explanation']
                 elif type == 'PRACTICAL':
                     fields = ["Program"]
                 elif type == 'PROGRAM':
@@ -80,6 +84,8 @@ def add_questions(request):
                                   option1=choices[0],option2=choices[1],option3=choices[2],option4=choices[3],
                                   answer=ans,explanation=explanation)
                     q.save()
+                    # sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=type,values=[[request.POST[field],choice[0],
+                    #                                                                            choice[1],choice[2],choice[3]]])
             count = questions.objects.all().filter(course=crs)
             print(len(count))
 
@@ -127,9 +133,7 @@ def mcq_exam(request):
             random.shuffle(ques)
             ques_set = ques[:2]
             courses = course.objects.values_list('name', flat=True).distinct()
-
             attempt = exam_attempts.objects.filter(student=request.user,course=crs)
-
             attempt = len(attempt)
 
             return render(request, 'mcq_exam.html',
@@ -139,26 +143,17 @@ def mcq_exam(request):
             prog = program.objects.all().filter(course=crs.id)
             prog_set = random.sample(set(prog),2)
             courses = course.objects.values_list('name', flat=True).distinct()
-
-            print(prog_set)
-
             attempt = exam_attempts.objects.filter(student=request.user,course=crs)
-
             attempt = len(attempt)
 
             return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
                                                            'prog_set': prog_set,'attempt':attempt})
 
         elif crs.type == 'PROGRAM':
-
             prog = program.objects.all().filter(course=crs.id)
-            prog_set = random.sample(set(prog), 2)
+            prog_set = random.sample(set(prog), 1)
             courses = course.objects.values_list('name', flat=True).distinct()
-
-            print(prog_set)
-
             attempt = exam_attempts.objects.filter(student=request.user,course=crs)
-
             attempt = len(attempt)
 
             return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
@@ -175,19 +170,14 @@ def view_questions(request,pageno=1):
             cname = request.POST['cname']
             type = request.POST['type']
             crs = course.objects.get(name=cname, type=type)
-            # print(crs.id)
             ques = questions.objects.all().filter(course=crs.id)
-            # rand_question = random.sample(set(ques), 20)
-            # print(rand_question)
             ques_set = ques
             pageno = request.POST['page']
             p = Paginator(ques_set, 20)
-            # else:
-            #     p = Paginator(ques_set, 12)
             page = p.page(pageno)
             courses = course.objects.values_list('name', flat=True).distinct()
 
-            messages.info('Question Loaded')
+            messages.info(request,'Question Loaded')
             return render(request,'view_questions.html',{'crs':crs,'count':count,'courses':courses,'ques_set':page})
         courses = course.objects.values_list('name', flat=True).distinct()
         return render(request,'view_questions.html', {'courses': courses})
@@ -199,26 +189,24 @@ def mcq_validate(request):
     answers = []
     anss = request.POST
     for qno in request.POST['qnos'].split(','):
-        # if field.find('ans')==0:
         ans = "ans"+qno
         q = questions.objects.get(id=int(qno))
         answers.append({'question':qno,'answer':q.answer})
         if ans in anss:
             ans = request.POST[ans]
-            # print(ans)
             if q.answer == ans:
-                print("Success")
+                # print("Success")
                 marks += 2
-            else:
-                print("Failed")
-    print(answers)
+            # else:
+            #     print("Failed")
+
     crs = course.objects.get(name=request.POST['cname'],type=request.POST['type'])
-    result = exam_attempts.objects.filter(student=request.user,course=crs)
+    result_attempts = exam_attempts.objects.filter(student=request.user,course=crs)
 
     SPREADSHEET_ID = models.extra_data.objects.get(name='student_performance').value
     row = models.user_profile.objects.get(user_id=request.user).student_performance_row
     row = int(row)
-    print(SPREADSHEET_ID,row)
+
     if crs.name == 'C':
         col = student_performance['ctheory']
     elif crs.name == 'SQL':
@@ -228,19 +216,31 @@ def mcq_validate(request):
     elif crs.name.find('Adv')==0:
         col = student_performance['advtheory']
 
-    print(col)
-    if len(result)==0:
+    # print(col)
+    y = request.user.date_joined.strftime('%Y')
+    # print(d)
+    SHEET_NAME = "Apr - Mar "+y
+    # value = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=SHEET_NAME,range="!"+str(col)+":"+str(col))
+    # print(value)
+    print(result_attempts)
+    hmarks = 0
+    for h in result_attempts:
+        if h.marks >= marks:
+            hmarks=h.marks
+    print(hmarks,marks)
+    if len(result_attempts)==0:
         attempt = 1
         result = exam_attempts(student=request.user,course=crs,attempt=attempt,marks=marks)
         result.save()
         # SPREADSHEET_ID = models.extra_data.objects.get(name='student_performance').value
         # sp = user_profile.objects.get(user_id=request.user).student_performance_row
-        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,row=row,value=marks,col=col,cell=True)
-    elif len(result)<2:
-        attempt = 2
+        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME, row=row, value=[marks], col=col, cell=True)
+    elif len(result_attempts)<crs.attempts_allowed:
+        attempt = len(result_attempts)+1
         result = exam_attempts(student=request.user, course=crs, attempt=attempt, marks=marks)
         result.save()
-        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,row=row,value=marks,col=col,cell=True)
+        if marks>hmarks:
+            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME, row=row,value=[marks],col=col,cell=True)
     else:
         attempt = "Attempts Overed"
 
@@ -277,12 +277,12 @@ def sync_questions(request):
             ext_row = ext.get(name=c.name+"_MCQ")
             last_update = ext_row.value
             fetch_from = str(int(last_update)+1)
-            ques = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=c.name,range="!A"+fetch_from+":F")
+            ques = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=c.name,range="!A"+fetch_from+":G")
             print(last_update)
             print(ques)
             if ques:
                 for q in ques:
-                    q = questions(course=c,question=q[0],option1=q[1],option2=q[2],option3=q[3],option4=q[4],answer=q[5])
+                    q = questions(course=c,question=q[0],option1=q[1],option2=q[2],option3=q[3],option4=q[4],answer=q[5],explanation=q[6])
                     q.save()
                 ext_row.value = int(last_update) + len(ques)
                 ext_row.save()
@@ -361,11 +361,9 @@ def getdata_practicle(request):
         a["_state"] = 'none'
         c = vars(course.objects.get(id=a["course_id"]))
         c["_state"] = 'none'
-        # a["course_id"] = vars(c)
         c['course'] = c['name']
         c.pop('name')
         s = vars(User.objects.get(id=a['student_id']))
-        # s.pop("first_name")
         a['name'] = s['first_name']
         id = str(a['id'])
         a.update(c)
@@ -404,16 +402,17 @@ def marks_practicle(request):
     marks = 0
     for m in request.POST.getlist('marks'):
         marks += int(m)
-    print(marks)
+    # print(marks)
     attempt = request.POST['attempt']
     ex = exam_attempts.objects.get(id=int(attempt))
     ex.marks = marks
     ex.save()
     crs = ex.course
     SPREADSHEET_ID = models.extra_data.objects.get(name='student_performance').value
+    sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
     row = models.user_profile.objects.get(user_id=request.user).student_performance_row
     row = int(row)
-    print(SPREADSHEET_ID, row)
+    # print(SPREADSHEET_ID, row)
     if crs.name == 'C':
         col = student_performance['cpractical']
     elif crs.name == 'SQL':
@@ -423,11 +422,11 @@ def marks_practicle(request):
     elif crs.name.find('Adv') == 0:
         col = student_performance['advpractical']
 
-    print(col)
+    # print(col)
 
-    sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=marks, col=col, cell=True)
+    sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=sheetname, row=row+1, value=[marks], col=col, cell=True)
 
-    return HttpResponse("")
+    return redirect('practical_validate')
 
 def saveprogram(request):
     print(request.FILES)
@@ -483,6 +482,6 @@ def setprogrammarks(request):
     if crs.name.find('Adv') == 0:
         col = student_performance['advpractical']
         print(col)
-        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=value, col=col, cell=True)
+        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=[value], col=col, cell=True)
         messages.info(request,'Program marks saved')
     return HttpResponse("")

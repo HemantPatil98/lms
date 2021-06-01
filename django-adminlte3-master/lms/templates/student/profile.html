@@ -381,24 +381,24 @@
                     <label for="fees">Mode Of Payment: </label>
                       <div class="form-group clearfix">
                           <div class="icheck-primary d-inline">
-                            <input type="radio" name="mode" id="checkboxPrimary1" value="LumpSum" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                            <input type="radio" name="mode" id="checkboxPrimary1" value="{{profile.0.LumpSum}}" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
                             <label for="checkboxPrimary1">Lump Sum
                             </label>
                           </div>
                         </div>
 
                         <div class="icheck-primary d-inline">
-                          <input type="radio" name="mode" id="checkboxPrimary2" value="1" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                          <input type="radio" name="mode" id="checkboxPrimary2" value="{{profile.0.1}}" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
                           <label for="checkboxPrimary2">
                           </label>
                         </div>
                         <div class="icheck-primary d-inline">
-                          <input type="radio" name="mode" id="checkboxPrimary3" value="2" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                          <input type="radio" name="mode" id="checkboxPrimary3" value="{{profile.0.2}}" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
                           <label for="checkboxPrimary3">
                           </label>
                         </div>
                         <div class="icheck-primary d-inline">
-                          <input type="radio" name="mode" id="checkboxPrimary4" value="3" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
+                          <input type="radio" name="mode" id="checkboxPrimary4" value="{{profile.0.3}}" {%if not request.user.is_staff%}onclick="return false"{%endif%} >
                           <label for="checkboxPrimary4">
                             Installment
                           </label>

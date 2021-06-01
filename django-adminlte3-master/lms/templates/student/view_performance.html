@@ -143,12 +143,11 @@ $.get(url,function(data,status){
         },
           insertItem: $.noop,
           updateItem: function(item) {
-            // console.log(Object.values(item));
-            // console.log(item);
+            console.log(Object.values(item));
+            console.log(item);
             sheetname = $("select[name='sheetname']").val();
             console.log(sheetname);
-            Url = 'http://127.0.0.1:8000/setdata/performance/?rowv='+Object.values(item)+'&sheetname='+sheetname
-            ;
+            Url = 'http://127.0.0.1:8000/setdata/performance/?rowv='+Object.values(item)+'&sheetname='+sheetname;
             data={
                 row:item,
             }
@@ -163,9 +162,9 @@ $.get(url,function(data,status){
             { name:"rowIndex",type:"number",css:"hide"},
             { name: "ID", type: "number", width: 70, css:"",editing:false},
             { name: "NAME", type: "text", width: 150,css:"fix-name"},
-            { name: "CONTACT", type: "text", width: 100,css:'fix-contact'},
+            { name: "CONTACT NO", type: "text", width: 100,css:'fix-contact'},
             { name: "EMAIL ID", type: "text",width:100,css:'rol'},
-            { name: "DATE OF ADMISSION", type: "text",width:100,css:'rol'},
+            { name: "ADMISSION DATE", type: "text",width:100,css:'rol'},
             { name: "TRAINING MODE", type: "text",width:100,},
             { name: "COURSE", type: "text",width:100,css:'rol'},
             { name: "COURSE START DATE", type: "text",width:100,css:'rol'},
@@ -188,7 +187,6 @@ $.get(url,function(data,status){
             { name: "WD TRAINER NAME", type: "text",width:100,css:'rol'},
             { name: "WD MODULE START DATE", type: "text",width:100,css:'rol'},
             { name: "WD MODULE END DATE", type: "text",width:100,css:'rol'},
-            // { name: "wdtheory", type: "number",width:50},
             { name: "WD PRACTICAL ( OUT OF 150 )", type: "number",width:100,css:'rol'},
             { name: "WD ORAL ( OUT OF 50 )", type: "number",width:100,css:'rol'},
             { name: "WD TOTAL ( OUT OF 200 )", type: "number",width:100,editing:false},
@@ -217,7 +215,6 @@ $.get(url,function(data,status){
             { name: "TOTAL MARKS ( OUT OF 700 )", type: "number",width:100,editing:false},
             { name: "ELIGIBLE FOR PLACEMENT(Y/N)", type: "text",width:100,css:'rol'},
             { name: "REMARK", type: "text",width:100,css:'rol'},
-            // { type:'control'},
         ]
     });
   });

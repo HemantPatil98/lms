@@ -89,16 +89,26 @@
 console.log(sheetname);
   var url = "http://127.0.0.1:8000/getdata/profile/?sheetname="+sheetname;
 $.get(url,function(data,status){
-    // console.log(data);
-    // console.log(JSON.parse(data.replaceAll("'",'"')));
-    // db = {};
+
     data = data.replaceAll("'",'"');
     db.data=JSON.parse(data);
-    // console.log(db.data);
+
+    fields= [
+    ];
+
+
+    window.col = Object.keys(db.data[0]);
+    if (col.length>32) {
+      console.log(col.length);
+     for(i=32;i<col.length;i++){
+      console.log(i);
+      $('#grid').jsGrid('appendFields',{name:col[i],type:'text',editing:true});
+      };
+    };
+
     $('#grid').jsGrid({data:db.data});
-// wndow.db=db;
-    // db.loadData;
-    // addaction();
+   
+
     $(".jsgrid-grid-body").keypress(function(){var keycode = (event.keyCode ? event.keyCode : event.which);
           if(keycode == '13'){window.edit_row=this;$('#grid').jsGrid('updateItem')}});
 });
@@ -109,7 +119,7 @@ $.get(url,function(data,status){
 $(function () {
 
     $("#grid").jsGrid({
-        height: "100%",
+        height: "auto",
         width: "100%",
 
         filtering: true,
@@ -151,19 +161,20 @@ $(function () {
         },
           insertItem: $.noop,
           updateItem: function(item) {
-            // console.log(Object.values(item));
-            // console.log(item);
+
             sheetname = $("select[name='sheetname']").val();
-            console.log(sheetname);
+
             Url = 'http://127.0.0.1:8000/setdata/profile/?rowv='+Object.values(item)+'&sheetname='+sheetname;
             data={
                 row:item,
             }
                 $.get(Url,function(data,status){
-                    console.log(data);
                 });
             },
           deleteItem: $.noop
+        },
+        appendFields: function (fields) {
+         this.fields.push(fields);
         },
 
         fields: [

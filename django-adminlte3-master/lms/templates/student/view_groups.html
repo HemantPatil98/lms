@@ -1,6 +1,6 @@
 {%extends 'student/base.html'%}
-{%load static%}
 {%load admin_menu%}
+{%load static%}
 {%block style%}
 {%if gname%}
 <link rel="stylesheet" href="{%static 'icon_font/css/icon_font.css'%}">
@@ -183,12 +183,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>View Groups</h1>
+            <h1>Add Group</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">View Groups</li>
+              <li class="breadcrumb-item active">Add Group</li>
             </ol>
           </div>
         </div>
@@ -196,8 +196,8 @@
     </section>
     {%endblock%}
 
-    {%block content%}
     <!-- Main content -->
+    {%block content%}
     <section class="content">
       <div class="container-fluid">
         <div class="row">
@@ -205,17 +205,17 @@
             <!-- general form elements -->
             <div class="card card-primary">
               <div class="card-header">
-                <h3 class="card-title">View Groups </h3>
+                <h3 class="card-title">Groups </h3>
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-              <form action="{%url 'viewgroups'%}" method="POST">
+              <span><i>* For students groups please use abbrevations such as C_,SQL_,WD_,PYTHON_,JAVA_,TESTING_</i></span>
+              <form action="{%url 'addgroups'%}" method="POST" onsubmit="return save()">
                 {%csrf_token%}
                 <div class="card-body row">
-
                   <div class="form-group col-md-6">
                     <label>Groups</label>
-                    <select class="form-control select2" style="width: 100%;" name="gname" {%if gname%}readonly{%endif%}>
+                    <select class="form-control select2" style="width: 100%;" name="gname" {%if gname%}readonly{%endif%} >
                       {%if gname%}
                       <option selected>{{gname}}</option>
                       {%else%}
@@ -243,7 +243,7 @@
                   </div>
                   <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
                     <label>End Date</label>
-                    <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}">
+                    <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate}}">
                   </div>
 
                   {%if gname%}
@@ -265,15 +265,15 @@
                             <div class="form-group">
                               <label>Sections</label>
                               <div class="inputGroup">
-                                <input id="pervideo" name="pervideo" type="checkbox" {%if pre.video %}checked{%endif%}/>
+                                <input id="pervideo" name="pervideo" type="checkbox" {%if pre.video %}checked{%endif%} readonly="" />
                                 <label for="pervideo">Videos</label>
                               </div>
                               <div class="inputGroup">
-                                <input id="perexam" name="perexam" type="checkbox" {%if pre.exam %}checked{%endif%}/>
+                                <input id="perexam" name="perexam" type="checkbox" {%if pre.exam %}checked{%endif%} readonly="" />
                                 <label for="perexam">Exam</label>
                               </div>
                               <div class="inputGroup">
-                                <input id="pernotes" name="pernotes" type="checkbox" {%if pre.notes %}checked{%endif%}/>
+                                <input id="pernotes" name="pernotes" type="checkbox" {%if pre.notes %}checked{%endif%} readonly="" />
                                 <label for="pernotes">Notes</label>
                               </div>
                             </div>
@@ -288,7 +288,21 @@
 
                       </div>
                     </div>
-                    <!-- /.card-header -->
+                    <!-- /.card -->
+                    <div class="card card-default">
+                      <div class="card-header"  style="background-color: #6f42c1cf;color: white">
+                        <h3 class="card-title">Video Permissions</h3>
+
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <!-- <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                          </button> -->
+                        </div>
+                      </div>
+                      <!-- /.card-header -->
                       <div class="card-body">
                         <div class="row">
                           <div class="col-12">
@@ -299,7 +313,7 @@
                                 <ul class="ks-cboxtags">
 
                                   {%for vp in vpermissions%}
-                                  <li><input type="checkbox" name='videopermission' id="{{vp}}" value="{{vp}}" {%if gname.permissions.all|has_per:vp%}checked{%endif%}><label for="{{vp}}">{{vp}}
+                                  <li><input type="checkbox" name='videopermission' id="{{vp}}" value="{{vp}}" {%if gname.permissions.all|has_per:vp%}checked{%endif%} readonly=""><label for="{{vp}}">{{vp}}
                                   </label></li>
 
                                   {%endfor%}
@@ -318,7 +332,6 @@
 
                       </div>
                     </div>
-                    <!-- /.card -->
                     <!-- /.card -->
                     <div class="card card-default col-sm-12">
                       <div class="card-header" style="background-color: #6f42c1cf;color: white">
@@ -348,30 +361,31 @@
                       </div>
                       <!-- /.card-body -->
 
+                              
+
+                      <div class="card-footer">
+
+                      </div>
+                    </div>
                   {%endif%}
 
                 </div>
                 <!-- /.card-body -->
 
                 <div class="card-footer">
-                  <button id="submit" name="submit" value="submit" type="submit" class="btn btn-primary">Submit</button>
+                  <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
               </form>
             </div>
         </div>
       </div>
-
-    </section>
-    <!-- /.content -->
+    </section>{{view}}
     {%endblock%}
+    <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-{%block script%}
-<style type="text/css">
-  .hide{
-    display: none;
-  }
-</style>
+
+    {%block script%}
 <script src="{%static 'js/jquery.transfer.js'%}"></script>
 <script type="text/javascript">
 
@@ -418,6 +432,17 @@ console.log(groupData);
 });
 // console.log(window.groupData);
 
+function save(){
+  items = window.myTransfer.getSelectedItems();
+  console.log(items)
+  data = "";
+  $.each(items,function(){
+    data +=(this.uid).toString()+",";
+  })
+  console.log(data);
+  $("input[name='students']").val(data);
+}
+
 
 </script>
 
@@ -437,136 +462,16 @@ console.log(groupData);
     </script>
 <script>
   $(function () {
-
-    $("select[name='gname']").change(function(){
-      $('#submit').trigger('click');
-    });
     //Initialize Select2 Elements
-    $('.select2').select2()
+    $('.select2').select2({
+          tags:true
+          })
 
     //Initialize Select2 Elements
     $('.select2bs4').select2({
-      theme: 'bootstrap4'
+      theme: 'bootstrap4',
+      // tags:true
     })
 
-    //Datemask dd/mm/yyyy
-    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
-    //Datemask2 mm/dd/yyyy
-    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
-    //Money Euro
-    $('[data-mask]').inputmask()
-
-    //Date range picker
-    $('#reservationdate').datetimepicker({
-        format: 'L'
-    });
-    //Date range picker
-    $('#reservation').daterangepicker()
-    //Date range picker with time picker
-    $('#reservationtime').daterangepicker({
-      timePicker: true,
-      timePickerIncrement: 30,
-      locale: {
-        format: 'MM/DD/YYYY hh:mm A'
-      }
-    })
-    //Date range as a button
-    $('#daterange-btn').daterangepicker(
-      {
-        ranges   : {
-          'Today'       : [moment(), moment()],
-          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        },
-        startDate: moment().subtract(29, 'days'),
-        endDate  : moment()
-      },
-      function (start, end) {
-        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-      }
-    )
-
-    //Timepicker
-    $('#timepicker').datetimepicker({
-      format: 'LT'
-    })
-
-    //Bootstrap Duallistbox
-    $('.duallistbox').bootstrapDualListbox({'filterPlaceHolder':"Search students here",'selectorMinimalHeight':250})
-
-    //Colorpicker
-    $('.my-colorpicker1').colorpicker()
-    //color picker with addon
-    $('.my-colorpicker2').colorpicker()
-
-    $('.my-colorpicker2').on('colorpickerChange', function(event) {
-      $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
-    })
-
-    $("input[data-bootstrap-switch]").each(function(){
-      $(this).bootstrapSwitch('state', $(this).prop('checked'));
-    })
-
-  })
-  // BS-Stepper Init
-  document.addEventListener('DOMContentLoaded', function () {
-    window.stepper = new Stepper(document.querySelector('.bs-stepper'))
-  })
-
-  // DropzoneJS Demo Code Start
-  Dropzone.autoDiscover = false
-
-  // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-  var previewNode = document.querySelector("#template")
-  previewNode.id = ""
-  var previewTemplate = previewNode.parentNode.innerHTML
-  previewNode.parentNode.removeChild(previewNode)
-
-  var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
-    url: "/target-url", // Set the url
-    thumbnailWidth: 80,
-    thumbnailHeight: 80,
-    parallelUploads: 20,
-    previewTemplate: previewTemplate,
-    autoQueue: false, // Make sure the files aren't queued until manually added
-    previewsContainer: "#previews", // Define the container to display the previews
-    clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
-  })
-
-  myDropzone.on("addedfile", function(file) {
-    // Hookup the start button
-    file.previewElement.querySelector(".start").onclick = function() { myDropzone.enqueueFile(file) }
-  })
-
-  // Update the total progress bar
-  myDropzone.on("totaluploadprogress", function(progress) {
-    document.querySelector("#total-progress .progress-bar").style.width = progress + "%"
-  })
-
-  myDropzone.on("sending", function(file) {
-    // Show the total progress bar when upload starts
-    document.querySelector("#total-progress").style.opacity = "1"
-    // And disable the start button
-    file.previewElement.querySelector(".start").setAttribute("disabled", "disabled")
-  })
-
-  // Hide the total progress bar when nothing's uploading anymore
-  myDropzone.on("queuecomplete", function(progress) {
-    document.querySelector("#total-progress").style.opacity = "0"
-  })
-
-  // Setup the buttons for all transfers
-  // The "add files" button doesn't need to be setup because the config
-  // `clickable` has already been specified.
-  document.querySelector("#actions .start").onclick = function() {
-    myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED))
-  }
-  document.querySelector("#actions .cancel").onclick = function() {
-    myDropzone.removeAllFiles(true)
-  }
-  // DropzoneJS Demo Code End
 </script>
-{%endblock%}
+    {%endblock%}

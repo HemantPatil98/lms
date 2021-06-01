@@ -82,12 +82,12 @@ def startsheet():
 
     if not extra_data.objects.filter(name='student_profile'):
 
-        basic = ["center", "dateofadmission", "course", "batchstartdate","module start from","trainingmode"]
-        personal_details = ["name", "address", "dateofbirth", "contact", "alternatecontact", "emailid"]
-        educational_details = ['examination', 'stream', 'collegename', 'boardname', 'yearofpassing', 'percentage']
-        fees = ["fees", "mode", "regammount", "installment1", "installment2", "installment3", "regdate",
-                "installment1date",
-                "installment2date", "installment3date"]
+        basic = ["center", "date of admission", "course", "batch start date","module start from","trainingmode"]
+        personal_details = ["name", "address", "date of birth", "contact", "alternate contact", "emailid"]
+        educational_details = ['examination', 'stream', 'college name', 'boardname', 'year of passing', 'percentage']
+        fees = ["fees", "mode", "reg ammount", "installment1", "installment2", "installment3", "reg date",
+                "installment1 date",
+                "installment2 date", "installment3 date"]
 
         remark = ["remark"]
 
@@ -221,7 +221,7 @@ def appendsheet(SPREADSHEET_ID,values,range='!A:A',dimension='ROWS',sheetname="A
     # values = [values]
     # sheetname = "Apr - Mar "+datetime.datetime.now().strftime("%Y")
     properties = sheet.get(spreadsheetId=SPREADSHEET_ID).execute().get("sheets")
-    print(properties)
+    # print(properties)
     sheets = []
     flag = 1
     # assert isinstance(properties, object)
@@ -263,26 +263,29 @@ def appendsheet(SPREADSHEET_ID,values,range='!A:A',dimension='ROWS',sheetname="A
         # print(x)
     return txt[x.span()[0]:len(txt)]
 
-def updatesheet(SPREADSHEET_ID,row,value,col=0,cell=False):
+def updatesheet(SPREADSHEET_ID,SHEET_NAME,row,value,col=0,cell=False,dimension="ROWS"):
 
     if cell:
         body = {
+            'majorDimension': dimension,
             "values": [
-                [
                     value
-                ]
             ]
         }
         request = sheet.values().update(spreadsheetId=SPREADSHEET_ID,
-                                    range="Apr - Mar 2021!"+str(chr(col+64))+str(row+1)+":"+str(chr(col+64))+str(row+1),
+                                    range=SHEET_NAME+"!"+str(chr(col+64))+str(row)+":"+str(chr(col+64))+str(row),
                                     valueInputOption="USER_ENTERED", body=body)
     else:
         body = {
-            "values": value
+            'majorDimension': dimension,
+            "values": [value]
         }
-        print(value)
-        request = sheet.values().update(spreadsheetId=SPREADSHEET_ID,
-                                    range="Apr - Mar 2021!A"+str(row)+":BE"+str(row+len(value)),
+
+        if dimension == 'ROWS':
+            request = sheet.values().update(spreadsheetId=SPREADSHEET_ID,range=SHEET_NAME+"!"+str(row)+":"+str(row+len(value)),
                                     valueInputOption="USER_ENTERED", body=body)
+        else:
+            request = sheet.values().update(spreadsheetId=SPREADSHEET_ID,range=SHEET_NAME + "!"+str(chr(col+64)) + str(row) + ":"+str(chr(col+64)) + str(row + len(value)),
+                                            valueInputOption="USER_ENTERED", body=body)
     response = request.execute()
     print(response)

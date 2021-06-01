@@ -132,8 +132,8 @@
                         <label>Out Off: 40</label>
                       </div>
                       <div class="col-md-6">
-                        <label>Attempt: {{attempt}}</label><br>
-                        <label>Total Attempts : 2</label>
+                        <label>Previous Attempts: {{attempt}}</label><br>
+                        <label>Total Attempts : {{crs.attempts_allowed}}</label>
                       </div>
 
                     </div>
@@ -504,6 +504,7 @@ function startTimer(duration, display) {
 
 <script>
   var alertf = 0;
+  var result =true;
   $('.closelink').click(function(){
     window.location.href = 'http://127.0.0.1:8000/index/';
   });
@@ -519,8 +520,12 @@ function startTimer(duration, display) {
       alertf +=1;
     }
     else if(alertf==1){
-      $('#alertbutton1').trigger('click');
+      if (result) {
+        $('#alertbutton1').trigger('click');
       $("input[type='submit']").trigger('click');
+      result=false;alertf+=1
+      }
+      
     }
     
   });

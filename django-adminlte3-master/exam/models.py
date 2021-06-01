@@ -9,6 +9,7 @@ class course(models.Model):
     instructions = models.TextField(null=True)
     type = models.CharField(max_length=15)
     time = models.IntegerField(default=30)
+    attempts_allowed = models.IntegerField(default=2)
 
     class Meta:
         unique_together = (('name', 'type'),)
