@@ -389,10 +389,11 @@
 
     {%block script%}
 <script src="{%static 'js/jquery.transfer.js'%}"></script>
+{%if gname%}
 <script type="text/javascript">
 
 window.groupData = [];
-url = "http://127.0.0.1:8000/students_groups/{{gname}}"
+url = "{%url 'students_groups' gname=gname%}";
 $.get(url,{},function(data){
 // console.log(data);
 groupData = JSON.parse(data);
@@ -447,7 +448,7 @@ function save(){
 
 
 </script>
-
+{%endif%}
     <script type="text/javascript">
       var select2children = [];
       $("select[name='gname'] option").each(function(){ select2children.push($(this).text())})

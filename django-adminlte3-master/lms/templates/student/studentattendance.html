@@ -176,7 +176,7 @@
                    $this.val(this.value).trigger('change');
                    // console.log(this.value<40);
                    if (this.value<40){
-                    console.log('#'+id);
+                    // console.log('#'+id);
                       $($this).css('color','rgb(255, 0, 0)');
                     }
                     else{
@@ -211,8 +211,8 @@ load();
 function load(){
     var sheetname=$("select[name='sheetname']").val();
 console.log(sheetname);
-var url = "http://127.0.0.1:8000/getdata/attendance/?sheetname="+sheetname;
-$.get(url,function(data,status){
+var url = "{%url 'getdata' table='attendance'%}";
+$.get(url,{sheetname:sheetname},function(data,status){
     // console.log(data);
     // console.log(JSON.parse(data.replaceAll("'",'"')));
     data = data.replaceAll("'",'"');
@@ -247,9 +247,9 @@ $.get(url,function(data,status){
  
     $('#grid').jsGrid({data:db.data});
 
-    add();
 
     // $('#grid tr td:nth-child(5)').html("<input name='present' type='checkbox'></html>");
+    add();
 });
 }
 
@@ -315,6 +315,54 @@ $(function () {
         ]
     });
   });
+function add(){
+  {%if request.user.is_staff%}
+  addaction();
+  {%endif%}
+}
+    d = new Date();
+  date = d.getDate();
+  if(date.toString().length==1){
+   date="0"+date;
+  }
+  month = d.getMonth()+1;
+  if(month.toString().length==1){
+   month="0"+month;
+  }
+  year = d.getFullYear();
+  // console.log(date,month,year);
+  const currentdate = date+'/'+month+'/'+year;
+  currentdate.replaceAll('"',"");
+function addaction(){
+        $('.jsgrid-table tbody tr').each(function(){
+          a=$(this)[0];
+          b=a.children[4];
+          if (db.data[0][currentdate]=="" ||db.data[0][currentdate]=="p") {
+            e=$('.jsgrid-grid-header .jsgrid-table tr')[0].children[4];
+            f=$('.jsgrid-grid-header .jsgrid-table tr')[1].children[4];
+            b.setAttribute("class","hide");
+            e.setAttribute("class","hide");
+            f.setAttribute("class","hide");
+            f=$('.jsgrid-grid-header .jsgrid-table tr')[0].children[5];
+            g=a.children[5];
+            f.innerText='Today';
+          if(db.data[this.rowIndex][currentdate]==='p'){
+              g.innerHTML='<input type=checkbox name=attendance checked onchange=addattendance('+this.rowIndex+')></input>';
+              present.push(this.rowIndex);
+            }
+            else{
+              g.innerHTML='<input type=checkbox name=attendance onchange=addattendance('+this.rowIndex+')></input>';
+            }
+          }
+          else{
+            b.innerHTML='<input type=checkbox name=attendance onchange=addattendance('+this.rowIndex+')></input>';
+          }
+          
+        });
+    }
 
+    function changesheet(){
+
+    }
 </script>
 {%endblock%}

@@ -84,20 +84,21 @@
 <script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
 
 <script type="text/javascript">
-
+ present = [];
 window.db ={};
 load();
 function load(){
+  present = [];
     var sheetname=$("select[name='sheetname']").val();
-console.log(sheetname);
-var url = "http://127.0.0.1:8000/getdata/attendance/?sheetname="+sheetname;
-$.get(url,function(data,status){
+// console.log(sheetname);
+var url = "{%url 'getdata' table='attendance'%}";
+$.get(url,{sheetname:sheetname},function(data,status){
 
     data = data.replaceAll("'",'"');
     db.data=JSON.parse(data);
 
     fields= [
-        { name: "ID", type: "number", width: 70, css:"",editing:false},
+        { name: "ID", type: "number", width: 70, css:"hide",editing:false},
         { name: "NAME", type: "text", width: 150,css:"fix-name",editing:false},
         { name: "CONTACT", type: "text", width: 100,css:'fix-contact',editing:false},
         { name: "EMAIL ID", type: "text",width: 100,editing:false},
@@ -140,7 +141,7 @@ $(function () {
    month="0"+month;
   }
   year = d.getFullYear();
-  console.log(date,month,year);
+  // console.log(date,month,year);
   const currentdate = date+'/'+month+'/'+year;
   currentdate.replaceAll('"','')
     $("#grid").jsGrid({
@@ -176,7 +177,7 @@ $(function () {
         },
           insertItem: $.noop,
           updateItem: function(rowIndex) { 
-            console.log(rowIndex.present.join(","));
+            // console.log(rowIndex.present.join(","));
             // alert(1);
             // const col = Object.keys(db.data[0]);
             // console.log(col.length-1);
@@ -187,25 +188,26 @@ $(function () {
             Url = "";
             a = db.data[0];
             if(!a.hasOwnProperty(currentdate)){
-                Url = 'http://127.0.0.1:8000/setdata/attendance/?rowv='+rowIndex.present.join(",")+'&row='+len+'&sheetname='+sheetname;
+                Url = "{%url 'setdata' table='attendance'%}";
 
             }else{
                 console.log("update");////else link for update attendance
-                Url = 'http://127.0.0.1:8000/attendance_update/?rowv='+rowIndex.present.join(",")+'&row='+len+'&sheetname='+sheetname;
+                Url = "{%url 'attendance_update'%}";
 
             }
-                $.get(Url,function(data,status){
+                $.get(Url,{rowv:rowIndex.present,row:len,sheetname:sheetname},function(data,status){
                     console.log(data);
                 }).done(function(){
-                  setTimeout('', 3000);
-                  reload();
+
                 });
+                  setTimeout('', 3000);
+                  window.location.replace(window.location.href);
             load();
         },
           deleteItem: $.noop
         },
         fields: [
-            { name: "ID", type: "number", width: 70, css:"",editing:false},
+            { name: "ID", type: "number", width: 70, css:"hide",editing:false},
             { name: "NAME", type: "text", width: 150,css:"fix-name",editing:false},
             { name: "CONTACT", type: "text", width: 100,css:'fix-contact',editing:false},
             { name: "EMAIL ID", type: "text",width: 100,editing:false},
@@ -213,7 +215,7 @@ $(function () {
         ]
     });
   });
- present = [];
+
 function addattendance(x){
   flag=true;
   console.log(x);

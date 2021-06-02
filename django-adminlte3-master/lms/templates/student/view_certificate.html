@@ -87,8 +87,8 @@
  function load(){
     var sheetname=$("select[name='sheetname']").val();
 console.log(sheetname);
-  var url = "http://127.0.0.1:8000/getdata/profile/?sheetname="+sheetname;
-$.get(url,function(data,status){
+  var url = "{%url 'getdata' table='profile'%}";
+$.get(url,{sheetname:sheetname},function(data,status){
     // console.log(data);
     // console.log(JSON.parse(data.replaceAll("'",'"')));
     db = {};
@@ -146,11 +146,11 @@ $(function () {
             // console.log(item);
             sheetname = $("select[name='sheetname']").val();
             console.log(sheetname);
-            Url = 'http://127.0.0.1:8000/setdata/profile/?rowv='+Object.values(item)+'&sheetname='+sheetname;
+            Url = "{%url 'setdata' table='profile'%}";
             data={
                 row:item,
             }
-                $.get(Url,function(data,status){
+                $.get(Url,{rowv:Object.values(item),sheetname:sheetname},function(data,status){
                     console.log(data);
                 });
             },

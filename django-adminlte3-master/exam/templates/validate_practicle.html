@@ -95,7 +95,7 @@
 console.log(cname);
     var type=$("select[name='type']").val();
 console.log(type);
-  var url = "http://127.0.0.1:8000/getdata_practicle/?cname="+cname+"&type="+type;
+  var url = "{%url 'getdata_practicle'%}"
   if (type=='MCQ') {
    var field= [
             { name: "ID", type: "number", width: 70,editing:false},
@@ -135,7 +135,7 @@ console.log(type);
 
     $('#grid').jsGrid({fields:field});
 
-$.get(url,function(data,status){
+$.get(url,{cname:cname,type:type},function(data,status){
     console.log(data);
     console.log(JSON.parse(data.replaceAll("'",'"')));
     // db = {};
@@ -193,11 +193,11 @@ $(function () {
             // console.log(item);
             // sheetname = $("select[name='sheetname']").val();
             // console.log(sheetname);
-            Url = 'http://127.0.0.1:8000/setprogrammarks/?id='+item.ID+'&value='+item.MARKS;
+            Url = "{%url 'setprogrammarks'%}"
             data={
                 row:item,
             }
-                $.get(Url,function(data,status){
+                $.get(Url,{id:item.ID,value:item.MARKS},function(data,status){
                     console.log(data);
                 });
             },
@@ -212,7 +212,7 @@ $(function () {
             { name: "ATTEMPT", type: "text",width:100,editing:false},
             { name: "MARKS", type: "text",width:100,editing:true},
             // { name: "PROGRAMS", type: "text",width:100,editing:false,itemTemplate: function(value) {
-            //   return "<a href='http://127.0.0.1:8000/view/practicle/"+value+"'>Link</a>";},},
+            //   return "<a href='window.location.origin/view/practicle/"+value+"'>Link</a>";},},
         ]
     });
   });

@@ -243,7 +243,7 @@
                   {%if gname%}
                     <div class="card card-default col-sm-12">
                       <div class="card-header" style="background-color: #6f42c1cf;color: white">
-                        <h3 class="card-title">Select Users</h3>
+                        <h3 class="card-title">Select Modules</h3>
 
                         <div class="card-tools">
                           <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -299,8 +299,8 @@
 
 
 window.groupData = [];
-url = "http://127.0.0.1:8000/user_permissions/?uid={{member.id}}"
-$.get(url,{},function(data){
+url = "{%url 'user_permissions'%}";
+$.get(url,{uid:{{member.id}}},function(data){
 console.log(data);
 groupData = JSON.parse(data);
 var settings = {

@@ -86,8 +86,8 @@
   function load(){
       var sheetname=$("select[name='sheetname']").val();
 console.log(sheetname);
-var url = "http://127.0.0.1:8000/getdata/performance/?sheetname="+sheetname;
-$.get(url,function(data,status){
+var url = "{%url 'getdata' table='performance'%}";
+$.get(url,{sheetname:sheetname},function(data,status){
     // console.log(data);
     // console.log(JSON.parse(data.replaceAll("'",'"')));
     db = {};
@@ -143,16 +143,16 @@ $.get(url,function(data,status){
         },
           insertItem: $.noop,
           updateItem: function(item) {
-            console.log(Object.values(item));
-            console.log(item);
+            // console.log(Object.values(item));
+            // console.log(item);
             sheetname = $("select[name='sheetname']").val();
-            console.log(sheetname);
-            Url = 'http://127.0.0.1:8000/setdata/performance/?rowv='+Object.values(item)+'&sheetname='+sheetname;
+            // console.log(sheetname);
+            Url = "{%url 'setdata' table='performance'%}";
             data={
                 row:item,
             }
-                $.get(Url,function(data,status){
-                    console.log(data);
+                $.get(Url,{rowv:Object.values(item),sheetname:sheetname},function(data,status){
+                    // console.log(data);
                 });
             },
           deleteItem: $.noop

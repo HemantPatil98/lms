@@ -38,7 +38,7 @@
 	    });
 			abc = Object.values(window.parent)[1];
 			if (abc.location.pathname=='/videoframe/') {
-				location.replace("http://127.0.0.1:8000/");
+				location.replace(window.location.origin);
 			}
 			// console.log(abc.innerHeight);
 			// $('#my-video').css('height',abc.innerHeight+"!important")
@@ -57,8 +57,8 @@
     poster="/media/videos/thumb/{{course}}/{{video}}.jpg"
     data-setup="{}"
   >
-    <source src="http://127.0.0.1:8000/v/{{course}}/{{video}}/" type="video/mp4" />
-    <source src="http://127.0.0.1:8000/v/{{course}}/{{video}}/" type="video/webm" />
+    <source src="{%url 'v' course=course video=video%}" type="video/mp4" />
+    <source src="{%url 'v' course=course video=video%}" type="video/webm" />
     <p class="vjs-no-js">
       To view this video please enable JavaScript, and consider upgrading to a
       web browser that

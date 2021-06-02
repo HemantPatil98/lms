@@ -34,7 +34,7 @@
               <div class="media-body">
                 <h3 class="dropdown-item-title">
                   {{note.title}}
-                  <span class="float-right text-sm "><i class="fas fa-file" onclick="window.location.href='/static/{{note.file}}'"></i></span>
+                  <span class="float-right text-sm "><i class="fas fa-file" onclick="(function(){window.location.href='/media/{{note.file}}'})()"></i></span>
                 </h3>
                 <p class="text-sm">{{note.description}}</p>
                 <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> {{note.generateddate}}</p>

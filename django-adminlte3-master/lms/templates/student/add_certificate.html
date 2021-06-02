@@ -122,7 +122,7 @@ $(function () {
           insertItem: $.noop,
           updateItem: function(item) {
             // console.log(Object.values(item));
-            console.log(item);
+            // console.log(item);
             // sheetname = $("select[name='sheetname']").val();
             // console.log(sheetname);
             // $("input[name='submit']").trigger('click');
@@ -131,8 +131,9 @@ $(function () {
 formData.append('file', $('#file')[0].files[0]);
 formData.append('id',item.ID);
 formData.append('certificate_number',item['CERTIFICATE NUMBER']);
+formData.append('certificate_status',item['CERTIFICATE STATUS']);
 $.ajax({
-       url : 'http://127.0.0.1:8000/set/certificate/',
+       url : "{%url 'setcertificate'%}",
        type : 'POST',
        data : formData,
        processData: false,  // tell jQuery not to process the data
@@ -149,11 +150,14 @@ $.ajax({
         fields: [
             { name: "ID", type: "number", width: 70,editing:true, css:"hide"},
             { name: "NAME", type: "text", width: 70,editing:true, css:""},
-            { name: "CERTIFICATE STATUS", type: "text", width: 70, css:""},
+            { name: "CERTIFICATE STATUS", type: "select", width: 70, css:"", items:[
+                                 { Name: "In Process", Id: "In Process"},
+                                 { Name: "Issued", Id: "Issued" },
+                                 { Name: "Rejected", Id: "Rejected"}],valueField: "Id",textField: "Name"},
             { name: "CERTIFICATE NUMBER", type: "text",width:100,css:''},
             { name: "CERTIFICATE", type: "text",width:100,css:'',editTemplate: function(value) {
         return this._editPicker = $("<input type='file' name='file' id='file'>");},editValue: function() {
-        return this._editPicker.val();}},
+        return this._editPicker.val();},itemTemplate: function(value, item) { if (value) {return this._editPicker = $("<a href=/media/"+value+">Open</a>")};}},
         { name: "control", type:"control"}
         ]
     });
@@ -167,15 +171,15 @@ $.ajax({
   load();
  function load(){
     var status=$("select[name='status']").val();
-console.log(status);
-  var url = "http://127.0.0.1:8000/get/certificate/?status="+status;
-$.get(url,function(data,status){
-    console.log(data);
+// console.log(status);
+  var url = "{%url 'getcertificate'%}";
+$.get(url,{status:status},function(data,status){
+    // console.log(data);
     // console.log(JSON.parse(data.replaceAll("'",'"')));
     // db = {};
     data = data.replaceAll("'",'"');
     db.data=JSON.parse(data);
-    console.log(db.data);
+    // console.log(db.data);
     $('#grid').jsGrid({data:db.data});
 // wndow.db=db;
     // db.loadData;

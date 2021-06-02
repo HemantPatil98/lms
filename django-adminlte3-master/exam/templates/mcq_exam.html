@@ -277,7 +277,7 @@
             </div>
             <div class="modal-footer justify-content-between">
               <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-outline-light">Re attempt</button>
+              <!-- <button type="button" class="btn btn-outline-light">Re attempt</button> -->
             </div>
           </div>
           <!-- /.modal-content -->
@@ -403,7 +403,7 @@ function startTimer(duration, display) {
     clearInterval(window.a);
     // console.log(qno);
     // console.log( $("form" ).serialize()+"&qnos="+qno );
-    $.post( "http://127.0.0.1:8000/mcq_validate/", $( "form" ).serialize()+"&qnos="+qno ).done(function(data){
+    $.post( "{%url 'mcq_validate'%}", $( "form" ).serialize()+"&qnos="+qno ).done(function(data){
     $('form input').attr('disabled','disabled');
     $('form label').attr('onclick','false');
     // console.log(data.replaceAll("'",'"'));
@@ -506,10 +506,10 @@ function startTimer(duration, display) {
   var alertf = 0;
   var result =true;
   $('.closelink').click(function(){
-    window.location.href = 'http://127.0.0.1:8000/index/';
+    window.location.href = "{%url 'index'%}";
   });
   $('.reattempt').click(function(){
-    window.location.href = 'http://127.0.0.1:8000/mcq/exam/';
+    window.location.href = "{%url 'mcq_exam'%}";
   });
   {%if crs%}
   // $('.content').attr('onmouseleave',"alert('')");

@@ -390,7 +390,7 @@
 <script type="text/javascript">
 
 window.groupData = [];
-url = "http://127.0.0.1:8000/students_groups/{{gname}}"
+url = "{%url 'students_group' gname=gname%}";
 $.get(url,{},function(data){
 // console.log(data);
 groupData = JSON.parse(data);

@@ -94,7 +94,7 @@ iframe{
 
       <div class="col-sm-12 col-md-8">
         <div id="video"  style="background-color: #9193955e;" style="height: 100%;width: 100%;"><!-- #545190b8; -->
-            <iframe src="http://127.0.0.1:8000/videoframe/{{course}}/{{videos.0}}/" height="100%" width="100%" style="overflow: hidden;"></iframe>
+            <iframe src="{%url 'videoframe' course=course video=videos.0%}" height="100%" width="100%" style="overflow: hidden;"></iframe>
         </div>
 
       </div>
@@ -123,10 +123,11 @@ iframe{
 <script type="text/javascript">
   $("article").click(function(){
     var datakey=$(this).attr('data-key');
-    var src = "http://127.0.0.1:8000/videoframe/{{course}}/"+datakey;
+    var src = window.location.origin+"/videoframe/{{course}}/"+datakey;
     $('iframe').attr('src',src);
     $("#title").text(datakey);
-    url = "http://127.0.0.1:8000/watched_video/?course={{course}}&video="+datakey;
+    url = window.location.origin+"/watched_video/?course={{course}}&video="+datakey;
+    console.log(url);
     $.get(url,{},function(data){});
   })
 </script>

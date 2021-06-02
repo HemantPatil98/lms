@@ -82,7 +82,7 @@
         updateItem: function(rowIndex,updatingRow) { 
             console.log(updatingRow);
             // alert(1);
-            Url = 'http://127.0.0.1:8000/setdata/profile/?row='+rowIndex+'&rowv='+updatingRow;
+            Url = 'window.location.origin/setdata/profile/?row='+rowIndex+'&rowv='+updatingRow;
             data={
                 row:updatingRow,
             }
@@ -101,7 +101,7 @@
     };
 
 window.db = db;
-var url = "http://127.0.0.1:8000/getdata/profile/";
+var url = "window.location.origin/getdata/profile/";
 $.get(url,function(data,status){
     // console.log(data);
     // console.log(JSON.parse(data.replaceAll("'",'"')));

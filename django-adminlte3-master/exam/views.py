@@ -131,7 +131,7 @@ def mcq_exam(request):
             ques = questions.objects.all().filter(course=crs)
             ques = list(ques)
             random.shuffle(ques)
-            ques_set = ques[:2]
+            ques_set = random.sample(set(ques),2)
             courses = course.objects.values_list('name', flat=True).distinct()
             attempt = exam_attempts.objects.filter(student=request.user,course=crs)
             attempt = len(attempt)

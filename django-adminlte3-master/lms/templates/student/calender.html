@@ -19,7 +19,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">View Groups</li>
+              <li class="breadcrumb-item active">View Schedule</li>
             </ol>
           </div>
         </div>
@@ -108,7 +108,7 @@
 {%block script%}
 <script src="{%static 'student/plugins/fullcalendar/main.js'%}"></script>
 <script>
-  url = "http://127.0.0.1:8000/getcalenderevents/";
+  url = "{%url 'getcalenderevents'%}";
   $.get(url,{},function(data){
 
 window.data = JSON.parse(data);

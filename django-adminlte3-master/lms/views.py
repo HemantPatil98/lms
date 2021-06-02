@@ -310,7 +310,7 @@ def addgroups(request,view="false"):
             gpinfo.save()
             messages.info(request,'Group created')
             SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
-            attendance = ["id","user_id", "name", "contact", "emailid"]
+            attendance = ["id","user_id", "name", "contact", "email id"]
             sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,columns=attendance)
             messages.info(request, gname + " is added in sheet")
         else:
@@ -692,7 +692,7 @@ def studentupdate(request):
                         filledaddstudentform.append("")
 
         # print(filledaddstudentform)
-        sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
+        sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
         index = "=INDIRECT(" + '"A"' + "&ROW()-4)+1"
         import math
         if sheetsapi.sheetvalues(SPREADSHEET_ID, sheetname) is None:
@@ -748,7 +748,7 @@ def studentupdate(request):
 
         # print(student_performance)
 
-        sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
+        sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
         # index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
         # if sheetsapi.sheetvalues(sheetid, sheetname) is None:
         #     index = 1
@@ -971,7 +971,7 @@ def student_performance_in(request):
     # sheetid = fp.read()
     # fp.close()
     sheetid = extra_data.objects.get(name='student_performance').value
-    sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
+    sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
     values = sheetsapi.sheetvalues(sheetid, sheetname)
     # print(data)
     # data =[{key:val for key in student_performance for val in data[0]} ]
@@ -998,7 +998,7 @@ def student_profile_in(request):
     # sheetid = fp.read()
     # fp.close()
     sheetid = extra_data.objects.get(name='student_profile').value
-    sheetname = "Apr - Mar " + datetime.datetime.now().strftime("%Y")
+    sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
     values = sheetsapi.sheetvalues(sheetid, sheetname)
     # print(data)
     # data =[{key:val for key in student_performance for val in data[0]} ]
@@ -1036,6 +1036,8 @@ def get_data(request,table):
         SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
     if table == 'feedback':
         SPREADSHEET_ID = extra_data.objects.get(name='feedback').value
+    if table == 'schedule':
+        SPREADSHEET_ID = extra_data.objects.get(name='batch schedule').value
 
     SHEET_NAME = request.GET['sheetname']
 
@@ -1065,27 +1067,29 @@ def get_data(request,table):
 
 ###
 def set_data(request,table):
-    rowv = request.GET['rowv'].split(',')
+    print(request.GET)
+    rowv = request.GET.getlist('rowv[]')
+    print(rowv)
     row = rowv[0]
     rowv = rowv[1::]
     SHEET_NAME = request.GET['sheetname']
-    print(request.GET)
-    print(row)
+    # print(request.GET)
+    # print(row)
     if table != 'attendance':
         if table == 'profile':
             SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
         if table == 'performance':
             SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
-        rowv[16] = '=sum(N2,O2,P2)'
-        rowv[23] = '=sum(U2,V2,W2,)'
-        rowv[29] = '=sum(AB2,AC2)'
-        rowv[40] = '=sum(AL2,AM2,AN2,)'
-        rowv[48] = '=sum(AT2,AU2,AV2)'
-        rowv[-2] = '=IF((IF(N2,1,0)+IF(O2,1,0)+IF(P2,1,0)+IF(U2,1,0)+IF(V2,1,0)+IF(W2,1,0)+IF(AB2,1,0)+IF(AC2,1,0)+IF(AE2,1,0)+IF(AF2,1,0)+IF(AL2,1,0)+IF(AM2,1,0)+IF(AN2,11,0)+IF(AP2,1,0)+IF(AT2,1,0)+IF(AU2,1,0)+IF(AV2,1,0)+IF(AZ2,1,0)+IF(BB2,1,0))=19,"Y","N")'
+            rowv[16] = '=sum(N2,O2,P2)'
+            rowv[23] = '=sum(U2,V2,W2,)'
+            rowv[29] = '=sum(AB2,AC2)'
+            rowv[40] = '=sum(AL2,AM2,AN2,)'
+            rowv[48] = '=sum(AT2,AU2,AV2)'
+            rowv[-2] = '=IF((IF(N2,1,0)+IF(O2,1,0)+IF(P2,1,0)+IF(U2,1,0)+IF(V2,1,0)+IF(W2,1,0)+IF(AB2,1,0)+IF(AC2,1,0)+IF(AE2,1,0)+IF(AF2,1,0)+IF(AL2,1,0)+IF(AM2,1,0)+IF(AN2,11,0)+IF(AP2,1,0)+IF(AT2,1,0)+IF(AU2,1,0)+IF(AV2,1,0)+IF(AZ2,1,0)+IF(BB2,1,0))=19,"Y","N")'
         sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME, row=int(row)+1, value=rowv)
     elif table == 'attendance':
         SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
-        rowv = request.GET['rowv'].split(',')
+        rowv = request.GET['rowv[]']
         row = request.GET['row']
         SHEET_NAME = request.GET['sheetname']
         if (type(rowv[0])==int):
@@ -1120,16 +1124,19 @@ def set_data(request,table):
 
 ###
 def attendance_update(request):
+    print(request.GET)
     SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
-    rowv = request.GET['rowv'].split(',')
+    rowv = request.GET.getlist('rowv[]')
     row = request.GET['row']
     SHEET_NAME = request.GET['sheetname']
+    print(rowv)
     if (type(rowv[0]) == int):
         rowv = [x for x in rowv]
     else:
         rowv = [int(x) for x in rowv]
 
-    rowv.sort()
+    # rowv.sort()
+    print(rowv,max(rowv))
     date = datetime.now()
     day = date.strftime("%d")
     month = date.strftime("%m")
@@ -1138,7 +1145,7 @@ def attendance_update(request):
     currentdate = day + "/" + month + "/" + year
     present = [currentdate]
 
-    for i in range(0, rowv[-1] + 1):
+    for i in range(0, max(rowv) + 1):
         if i in rowv:
             present.append("p")
         else:
@@ -1302,7 +1309,7 @@ def getcertificate(request):
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def setcertificate(request):
-    print(request.FILES['file'])
+    print(request.POST)
     try:
         file = request.FILES['file']
         file._name = str(request.user.username.split(':')[0]) + "." + file._name.split('.')[1]
@@ -1313,9 +1320,12 @@ def setcertificate(request):
     cr = certificate_request.objects.get(id=id)
     cr.certificate_number = cn
     cr.certificate = file
+    # print(request.POST['certificate_status'])
+    cr.certificate_status = request.POST['certificate_status']
     cr.save()
-    print(file)
-    print(request.POST['id'])
+    # print(file)
+    # print(request.POST['id'])
+
     return HttpResponse(str(cr.certificate))
 
 def objtodict(obj):
@@ -1361,7 +1371,7 @@ def timelinedata(request):
             vars(d)['_state'] = 'none'
             vars(d)['name'] = User.objects.get(id=vars(d)['generator_id']).first_name
             # vars(d)['generator_id'] = User.objects.get(id=d.generator_id).first_name
-            now = datetime.datetime.now(datetime.timezone.utc)
+            now = datetime.now(timezone.utc)
             d.body = str(d.body).replace('"','')
             time = ""
             vars(d)['date'] = d.generatedtime.strftime('%d %B %Y')
@@ -1388,7 +1398,7 @@ def timelinedata(request):
 
 def addfeedback(request):
     print(request.POST)
-    day = datetime.datetime.now()
+    day = datetime.now()
     data = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)',day.strftime("%d/%M/%Y"),request.user.first_name,
             request.user.last_name,request.user.email]
     data1 =[]
@@ -1478,6 +1488,9 @@ def calender(request):
     print(data)
     return render(request,'student/calender.html',{'data':data})
 
+def schedule(request):
+    return render(request,'student/schedule.html')
+
 def getcalenderevents(request):
     SPREADSHEET_ID = extra_data.objects.get(name='batch schedule').value
     values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname="Sheet 1")
@@ -1547,6 +1560,6 @@ class Pdf(View):
             'name': request.user.first_name,
             'contact': values[0][2]
         }
-        # print(str(Render.render('student/pdf.html', params)))
+        print(bin(Render.render('student/pdf.html', params).as_view()))
         return Render.render('student/pdf.html', params)
 

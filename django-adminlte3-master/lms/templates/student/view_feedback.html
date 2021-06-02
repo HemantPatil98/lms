@@ -87,8 +87,8 @@
  function load(){
     var sheetname=$("select[name='sheetname']").val();
 console.log(sheetname);
-  var url = "http://127.0.0.1:8000/getdata/feedback/?sheetname="+sheetname;
-$.get(url,function(data,status){
+  var url = "{%url 'getdata' table='feedback'%}";
+$.get(url,{sheetname:sheetname},function(data,status){
     console.log(data[508],data[509],data[510]);
     console.log(JSON.parse(data.replaceAll("'",'"')));
     // db = {};
@@ -156,16 +156,16 @@ $(function () {
           updateItem: function(item) {
             // console.log(Object.values(item));
             // console.log(item);
-            sheetname = $("select[name='sheetname']").val();
-            console.log(sheetname);
-            Url = 'http://127.0.0.1:8000/setdata/feedback/?rowv='+Object.values(item)+'&sheetname='+sheetname;
-            data={
-                row:item,
-            }
-                $.get(Url,function(data,status){
-                    console.log(data);
-                });
-            },
+            // sheetname = $("select[name='sheetname']").val();
+            // console.log(sheetname);
+            // Url = 'window.location.origin/setdata/feedback/?rowv='+Object.values(item)+'&sheetname='+sheetname;
+            // data={
+            //     row:item,
+            // }
+            //     $.get(Url,function(data,status){
+            //         console.log(data);
+            //     });
+            // },
           deleteItem: $.noop
         },
 

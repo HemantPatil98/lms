@@ -137,7 +137,7 @@
 });
 
   function load(){
-  url = 'http://127.0.0.1:8000/timelinedata/'
+  url = "{%url 'timelinedata'%}";
   $.get( url, { pre:pre }).done(function( data ) {
     window.data = data;
     // console.log(data,data[431]);
@@ -197,7 +197,7 @@ var publish = function(id){
   title = $("input[name='title']").val();
   body = $(id).summernote('code');
   // console.log(type,body);F
-  url = 'http://127.0.0.1:8000/addtimeline/'
+  url = "{%url 'addtimeline'%}";
   $.post( url, { type: type, title: title, body: body })
   .done(function( data ) {
     alert( "Data Loaded: " + data );
@@ -210,10 +210,11 @@ var save = function(){
 }
 
 var deleteitem = function(id){
-  url = 'http://127.0.0.1:8000/deletetimeline/'
+  url = "{%url 'deletetimeline'%}";
   $.get( url, { id: id })
   .done(function( data ) {
     // alert( "Data Loaded: " + data );
+    window.location.replace(window.location.href);
   });
 }
 </script>

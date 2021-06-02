@@ -123,7 +123,7 @@
         //     pageSize=$("#grid").jsGrid("option", "pageSize");
         //     console.log((pageSize*(pageIndex-1))+rowIndex);
         //     recordValue=(pageSize*(pageIndex-1))+rowIndex;
-        //     Url = 'http://127.0.0.1:8000/setdata/performance/?row='+recordValue+'&rowv='+updatingRow;
+        //     Url = 'window.location.origin/setdata/performance/?row='+recordValue+'&rowv='+updatingRow;
         //     data={
         //         row:updatingRow,
         //     }
@@ -142,7 +142,7 @@
     };
 
 // window.db = db;
-// var url = "http://127.0.0.1:8000/getdata/performance/";
+// var url = "window.location.origin/getdata/performance/";
 // $.get(url,function(data,status){
 //     // console.log(data);
 //     // console.log(JSON.parse(data.replaceAll("'",'"')));

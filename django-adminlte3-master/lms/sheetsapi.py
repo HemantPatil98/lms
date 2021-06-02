@@ -201,7 +201,7 @@ def sheetvalues(SPREADSHEET_ID,sheetname,range='!A2:BE'):
     # fields = "sheets(data(rowMetadata(hiddenByFilter)),properties/sheetId)"
     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=sheetname+range).execute()
     values = result.get('values', [])
-    # print(result)
+    # print(values)
     if not values:
         return None
     else:
@@ -285,7 +285,8 @@ def updatesheet(SPREADSHEET_ID,SHEET_NAME,row,value,col=0,cell=False,dimension="
             request = sheet.values().update(spreadsheetId=SPREADSHEET_ID,range=SHEET_NAME+"!"+str(row)+":"+str(row+len(value)),
                                     valueInputOption="USER_ENTERED", body=body)
         else:
-            request = sheet.values().update(spreadsheetId=SPREADSHEET_ID,range=SHEET_NAME + "!"+str(chr(col+64)) + str(row) + ":"+str(chr(col+64)) + str(row + len(value)),
+            request = sheet.values().update(spreadsheetId=SPREADSHEET_ID,range=SHEET_NAME + "!"+str(chr(col+64)) +":"+str(chr(col+64)),
                                             valueInputOption="USER_ENTERED", body=body)
+    # print(str(chr(col+64)))
     response = request.execute()
     print(response)

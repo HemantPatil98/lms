@@ -46,7 +46,7 @@ console.log(currentdate);
         //     console.log(len);
         //     Url = "";
         //     if(!db.data[0][currentdate]){
-        //         Url = 'http://127.0.0.1:8000/setdata/attendance/?rowv='+rowIndex+'&row='+len;
+        //         Url = 'window.location.origin/setdata/attendance/?rowv='+rowIndex+'&row='+len;
 
         //     }else{
         //         console.log("update");
@@ -75,7 +75,7 @@ console.log(currentdate);
 // function load(){
 //     var sheetname=$("select[name='group']").val();
 // console.log(sheetname);
-// var url = "http://127.0.0.1:8000/getdata/attendance/?sheetname="+sheetname;
+// var url = "window.location.origin/getdata/attendance/?sheetname="+sheetname;
 // $.get(url,function(data,status){
 //     // console.log(data);
 //     // console.log(JSON.parse(data.replaceAll("'",'"')));

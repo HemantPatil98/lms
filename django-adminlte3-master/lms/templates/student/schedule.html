@@ -1,7 +1,8 @@
 {%extends 'student/base.html'%}
-{%load admin_menu%}
 {%load static%}
+{%load admin_menu%}
 {%block style%}
+
   <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid.min.css'%}">
   <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid-theme.min.css'%}">
   <style type="text/css">
@@ -22,30 +23,30 @@
   }
 </style>
 {%endblock%}
+{%load static%}
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     {%block content_header%}
-    <div class="content-header">
+    <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Student Data</h1>
-          </div><!-- /.col -->
+            <h1>View Groups</h1>
+          </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Student Data</li>
+              <li class="breadcrumb-item active">View Schedule</li>
             </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
+          </div>
+        </div>
       </div><!-- /.container-fluid -->
-    </div>
+    </section>
     {%endblock%}
-    <!-- /.content-header -->
 
-    <!-- Main content -->
     {%block content%}
+    <!-- Main content -->
     <section class="content">
       <div class="card card-primary">
         <div class="card-header">
@@ -67,8 +68,8 @@
       </div>
       <!-- /.card -->
     </section>
-    {%endblock%}
     <!-- /.content -->
+    {%endblock%}
   </div>
   <!-- /.content-wrapper -->
 {%block script%}
@@ -85,30 +86,20 @@
   var db = {};
   load();
  function load(){
-    var sheetname=$("select[name='sheetname']").val();
-console.log(sheetname);
-  var url = "{%url 'getdata' table='profile'%}";
+    var sheetname="Sheet 1";
+// console.log(sheetname);
+  var url = "{%url 'getdata' table='schedule'%}";
 $.get(url,{sheetname:sheetname},function(data,status){
-
+    // console.log(data);
+    console.log(JSON.parse(data.replaceAll("'",'"')));
+    db = {};
     data = data.replaceAll("'",'"');
     db.data=JSON.parse(data);
-
-    fields= [
-    ];
-
-
-    window.col = Object.keys(db.data[0]);
-    if (col.length>32) {
-      console.log(col.length);
-     for(i=32;i<col.length;i++){
-      console.log(i);
-      $('#grid').jsGrid('appendFields',{name:col[i],type:'text',editing:true});
-      };
-    };
-
+    // console.log(db.data);
     $('#grid').jsGrid({data:db.data});
-   
-
+// wndow.db=db;
+    // db.loadData;
+    // addaction();
     $(".jsgrid-grid-body").keypress(function(){var keycode = (event.keyCode ? event.keyCode : event.which);
           if(keycode == '13'){window.edit_row=this;$('#grid').jsGrid('updateItem')}});
 });
@@ -123,7 +114,7 @@ $(function () {
         width: "100%",
 
         filtering: true,
-        editing: true,
+        editing: false,
         sorting: true,
         paging: true,
 
@@ -131,89 +122,55 @@ $(function () {
 
         controller: {
           loadData: function(filter) {
-            last = "";
            return $.grep(db.data, function(client) {
                 var flag=false;
-                console.log(last);
-                if(client.rowIndex%4==0)
-                {
-                console.log(client);
-
-                  $.each(Object.keys(client),function(key,val){
+                $.each(Object.keys(client),function(key,val){
                     val=val.toString();
                     val1=client[val].toString();
                     val2=filter[val];
                     if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
-                      last = client.rowIndex;
+
                     flag=true;
                     }else{
                         flag=false;
-                        last="";
                         return false;
                     };
                 })
-                }
-                
-                 if (flag || client.rowIndex-last <4) {
+                 if (flag) {
                     return client;
                 }
             });
         },
           insertItem: $.noop,
           updateItem: function(item) {
-
+            // console.log(Object.values(item));
+            // console.log(item);
             sheetname = $("select[name='sheetname']").val();
-
-            Url = "{%url 'setdata' table='profile'%}";
+            console.log(sheetname);
+            console.log(JSON.stringify(item));
+            // console.log(Object.values(item).toString());
+            Url = "{%url 'setuser'%}";
             data={
                 row:item,
             }
-                $.get(Url,{rowv:Object.values(item),sheetname:sheetname},function(data,status){
+                $.get(Url,{values:JSON.stringify(item)},function(data,status){
+                    console.log(data);
                 });
             },
           deleteItem: $.noop
         },
-        appendFields: function (fields) {
-         this.fields.push(fields);
-        },
 
         fields: [
-            { name: "ID", type: "number", width: 70, css:""},
-            { name: "DATETIME", type: "text", width: 70, css:"hide"},
-            { name: "CENTER", type: "text", width: 70, css:"hide"},
-            { name: "DATE OF ADMISSION", type: "text",width:100,css:'rol'},
-            { name: "COURSE", type: "text",width:100,css:'rol'},
-            { name: "BATCH START DATE", type: "text",width:100,css:'rol'},
-            { name: "MODULE START FROM", type:"text",width:100},
-            { name: "TRAINING MODE", type: "text",width:100},
-            { name: "NAME", type: "text", width: 150,css:"fix-name"},
-            { name: "ADDRESS", type:"text",width:100,css:"hide"},
-            { name: "DATE OF BIRTH", type:"text",width:100,css:"hide"},
-            { name: "CONTACT", type: "text", width: 100,css:'fix-contact'},
-            { name: "EMAIL ID", type: "text",width:100,css:'rol'},
-            { name: "ALTERNATE CONTACT", type: "text", width: 100,css:''},
-            { name: "EXAMINATION", type:"text",width:100},
-            { name: "STREAM", type:"text",width:100},
-            { name: "COLLEGE NAME", type:"text",width:100},
-            { name: "BOARD NAME", type:"text",width:100},
-            { name: "YEAR OF PASSING", type:"text",width:100},
-            { name: "PERCENTAGE", type:"text",width:100},
-            { name: "FEES", type:"text",width:100},
-            { name: "MODE", type:"text",width:100},
-            { name: "REG AMMOUNT", type:"text",width:100},
-            { name: "INSTALLMENT1", type:"text",width:100},
-            { name: "INSTALLMENT2", type:"text",width:100},
-            { name: "INSTALLMENT3", type:"text",width:100},
-            { name: "REG DATE", type:"text",width:100},
-            { name: "INSTALLMENT1 DATE", type:"text",width:100},
-            { name: "INSTALLMENT2 DATE", type:"text",width:100},
-            { name: "INSTALLMENT3 DATE", type:"text",width:100},
-            { name: "REMARK", type:"text",width:100}
+            { name: "TIME", type: "text", width: 70,editing:false},
+            { name: "MODULE NAME", type: "text", width: 70},
+            { name: "START DATE", type: "text", width: 70},
+            { name: "MENTOR NAME", type: "text", width: 70},
+            { name: "END DATE", type: "text", width: 70},
+            { name: "UPCOMING MODULE START DATE", type: "text", width: 70},
+            { name: "UPCOMING MODULE NAME", type: "text", width: 70},
+            { name: "MENTOR NAME U", type: "text", width: 70},
         ]
     });
   });
 </script>
 {%endblock%}
-
-
-
