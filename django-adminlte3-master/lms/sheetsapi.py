@@ -278,7 +278,7 @@ def updatesheet(SPREADSHEET_ID,SHEET_NAME,row,value,col=0,cell=False,dimension="
     else:
         body = {
             'majorDimension': dimension,
-            "values": [value]
+            "values": value
         }
 
         if dimension == 'ROWS':

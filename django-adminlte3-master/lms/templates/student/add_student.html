@@ -81,7 +81,7 @@
                   </div>
                   <div class="form-group col-sm-6">
                       <label>Date of Addmission: </label>
-                        <input type="date" name="dateofadmission" class="form-control" value="{{profile.0.dateofadmission}}" {%if not request.user.is_staff%}readonly{%endif%}/>
+                        <input type="date" name="dateofadmission" class="form-control" value="{{profile.0.dateofadmission}}" {%if not request.user.is_staff%}readonly{%endif%} required="" />
                   </div>
                   <div class="col-sm-6">
                       <!-- select -->
@@ -123,7 +123,7 @@
                   </div>
                   <div class="form-group col-md-6">
                     <label for="name">Name</label>
-                    <input name="name" type="text" class="form-control" id="name" placeholder="Enter Name" value="{{profile.0.name}}">
+                    <input name="name" type="text" class="form-control" id="name" placeholder="Enter Name" value="{{profile.0.name}}" required="">
                   </div>
                   <div class="form-group col-md-6">
                     <label for="address">Address</label>
@@ -143,7 +143,7 @@
                   </div>
                   <div class="form-group col-md-6">
                       <label for="exampleInputEmail1">Email address</label>
-                      <input name="emailid" type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email" value="{{profile.0.emailid}}" {%if not request.user.is_staff%}readonly{%endif%}>
+                      <input name="emailid" type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email" value="{{profile.0.emailid}}" {%if not request.user.is_staff%}readonly{%endif%} required>
                   </div>
                 <!-- <div class="row"> -->
                   <div class="col-12">
@@ -366,12 +366,13 @@
                 </div>
                 <!-- /.card-body -->
 
-              </form>
             </div>
 
             <div class="card-footer">
               <button type="submit" name="submit" class="btn btn-primary">Submit</button>
             </div>
+              </form>
+            
         </div>
       </div>
 
@@ -382,21 +383,19 @@
   <!-- /.content-wrapper -->
 {%block script%}
 <script>
-
+$("input[name='dateofadmission']").defaultValue = "2014-02-09";
   $("input[name='mode']").click(function(){
     mode=$("input[name='mode']:checked").val();
     if (mode=="LumpSum"){
         // console.log($(this));
       $('#installment tbody tr').each(function(){
         // console.log($(this));
-        $.each($(this).children(),function(){
+        $.each($(this).children(),function(i){
+          if (i>2){
           $(this).children('input').attr('readonly','readonly');
-        // console.log($(this).children('input').attr('readonly','readonly'));
 
+          }
         })
-        $("input[name='regammount']").removeAttr('readonly');
-        $("input[name='regdate']").removeAttr('readonly');
-        // console.log($(this).children('td'));
       })
     }
     else{

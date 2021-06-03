@@ -126,8 +126,12 @@ $.get(url,{sheetname:sheetname},function(data,status){
                 var flag=false;
                 $.each(Object.keys(client),function(key,val){
                     val=val.toString();
-                    val1=client[val].toString();
+                    val1=client[val].toString().toLowerCase();
                     val2=filter[val];
+                    if (val2){
+                      val2=filter[val].toString().toLowerCase();
+                    }
+
                     if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
 
                     flag=true;
@@ -212,7 +216,7 @@ $.get(url,{sheetname:sheetname},function(data,status){
             { name: "MOCK INTERVIEW REMARK - 3( EXCELLENT/GOOD/POOR)", type: "text",width:100,css:'rol'},
             { name: "SOFT SKILLS ( OUT OF 100 )", type: "number",width:100,css:'rol'},
             { name: "FINAL MOCK INTERVIEW REMARK - ( EXCELLENT/GO/POOR)", type: "text",width:100,editing:false},
-            { name: "TOTAL MARKS ( OUT OF 700 )", type: "number",width:100,editing:false},
+            { name: "TOTAL MARKS ( OUT OF 700 )", type: "number",width:100,editing:true},
             { name: "ELIGIBLE FOR PLACEMENT(Y/N)", type: "text",width:100,css:'rol'},
             { name: "REMARK", type: "text",width:100,css:'rol'},
         ]

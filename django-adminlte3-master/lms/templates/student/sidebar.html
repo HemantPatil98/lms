@@ -88,7 +88,7 @@
               <li class="nav-item">
                 <a href="{% url 'viewstudents' %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Students</p>
+                  <p>Students Profile</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -146,6 +146,14 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+              {%if request.user.is_superuser%}
+              <li class="nav-item">
+                <a href="{%url 'videopermissions'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Video Permissions</p>
+                </a>
+              </li>
+              {%endif%}
               <li class="nav-item">
                 <a href="{%url 'video' course='C'%}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -193,8 +201,78 @@
                   <p>Exam</p>
                 </a>
               </li>
+              {%if request.user.is_superuser%}
+              <li class="nav-item">
+                <a href="{%url 'add_questions'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Add Questions</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{%url 'view_questions' pageno=1%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>View Questions</p>
+                </a>
+              </li>
+              {%endif%}
             </ul>
           </li>
+
+          {%if request.user.is_superuser%}
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa fa-code"></i>
+              <p>
+                Evaluate Exams
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{%url 'practicle_validate'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Open</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          {%endif%}
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fas fa-history"></i>
+              <p>
+                Timeline
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{%url 'timeline'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>{%if request.user.is_superuser%}Add / {%endif%}View Timeline</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          {%if request.user.is_superuser%}
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fas fa-edit"></i>
+              <p>
+                Feedback
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{%url 'viewfeedback'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>View Feedback</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          {%endif%}
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="fas fa-check-square"></i>
@@ -207,7 +285,7 @@
               <li class="nav-item">
                 <a href="{%if request.user.is_staff%}{%url 'attendance'%}{%else%}{%url 'studentsattendance'%}{%endif%}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add / view Attendance</p>
+                  <p>{%if request.user.is_superuser%}Add /{%endif%} view Attendance</p>
                 </a>
               </li>
             </ul>

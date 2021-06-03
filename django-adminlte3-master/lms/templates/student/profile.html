@@ -60,34 +60,43 @@
                        alt="User profile picture">
                 </div>
                 <br>
-                <div class="text-center">
-                    <input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90"
-                           data-fgColor="#00a65a" readonly="true">
+                <div class="text-center" id="popupReturn" on hover=>
+                    <input type="text" class="knob knob1"  data-thickness="0.1" data-width="90" data-height="90"
+                           data-fgColor="#00a65a" readonly="true" value="{{performance|key_with_space:'Total Marks ( Out of 700 )'|div:7}}">
 
                     <div class="knob-label">Average Performance</div>
+                    <div id="tableContent" style="display:none">
+                        <div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Performance</div>
+                                <div class="panel-body form-inline dept1">
+                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'C Total Marks'}}"><br>C</div>
+                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'sql Total Marks'}}"><br>Sql</div>
+                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'WD Total Marks'}}"><br>WD</div>
+                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Core Total Marks'}}"><br>Core</div>
+                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Adv Total Marks'}}"><br>Adv</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                   </div>
-                <h3 class="profile-username text-center">{{profile.0.name}}</h3>
+                <h3 class="profile-username text-center">{{performance|key_with_space:'Name'}}</h3>
 
-                <p class="text-muted text-center">{{profile.0.course}} - Developer</p>
-
+                <p class="text-muted text-center">{{performance|key_with_space:'Course'}}</p>
                 <ul class="list-group list-group-unbordered mb-3">
                   <li class="list-group-item">
-                    <b>Date of Admission</b> <a class="float-right">{{profile.0.dateofadmission}}</a>
+                    <b>Date of Admission</b> <a class="float-right">{{performance|key_with_space:'Admission Date'}}</a>
                   </li>
                   <li class="list-group-item">
-                    <b>Training Mode</b> <a class="float-right">{{profile.0.trainingmode}}</a>
-                  </li>
-                  <!-- <li class="list-group-item">
-                    <b>Fees</b> <a class="float-right">{{profile.0.fees}}</a>
+                    <b>Training Mode</b> <a class="float-right">{{performance|key_with_space:'Training Mode'}}</a>
                   </li>
                   <li class="list-group-item">
-                    <b>Fees Pending</b> <a class="float-right"></a>
+                    <b>Current Module</b> <a class="float-right">{{performance|key_with_space:'Current Module'}}</a>
                   </li>
-                  <li class="list-group-item">
-                    <b>Next Installment</b> <a class="float-right"></a>
-                  </li> -->
                 </ul>
-                <a href="{%if not rc.id%}{%url 'request_certificate'%}{%endif%}" class="btn btn-primary {%if rc.certificate_status == 'In Process'%}btn-info{%elif rc.certificate_status == 'success'%}btn-success{%endif%} btn-block"><b>Request for Certificate</b></a>
+
+                <a {%if performance|key_with_space:'Eligible For Placement(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block'{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="bottom" title="After 60% you can apply for certicicate" style='cursor:not-allowed'{%endif%}  ><b>Request for Certificate</b></a>
+                <a class="btn btn-info btn-block" href="{%url 'pdf'%}" style="margin-top:5px;" target="new"><b>Offer Letter</b></a>
               </div>
               <!-- /.card-body -->
             </div>
@@ -158,7 +167,7 @@
                     <div class="form-group col-md-6"></div>
                     <div class="form-group col-md-6">
                       <label>Profile Photo</label>
-                      <label for="photo" style="" onclick="(function(){$('#photo').trigger('click')})()"><i class="fas fa-camera fa-2x" {%if not request.session.ab.photo%} class="hide" id="photohover" {%endif%} style="color:#bfc6ce94"></i></label>
+                      <label for="photo" style="" onclick="(function(){$('#photo').trigger('click')})()"><i class="fas fa-camera fa-2x" {%if not request.session.ab.photo%} class="hide" id="photohover" {%endif%} style="color:#bfc6ce94;cursor:pointer"></i></label>
                       <input type="file" name="photo" id="photo" style="display: none;">
                     </div>
                     <div class="form-group col-md-6">
@@ -544,20 +553,23 @@
         }
       }
     });
-    $({
-        value: 0
-    }).animate({
-        value: 80
-    }, {
-        duration: 950,
-        easing: 'swing',
-        progress: function () {
-            $('.knob').val(Math.round(this.value)).trigger('change');
-            if (this.value<40){
-              $('.knob').attr('data-fgColor','#ff0b0b');
-            }
-        }
-    });
+    $.each('.knob',function () {
+      b = this;
+      $({
+          value: 0
+      }).animate({
+          value: $(this).val()
+      }, {
+          duration: 950,
+          easing: 'swing',
+          progress: function () {
+              $(b).val(Math.round(this.value)).trigger('change');
+              if (this.value<40){
+                $(b).attr('data-fgColor','#ff0b0b');
+              }
+          }
+      });
+    })
 
     /* END JQUERY KNOB */
 

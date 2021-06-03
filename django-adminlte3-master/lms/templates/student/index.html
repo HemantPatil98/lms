@@ -109,7 +109,7 @@
                 </ul>
 
                 <a {%if performance|key_with_space:'Eligible For Placement(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block'{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="bottom" title="After 60% you can apply for certicicate" style='cursor:not-allowed'{%endif%}  ><b>Request for Certificate</b></a>
-
+                <a class="btn btn-info btn-block" href="{%url 'pdf'%}" style="margin-top:5px;" target="new"><b>Offer Letter</b></a>
               </div>
           </div>
           <div class="col-md-9">

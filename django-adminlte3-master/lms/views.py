@@ -23,16 +23,15 @@ def log_in(request):
 
         if us is not None:
             try:
-                ab = user_profile.objects.filter(user_id=us.id)[0]
+                ab = user_profile.objects.get(user_id=us.id)
                 vars(ab)['_state'] = None
                 request.session['ab']=vars(ab)
-
+                # print(vars(request.session))
             except:
                 pass
             messages.info(request, "Successfully Log In")
             if us.last_login !=None:
                 login(request, us)
-
                 return redirect(index)
             else:
                 login(request, us)
@@ -82,7 +81,6 @@ def reset_password(request):
 ##
 @login_required(login_url='')
 def index(request):
-
     try:
         flag=request.user
     except:
@@ -143,16 +141,16 @@ def index(request):
         # print(performance)
         us = User.objects.get(id=request.user.id)
         gps = us.groups.all()
-        print(us.groups.all())
+        # print(us.groups.all())
         per = {}
         for g in gps:
             gpinfo = groupsinfo.objects.get(group=g.id)
             courses = course.objects.values_list('name', flat=True).distinct()
             for c in courses:
-                print(gpinfo.course,c)
+                # print(gpinfo.course,c)
                 cper = []
                 if gpinfo.course == c:
-                    print(gpinfo.course,c)
+                    # print(gpinfo.course,c)
                     if len(g.permissions.filter(name="video")):
                         cper.append('video')
                     if len(g.permissions.filter(name="notes")):
@@ -161,7 +159,7 @@ def index(request):
                         cper.append('exam')
                     per[c]=cper
 
-            print(per)
+            # print(per)
 
         from .models import notice
         notice1 = ""
@@ -186,20 +184,23 @@ def addstudent(request):
                     profile[i].append(val[i])
                 except:
                     profile[i].append("")
-
-        performance = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)', profile[0][8],
-                       profile[0][11] + "/" + profile[0][12]
-            , profile[0][13], profile[0][3], profile[0][7], profile[0][5], profile[0][4], profile[0][6]]
-        print(performance)
-
-        SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
-
         if request.user.is_staff:
-            performance_row = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=[performance])
-        else:
-            sp = user_profile.objects.get(id=request.user.id)
-            performance_row = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,row=sp.student_performance_row,
-                                                    value=[performance])
+            performance = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)', profile[0][8],
+                           profile[0][11] + "/" + profile[0][12]
+                , profile[0][13], profile[0][3], profile[0][7], profile[0][5], profile[0][4], profile[0][6]]
+            # print(performance)
+
+            SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
+
+            if request.user.is_staff:
+                performance_row = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=[performance])
+            else:
+                sp = user_profile.objects.get(id=request.user.id)
+                y = request.user.date_joined.strftime('%Y')
+                # print(d)
+                SHEET_NAME = "Apr - Mar " + y
+                performance_row = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=sp.student_performance_row,
+                                                        value=[performance])
 
         SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
 
@@ -207,12 +208,12 @@ def addstudent(request):
             profile_row = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=profile)
         else:
             sp = user_profile.objects.get(id=request.user.id)
-            profile = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,row=sp.student_profile_row,value=profile)
+            profile = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=sp.student_profile_row,value=profile)
 
         if request.user.is_staff:
             username = request.POST['emailid']
             password = randomstring(request)
-            print(username)
+            # print(username)
             us = User.objects.create_user(username=username,first_name=request.POST['name'],
                       password=password,email=request.POST['emailid'],last_name=request.POST['contact'])
             us.save()
@@ -230,18 +231,39 @@ def addstudent(request):
                     us_profile.photo = file
                 us_profile.save()
             else:
-                us_profile.update(photo=file)
-                # user_profile.save()
+                us_profile = user_profile.objects.get(user_id=request.user.id)
+                us_profile.photo = file
+                us_profile.save()
             # message to be sent
+
+            params = {
+                'addate': datetime.now(),
+                'name': request.user.first_name,
+                'contact': request.POST['contact']
+            }
+            Render.render_to_file('student/pdf.html', params)
+
             header = 'To:' + us.username + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
 
             message = header + '\n Username: ' + username + '\n Password: ' + password + ' \n\n'
-            print(message)
+            # print(message)
 
-            mail(us.email,message)
+            mailletter(us.email,message)
             # up = user_profile.objects.all().filter(user_id=request.user.id)[0]
             messages.info(request,'Student added successfully')
         else:
+            from .models import user_profile
+            try:
+                file = request.FILES['photo']
+                file._name = str(request.user.username +"."+ file._name.split('.')[1])
+            except:
+                file = ""
+            us_profile = user_profile.objects.get(user_id=request.user.id)
+            us_profile.photo=file
+            us_profile.save()
+            vars(us_profile)['_state'] = None
+            request.session['ab']=vars(us_profile)
+            # print(vars(us_profile))
             messages.info(request,'Profile updated successfully')
 
         return redirect('index')
@@ -585,14 +607,40 @@ def viewprofile(request):
     except:
             notice1 = ""
 
-    # sheetid = extra_data.objects.get(name='student_performance').value
-    # up = user_profile.objects.get(user_id=request.user.id)
-    # row = up.student_performance_row
-    # range = "!A" + str(row) + ":AS" + str(row)
-    # # print(range)
-    # values = sheetsapi.sheetvalues(SPREADSHEET_ID=sheetid,sheetname='Apr - Mar 2021',range=range)
-    # print(values,values[4])
-    return render(request,'student/profile.html',{'profile':profile,'up':up,'rc':rc,'notice':notice1})
+    SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
+    up = user_profile.objects.get(user_id=request.user)
+    performance_row = up.student_performance_row
+    range = "!" + str(performance_row) + ":" + str(performance_row)
+    values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname='Apr - Mar 2021', range=range)
+
+    fields = ['id', 'Name', 'Contact No', 'Email ID', 'Admission Date', 'Training Mode',
+              'Course Start Date', 'Course',
+              'Course Start From', 'Current Module',
+              'C Trainer Name', 'C module start date', 'C module end date', 'C Theory ( Out of 40)',
+              'C Practical (Out of 40)', 'C Oral ( Out of 20)', 'C Total Marks',
+              'Sql Trainer Name', 'Sql module start date', 'Sql module end date',
+              'SQl Theory ( Out of 40)', 'SQl Practical (Out of 40)', 'SQL Oral ( Out of 20)', 'Sql Total Marks',
+              'WD Trainer Name', 'WD module start date', 'WD module end date',
+              'WD Practical (Out of 150)', 'WD Oral ( Out of 50)', 'WD Total Marks',
+              'Portfolio URL', 'Mock Interview Remark - 1( Excellent/Good/Poor)', 'Project Guide',
+              'Mini Project',
+              'Core Trainer Name', 'Core module start date', 'Core module end date',
+              'Core Theory ( Out of 40)',
+              'Core Practical (Out of 40)', 'Core Oral ( Out of 20)', 'Core Total Marks',
+              'Mock Interview Remark - 2( Excellent/Good/Poor)',
+              'Adv Trainer Name', 'Adv module start date', 'Adv module end date',
+              'Adv Theory ( Out of 40)',
+              'Adv Practical (Out of 40)', 'Adv Oral ( Out of 20)', 'Adv Total Marks',
+              'Full Course End Date', 'Cravita Poject Start Date',
+              'Mock Interview Remark - 3( Excellent/Good/Poor)',
+              'Soft Skills Marks ( Out of 100 )', 'Final Mock Interview', 'Total Marks ( Out of 700 )',
+              'Eligible For Placement(Y/N)', 'Remark'
+              ]
+
+    performance = dict(zip(fields, values[0]))  # list data to object
+
+    return render(request,'student/profile.html',{'profile':profile,'up':up,'rc':rc,'notice':notice1,
+                                                  'performance':performance})
 
 def editprofile(request):
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
@@ -625,165 +673,168 @@ def viewnotice(request):
         notice1 = ""
     return render(request,'student/view_notice.html',{'up':up,'data':page,'notice':notice1})
 
-def studentupdate(request):
-    from .models import user_profile as ap
-    SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
-    cell = 'False'
-    up = ap.objects.get(user_id=request.user.id)
-    # row = request.user.username.split(':')[1]
-    row = up.student_profile_row
-    value = ''
-    col = 0
-    if cell=="False":
-        Basic = {"center": "", "dateofadmission": "", "course": "", "batchstartdate": "", "startcourse": "",
-                 "trainingmode": ""}
-        Personal_details = {"name": "", "address": "", "dateofbirth": "", "contact": "", "emailid": "",
-                            "alternatecontact": ""}
-        Educational_details = [
-            {'secondary': "", 'stream10': "", 'collegename10': "", 'boardname10': "", 'yearofpassing10': "",
-             'percentage10': ""},
-            {'hsecondary': "", 'stream12': "", 'collegename12': "", 'boardname12': "", 'yearofpassing12': "",
-             'percentage12': ""},
-            {'graduation': "", 'streamg': "", 'collegenameg': "", 'boardnameg': "", 'yearofpassing': "",
-             'percentageg': ""},
-            {'pg': "", 'streampg': "", 'collegenamepg': "", 'boardnamepg': "", 'yearofpassinpg': "", 'percentagepg': ""}
-        ]
-
-        Fees = {"fees": "", "mode": "", "regammount": "", "installment1": "", "installment2": "", "installment3": "",
-                "regdate": "", "installment1date": "", "installment2date": "", "installment3date": ""}
-
-        Remark = {"remark": ""}
-        addstudentform = {"Basic": Basic, "Personal_details": Personal_details,
-                          "Educational_details": Educational_details, "Fees": Fees, "Remark": Remark}
-
-        filledaddstudentform = []
-
-        flag = True
-
-        acced = [[], [], []]
-
-        i = -1
-
-        for section in addstudentform:
-            for fields in addstudentform[section]:
-                if isinstance(fields, dict):
-                    for field in fields:
-                        fields[field] = request.POST.get(field)
-                        if flag:
-                            if request.POST.get(field):
-                                filledaddstudentform.append(request.POST.get(field))
-                            else:
-                                filledaddstudentform.append("")
-                            # flag = False
-                        else:
-                            # print(i)
-                            if request.POST.get(field):
-                                acced[i].append(request.POST.get(field))
-                            else:
-
-                                acced[i].append("")
-                    flag = False
-                    i += 1
-                else:
-                    addstudentform[section][fields] = request.POST.get(fields)
-                    if request.POST.get(fields):
-                        filledaddstudentform.append(request.POST.get(fields))
-                    else:
-                        filledaddstudentform.append("")
-
-        # print(filledaddstudentform)
-        sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
-        index = "=INDIRECT(" + '"A"' + "&ROW()-4)+1"
-        import math
-        if sheetsapi.sheetvalues(SPREADSHEET_ID, sheetname) is None:
-            index = 1
-        index = math.ceil(up.student_performance_row)
-
-        # print(filledaddstudentform)
-
-        rowv = int(row)
-        performance_row = sheetsapi.updatesheet(SPREADSHEET_ID,rowv, [index, ""] + filledaddstudentform,col, cell=False)
-        sheetsapi.updatesheet(SPREADSHEET_ID,rowv+1, ["", ""] + [""] * 12 + acced[0], col, cell=False)
-        sheetsapi.updatesheet(SPREADSHEET_ID,rowv+2, ["", ""] + [""] * 12 + acced[1], col, cell=False)
-        sheetsapi.updatesheet(SPREADSHEET_ID,rowv+3, ["", ""] + [""] * 12 + acced[2], col, cell=False)
-        # sheetsapi.updatesheet(SPREADSHEET_ID, row, col, value=filledaddstudentform, cell=False)
-
-        # fp = open('student_performance.txt', 'r')
-        # sheetid = fp.read()
-        # fp.close()
-
-        sheetid = extra_data.objects.get(name='student_performance').value
-        student_performance = {'id': "", 'name': "", 'contact': "", 'emailid': "", 'dateofadmission': "",
-                               'trainingmode': "",
-                               'batchstartdate': "", 'course': "", 'startcourse': "", 'currentmodule': "",
-                               'ctrainername': "", 'cmodulestartdate': "", 'cmoduleenddate': "", 'ctheory': "",
-                               'cpracticle': "", 'coral': "", 'ctotal': "",
-                               'sqltrainername': "", 'sqlmodulestartdate': "", 'sqlmoduleenddate': "",
-                               'sqlpracticle': "", 'sqloral': "", 'sqltotal': "",
-                               'wdtrainername': "", 'wdmodulestartdate': "", 'wdmoduleenddate': "", 'wdpracticle': "",
-                               'wdoral': "", 'wdtotal': "", 'portfoiliolink': "",
-                               'mock1': "", 'miniguide': "", 'miniproject': "",
-                               'coretrainername': "", 'coremodulestartdate': "", 'coremoduleenddate': "",
-                               'coretheory': "", 'corepracticle': "", 'coreoral': "", 'coretotal': "",
-                               'mock2': "",
-                               'advtrainername': "", 'advmodulestartdate': "", 'advmoduleenddate': "", 'advtheory': "",
-                               'advpracticle': "", 'advoral': "", 'advtotal': "",
-                               'fullcourseenddate': "", 'cravitaprojectstartdate': "",
-                               'mock3': "", 'softskillsmarks': "", 'finalmock': "", 'totalmarks': "",
-                               'eligibleforplacement': "", 'remark': ""
-                               }
-
-        for s in student_performance.keys():
-            try:
-                student_performance[s] = request.POST[s]
-            except:
-                student_performance[s] = ""
-
-        # index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
-        # if sheetsapi.sheetvalues(sheetid, sheetname) is None:
-        #     index = 1
-        index = math.ceil(up.student_profile_row)
-
-        student_performance['id'] = index
-
-        # print(student_performance)
-
-        sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
-        # index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
-        # if sheetsapi.sheetvalues(sheetid, sheetname) is None:
-        #     index = 1
-        # print(filledaddstudentform)
-        student_performance = [x for x in student_performance.values()]
-        # import math
-        # print(math.ceil((int(request.user.username.split(':')[1])-1)/4))
-        row = up.student_performance_row
-        sheetsapi.updatesheet(sheetid,row,student_performance)
-
-        try:
-            file = request.FILES['photo']
-            file._name = str(request.user.username) +"."+ file._name.split('.')[1]
-        except:
-            file = ""
-        from .models import user_profile
-        us_profile = user_profile.objects.all().filter(user_id=request.user.id)
-        if len(us_profile)==0:
-            us_profile = user_profile(user_id=request.user,student_performance_row=str(int(performance_row)+1),photo=file)
-            us_profile.save()
-        else:
-            us_profile.update(photo=file)
-
-        messages.info(request,'profile updated')
-        return redirect(viewprofile)
-    else:
-        sheetsapi.updatesheet(SPREADSHEET_ID,row,col,value,cell)
-        # fp = open('student_performance.txt', 'r')
-        # sheetid = fp.read()
-        # fp.close()
-        # sheetsapi.updatesheet(SPREADSHEET_ID,idvalue,col,value,cell)
-        messages.info(request,'profile updated')
-        return redirect(viewstudent)
-
-    return HttpResponse("")
+# def studentupdate(request):
+#     from .models import user_profile as ap
+#     SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
+#     cell = 'False'
+#     up = ap.objects.get(user_id=request.user.id)
+#     # row = request.user.username.split(':')[1]
+#     row = up.student_profile_row
+#     value = ''
+#     col = 0
+#     if cell=="False":
+#         Basic = {"center": "", "dateofadmission": "", "course": "", "batchstartdate": "", "startcourse": "",
+#                  "trainingmode": ""}
+#         Personal_details = {"name": "", "address": "", "dateofbirth": "", "contact": "", "emailid": "",
+#                             "alternatecontact": ""}
+#         Educational_details = [
+#             {'secondary': "", 'stream10': "", 'collegename10': "", 'boardname10': "", 'yearofpassing10': "",
+#              'percentage10': ""},
+#             {'hsecondary': "", 'stream12': "", 'collegename12': "", 'boardname12': "", 'yearofpassing12': "",
+#              'percentage12': ""},
+#             {'graduation': "", 'streamg': "", 'collegenameg': "", 'boardnameg': "", 'yearofpassing': "",
+#              'percentageg': ""},
+#             {'pg': "", 'streampg': "", 'collegenamepg': "", 'boardnamepg': "", 'yearofpassinpg': "", 'percentagepg': ""}
+#         ]
+#
+#         Fees = {"fees": "", "mode": "", "regammount": "", "installment1": "", "installment2": "", "installment3": "",
+#                 "regdate": "", "installment1date": "", "installment2date": "", "installment3date": ""}
+#
+#         Remark = {"remark": ""}
+#         addstudentform = {"Basic": Basic, "Personal_details": Personal_details,
+#                           "Educational_details": Educational_details, "Fees": Fees, "Remark": Remark}
+#
+#         filledaddstudentform = []
+#
+#         flag = True
+#
+#         acced = [[], [], []]
+#
+#         i = -1
+#
+#         for section in addstudentform:
+#             for fields in addstudentform[section]:
+#                 if isinstance(fields, dict):
+#                     for field in fields:
+#                         fields[field] = request.POST.get(field)
+#                         if flag:
+#                             if request.POST.get(field):
+#                                 filledaddstudentform.append(request.POST.get(field))
+#                             else:
+#                                 filledaddstudentform.append("")
+#                             # flag = False
+#                         else:
+#                             # print(i)
+#                             if request.POST.get(field):
+#                                 acced[i].append(request.POST.get(field))
+#                             else:
+#
+#                                 acced[i].append("")
+#                     flag = False
+#                     i += 1
+#                 else:
+#                     addstudentform[section][fields] = request.POST.get(fields)
+#                     if request.POST.get(fields):
+#                         filledaddstudentform.append(request.POST.get(fields))
+#                     else:
+#                         filledaddstudentform.append("")
+#
+#         # print(filledaddstudentform)
+#         sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
+#         index = "=INDIRECT(" + '"A"' + "&ROW()-4)+1"
+#         import math
+#         if sheetsapi.sheetvalues(SPREADSHEET_ID, sheetname) is None:
+#             index = 1
+#         index = math.ceil(up.student_performance_row)
+#
+#         # print(filledaddstudentform)
+#         y = request.user.date_joined.strftime('%Y')
+#         # print(d)
+#         SHEET_NAME = "Apr - Mar " + y
+#
+#         rowv = int(row)
+#         performance_row = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,rowv, [index, ""] + filledaddstudentform,col, cell=False)
+#         # sheetsapi.updatesheet(SPREADSHEET_ID,rowv+1, ["", ""] + [""] * 12 + acced[0], col, cell=False)
+#         # sheetsapi.updatesheet(SPREADSHEET_ID,rowv+2, ["", ""] + [""] * 12 + acced[1], col, cell=False)
+#         # sheetsapi.updatesheet(SPREADSHEET_ID,rowv+3, ["", ""] + [""] * 12 + acced[2], col, cell=False)
+#         # sheetsapi.updatesheet(SPREADSHEET_ID, row, col, value=filledaddstudentform, cell=False)
+#
+#         # fp = open('student_performance.txt', 'r')
+#         # sheetid = fp.read()
+#         # fp.close()
+#
+#         sheetid = extra_data.objects.get(name='student_performance').value
+#         student_performance = {'id': "", 'name': "", 'contact': "", 'emailid': "", 'dateofadmission': "",
+#                                'trainingmode': "",
+#                                'batchstartdate': "", 'course': "", 'startcourse': "", 'currentmodule': "",
+#                                'ctrainername': "", 'cmodulestartdate': "", 'cmoduleenddate': "", 'ctheory': "",
+#                                'cpracticle': "", 'coral': "", 'ctotal': "",
+#                                'sqltrainername': "", 'sqlmodulestartdate': "", 'sqlmoduleenddate': "",
+#                                'sqlpracticle': "", 'sqloral': "", 'sqltotal': "",
+#                                'wdtrainername': "", 'wdmodulestartdate': "", 'wdmoduleenddate': "", 'wdpracticle': "",
+#                                'wdoral': "", 'wdtotal': "", 'portfoiliolink': "",
+#                                'mock1': "", 'miniguide': "", 'miniproject': "",
+#                                'coretrainername': "", 'coremodulestartdate': "", 'coremoduleenddate': "",
+#                                'coretheory': "", 'corepracticle': "", 'coreoral': "", 'coretotal': "",
+#                                'mock2': "",
+#                                'advtrainername': "", 'advmodulestartdate': "", 'advmoduleenddate': "", 'advtheory': "",
+#                                'advpracticle': "", 'advoral': "", 'advtotal': "",
+#                                'fullcourseenddate': "", 'cravitaprojectstartdate': "",
+#                                'mock3': "", 'softskillsmarks': "", 'finalmock': "", 'totalmarks': "",
+#                                'eligibleforplacement': "", 'remark': ""
+#                                }
+#
+#         for s in student_performance.keys():
+#             try:
+#                 student_performance[s] = request.POST[s]
+#             except:
+#                 student_performance[s] = ""
+#
+#         # index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
+#         # if sheetsapi.sheetvalues(sheetid, sheetname) is None:
+#         #     index = 1
+#         index = math.ceil(up.student_profile_row)
+#
+#         student_performance['id'] = index
+#
+#         # print(student_performance)
+#
+#         sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
+#         # index = "=INDIRECT(" + '"A"' + "&ROW()-1)+1"
+#         # if sheetsapi.sheetvalues(sheetid, sheetname) is None:
+#         #     index = 1
+#         # print(filledaddstudentform)
+#         student_performance = [x for x in student_performance.values()]
+#         # import math
+#         # print(math.ceil((int(request.user.username.split(':')[1])-1)/4))
+#         row = up.student_performance_row
+#         sheetsapi.updatesheet(sheetid,row,student_performance)
+#
+#         try:
+#             file = request.FILES['photo']
+#             file._name = str(request.user.username) +"."+ file._name.split('.')[1]
+#         except:
+#             file = ""
+#         from .models import user_profile
+#         us_profile = user_profile.objects.all().filter(user_id=request.user.id)
+#         if len(us_profile)==0:
+#             us_profile = user_profile(user_id=request.user,student_performance_row=str(int(performance_row)+1),photo=file)
+#             us_profile.save()
+#         else:
+#             us_profile.update(photo=file)
+#
+#         messages.info(request,'profile updated')
+#         return redirect(viewprofile)
+#     else:
+#         sheetsapi.updatesheet(SPREADSHEET_ID,row,col,value,cell)
+#         # fp = open('student_performance.txt', 'r')
+#         # sheetid = fp.read()
+#         # fp.close()
+#         # sheetsapi.updatesheet(SPREADSHEET_ID,idvalue,col,value,cell)
+#         messages.info(request,'profile updated')
+#         return redirect(viewstudent)
+#
+#     return HttpResponse("")
 
 def attendance(request):
     SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
@@ -882,6 +933,19 @@ def randomstring(request):
 ###
 def mail(receiver,body):
     import smtplib
+    try:
+        s = smtplib.SMTP('mail.fortunecloudindia.com', 587)
+        s.starttls()
+        s.login("aniket.pawar@cravitaindia.com", "Aniket@123")
+        # print(s)
+        s.sendmail("aniket.pawar@cravitaindia.com", receiver, body)
+        s.quit()
+        return "success"
+    except:
+        return "failed"
+###
+def mailletter(receiver,body):
+    import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
     from email.mime.base import MIMEBase
@@ -898,26 +962,26 @@ def mail(receiver,body):
     message = MIMEMultipart()
     message['From'] = "aniket.pawar@cravitaindia.com"
     message['To'] = receiver
-    message['Subject'] = 'This email has an attacment, a pdf file'
+    message['Subject'] = 'Fortune Cloud LMS'
 
     message.attach(MIMEText(body, 'plain'))
 
-    pdfname = 'es_full.pdf'
+    pdfname = 'Offer Latter.pdf'
 
     # open the file in bynary
-    # binary_pdf = open(pdfname, 'rb')
+    binary_pdf = open(pdfname, 'rb')
 
-    # payload = MIMEBase('application', 'octate-stream', Name=pdfname)
-    # payload = MIMEBase('application', 'pdf', Name=pdfname)
-    # payload.set_payload((binary_pdf).read())
+    payload = MIMEBase('application', 'octate-stream', Name=pdfname)
+    payload = MIMEBase('application', 'pdf', Name=pdfname)
+    payload.set_payload((binary_pdf).read())
     # payload.set_payload(Pdf)
 
     # enconding the binary into base64
-    # encoders.encode_base64(payload)
+    encoders.encode_base64(payload)
 
     # add header with pdf name
-    # payload.add_header('Content-Decomposition', 'attachment', filename=pdfname)
-    # message.attach(payload)
+    payload.add_header('Content-Decomposition', 'attachment', filename=pdfname)
+    message.attach(payload)
 
     text = message.as_string()
     s.sendmail("aniket.pawar@cravitaindia.com", receiver, text)
@@ -1019,7 +1083,7 @@ def student_profile_out(request):
     rowv = request.GET['rowv'].split(',')
     row = request.GET['row']
     SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
-    print(rowv)
+    # print(rowv)
     sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=int(row) + 2, value=rowv)
     return HttpResponse("")
 
@@ -1067,9 +1131,9 @@ def get_data(request,table):
 
 ###
 def set_data(request,table):
-    print(request.GET)
+    # print(request.GET)
     rowv = request.GET.getlist('rowv[]')
-    print(rowv)
+    # print(rowv)
     row = rowv[0]
     rowv = rowv[1::]
     SHEET_NAME = request.GET['sheetname']
@@ -1124,19 +1188,19 @@ def set_data(request,table):
 
 ###
 def attendance_update(request):
-    print(request.GET)
+    # print(request.GET)
     SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
     rowv = request.GET.getlist('rowv[]')
     row = request.GET['row']
     SHEET_NAME = request.GET['sheetname']
-    print(rowv)
+    # print(rowv)
     if (type(rowv[0]) == int):
         rowv = [x for x in rowv]
     else:
         rowv = [int(x) for x in rowv]
 
     # rowv.sort()
-    print(rowv,max(rowv))
+    # print(rowv,max(rowv))
     date = datetime.now()
     day = date.strftime("%d")
     month = date.strftime("%m")
@@ -1168,10 +1232,10 @@ def sendotp(request):
             up = user_profile(user_id=request.user,otp=otp)
         else:
             up=up[0]
-        # print(us.otp)
+
         up.otp=otp
         up.save()
-        # print(up.otp)
+
         header = 'To:' + us[0].username + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS OTP \n'
 
         message = header + '\n Username: ' + us[0].username + '\n OTP: ' + otp + ' \n\n'
@@ -1185,6 +1249,7 @@ def sendotp(request):
         # messages.error(request,'Username not found')
         return HttpResponse("Username not found")
 
+###
 def get_user(request):
     gname = request.GET['gname']
     gp = Group.objects.get(name=gname)
@@ -1192,7 +1257,7 @@ def get_user(request):
     memb = []
     abc = []
     for m in members:
-        print(m.groups.all())
+        # print(m.groups.all())
         vars(m)['_state']='None'
         key = list(vars(m).keys())
         memb1 = []
@@ -1206,14 +1271,14 @@ def get_user(request):
     # print(memb)
     return HttpResponse(str(memb))
 
-
+###
 def set_user(request):
     values = request.GET['values'].replace('{','').replace('}','').replace('"','').replace("'",'').split(',')
     val={}
     for i in values:
         kv=i.split(':')
         val[kv[0].lower()]=kv[1]
-    print(values,val['is_staff'])
+    # print(values,val['is_staff'])
     us = User.objects.get(id=val['id'])
     us.is_staff = val['is_staff'].capitalize()
     us.is_active = val['is_active'].capitalize()
@@ -1235,7 +1300,7 @@ def test(request):
 
         performance = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)',profile[0][8],profile[0][11]+"/"+profile[0][12]
             ,profile[0][13],profile[0][3],profile[0][7],profile[0][5],profile[0][4],profile[0][6]]
-        print(performance)
+        # print(performance)
 
         SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
 
@@ -1298,7 +1363,7 @@ def getcertificate(request):
                 else:
                     data1[v.upper()]=vars(c)[v]
             data.append(data1)
-    print(us)
+    # print(us)
     # for u in us:
     #     st = user_profile.objects.get(user_id=u).student_performance_row
     #     print(st)
@@ -1306,10 +1371,11 @@ def getcertificate(request):
     #     print(v[0][13:17]+v[0][20:24]+v[0][27:30]+v[0][38:41]+v[0][46:49])
     return HttpResponse(str(data).replace('False','false').replace('True','true').replace('_',' '))
 
+###
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def setcertificate(request):
-    print(request.POST)
+
     try:
         file = request.FILES['file']
         file._name = str(request.user.username.split(':')[0]) + "." + file._name.split('.')[1]
@@ -1320,16 +1386,13 @@ def setcertificate(request):
     cr = certificate_request.objects.get(id=id)
     cr.certificate_number = cn
     cr.certificate = file
-    # print(request.POST['certificate_status'])
     cr.certificate_status = request.POST['certificate_status']
     cr.save()
-    # print(file)
-    # print(request.POST['id'])
 
     return HttpResponse(str(cr.certificate))
 
 def objtodict(obj):
-    print(obj)
+
     keys = vars(obj).keys()
     dic = {}
     for k in keys:
@@ -1342,17 +1405,19 @@ def objtodict(obj):
     # print(dic)
     return dic
 
-
+###
 def viewtimeline(request):
     return render(request,'student/timeline.html')
 
+###
 def addtimeline(request):
-    print(request.POST)
+
     if request.method == "POST":
         ti = timeline(generator=request.user,title=request.POST['title'],type=request.POST['type'],body=request.POST['body'])
         ti.save()
     return render(request,'student/timeline.html')
 
+###
 def deletetimeline(request):
     print(request.GET)
     if request.method == "GET":
@@ -1361,10 +1426,11 @@ def deletetimeline(request):
         ti.delete()
     return render(request,'student/timeline.html')
 
+###
 def timelinedata(request):
     pre = int(request.GET['pre'])
     data = timeline.objects.all().order_by('-id')[pre:pre+20]
-    print(request.GET)
+
     timel = []
     if len(data)>0:
         for d in data:
@@ -1395,9 +1461,9 @@ def timelinedata(request):
     return HttpResponse(timel)
 
 
-
+###
 def addfeedback(request):
-    print(request.POST)
+
     day = datetime.now()
     data = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)',day.strftime("%d/%M/%Y"),request.user.first_name,
             request.user.last_name,request.user.email]
@@ -1410,7 +1476,6 @@ def addfeedback(request):
             except:
                 data1.append("")
 
-    print(data+data1)
 
     feedback = data+data1
 
@@ -1421,6 +1486,7 @@ def addfeedback(request):
     request.session['feedback'] = False
     return redirect("index")
 
+###
 def viewfeedback(request):
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
     SPREADSHEET_ID = extra_data.objects.get(name='feedback').value
@@ -1433,6 +1499,7 @@ def viewfeedback(request):
 
     return render(request, 'student/view_feedback.html', {'up': up, 'sheetnames': SHEET_NAMES, 'notice': notice1})
 
+###
 def students_groups(request,gname):
     gp = Group.objects.all()
     data = [{'groupname':'Students'}]
@@ -1456,7 +1523,7 @@ def students_groups(request,gname):
 
     return HttpResponse(str(data).replace("'",'"'))
 
-
+###
 def students_current_groups(request,gname):
     data = []
     g = Group.objects.get(name=gname)
@@ -1488,6 +1555,7 @@ def calender(request):
     print(data)
     return render(request,'student/calender.html',{'data':data})
 
+###
 def schedule(request):
     return render(request,'student/schedule.html')
 
@@ -1522,7 +1590,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 import xhtml2pdf.pisa as pisa
 
-
+###
 class Render:
 
     @staticmethod
@@ -1531,18 +1599,30 @@ class Render:
         html = template.render(params)
         response = BytesIO()
         pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
+
+
         if not pdf.err:
             return HttpResponse(response.getvalue(), content_type='application/pdf')
         else:
             return HttpResponse("Error Rendering PDF", status=400)
-        
+
+    @staticmethod
+    def render_to_file(path: str, params: dict):
+        template = get_template(path)
+        html = template.render(params)
+        # file_name = "{0}-{1}.pdf".format(params['request'].user.first_name, randint(1, 1000000))
+        file_name = "Offer Letter.pdf"
+        file_path = os.path.join(os.path.abspath(os.path.dirname("__file__")), "", file_name)
+        with open(file_path, 'wb') as pdf:
+            pisa.pisaDocument(BytesIO(html.encode("UTF-8")), pdf)
+        return [file_name, file_path]
 
 from django.views.generic import View
 from django.utils import timezone
 from .models import *
 # from .render import Render
 
-
+###
 class Pdf(View):
 
     def get(self, request):
@@ -1556,10 +1636,10 @@ class Pdf(View):
         # print(values)
         today = timezone.now()
         params = {
-            'today': today,
+            'addate': datetime.strptime(values[0][4],"%Y-%m-%d"),
             'name': request.user.first_name,
             'contact': values[0][2]
         }
-        print(bin(Render.render('student/pdf.html', params).as_view()))
+        Render.render_to_file('student/pdf.html',params)
         return Render.render('student/pdf.html', params)
 

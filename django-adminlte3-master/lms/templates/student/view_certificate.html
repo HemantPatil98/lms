@@ -125,8 +125,12 @@ $(function () {
                 var flag=false;
                 $.each(Object.keys(client),function(key,val){
                     val=val.toString();
-                    val1=client[val].toString();
+                    val1=client[val].toString().toLowerCase();
                     val2=filter[val];
+                    if (val2){
+                      val2=filter[val].toString().toLowerCase();
+                    }
+
                     if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
 
                     flag=true;
