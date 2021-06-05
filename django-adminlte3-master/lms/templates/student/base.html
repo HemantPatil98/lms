@@ -6,8 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fortune Cloud Technologies | LMS</title>
 
-
-  {%include 'student/csslinks.html'%}
+  {%include 'student/includes/csslinks.html'%}
   {%block style%}
 
   {%endblock%}
@@ -31,12 +30,12 @@
   </div>
 
   <!-- Navbar -->
-    {%include 'student/navbar.html'%}
+    {%include 'student/includes/navbar.html'%}
 
   <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
-  {%include 'student/sidebar.html'%}
+  {%include 'student/includes/sidebar.html'%}
 
 
   <!-- Content Wrapper. Contains page content -->
@@ -71,7 +70,7 @@
 </div>
 <!-- ./wrapper -->
 <!-- <div id="sidebar-overlay"></div> -->
-{%include 'student/scriptlinks.html'%}
+{%include 'student/includes/scriptlinks.html'%}
 {%block script%}
 {%endblock%}
       <div class="modal fade" id="followus">
@@ -83,12 +82,7 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-
-           
             <div class="modal-body" style="align-self: center;">
-              <!-- <p>One fine body&hellip;</p> -->
-              
-              <!-- <div class="col-sm-12"></div> -->
               <a href="https://www.facebook.com/fortunecloudtechnologies/" target="new"><i class="fab fa-facebook-square social" style="color: #1877f2;"></i></a>
               <a href="https://www.instagram.com/fortunecloud/" target="new"><i class="fab fa-instagram social" style="color: #db3465;"></i></a>
               <a href="" target="new"><i class="fab fa-twitter social" style="color: #28a9e0;"></i></a>
@@ -203,12 +197,7 @@
 <!-- Page specific script -->
 {%for message in messages%}
 <script type="text/javascript">
-  // $('.toastrDefaultSuccess').click(function() {
-      toastr.success('{{message}}')
-    // });
-    //   function push(){
-    // $('[data-widget="pushmenu"]').PushMenu('toggle');
-  // }
+  toastr.success('{{message}}')
 </script>
 {%endfor%}
 <script type="text/javascript">
@@ -223,7 +212,6 @@
 
   {%if request.session.feedback%}
     $('#feedbacklink').trigger('click');
-
   {%endif%}
 </script>
 

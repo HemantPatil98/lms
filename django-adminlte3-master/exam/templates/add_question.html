@@ -110,9 +110,9 @@
                  {%if not crs%}
                  <hr>
                  <div class="row">
-                   <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.mcq_sheet}}" target="new">MCQ Question Sheet</a></div>
-                   <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.practical_sheet}}" target="new">Practical Question Sheet</a></div>
-                   <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.program_sheet}}" target="new">Program Question Sheet</a></div>
+                   <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.MCQ}}" target="new">MCQ Question Sheet</a></div>
+                   <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.PRACTICAL}}" target="new">Practical Question Sheet</a></div>
+                   <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.PROGRAM}}" target="new">Program Question Sheet</a></div>
                  </div>
                  {%endif%}
                  <div>
@@ -331,7 +331,22 @@ function syncquestions(){
 	}
 </script>
 {%endif%}
+<script type="text/javascript">
+	  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2({
+      {%if view != 'true'%}
+          tags:true
+          {%endif%}
+          })
 
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4',
+      // tags:true
+    })
+});
+</script>
 
 
     {%endblock%}

@@ -95,7 +95,8 @@ $.get(url,{sheetname:sheetname},function(data,status){
     db.data=JSON.parse(data);
     // console.log(db.data);
     $('#grid').jsGrid({data:db.data});
-// wndow.db=db;
+
+// window.db=db;
     // db.loadData;
     // addaction();
     $(".jsgrid-grid-body").keypress(function(){var keycode = (event.keyCode ? event.keyCode : event.which);

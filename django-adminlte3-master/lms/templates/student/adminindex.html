@@ -4,6 +4,11 @@
   .inner{
     height: 100px;
   }
+  @media (max-width: 767.98px){}
+  .small-box .icon {
+      display: block;
+  }
+}
 </style>
 {%endblock%}
 {%load static%}
@@ -46,7 +51,7 @@
               <div class="icon">
                 <a href="{% url 'addstudents' %}" class="icon"><i class="fas fa-user-graduate"></i></a>
               </div>
-              <a href="{% url 'viewstudents'%}" class="small-box-footer">
+              <a href="{% url 'sheetdata' table='profile'%}" class="small-box-footer">
                 View Student <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
@@ -111,9 +116,9 @@
                 <p>View Performance</p>
               </div>
               <div class="icon">
-                <a href="{% url 'viewperformance'%}" class="icon"><i class="fas fa-percentage"></i></a>
+                <a href="{% url 'sheetdata' table='peformacne'%}" class="icon"><i class="fas fa-percentage"></i></a>
               </div>
-              <a href="{% url 'viewperformance'%}" class="small-box-footer">
+              <a href="{% url 'sheetdata' table='peformacne'%}" class="small-box-footer">
                 View Performance <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
@@ -208,9 +213,9 @@
                 <p>Feedback</p>
               </div>
               <div class="icon">
-                <a href="{% url 'viewfeedback' %}" class="icon"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                <a href="{% url 'sheetdata' table='feedback'%}" class="icon"><i class="fa fa-edit" aria-hidden="true"></i></a>
               </div>
-              <a href="{% url 'viewfeedback'%}" class="small-box-footer">
+              <a href="{% url 'sheetdata' table='feedback'%}" class="small-box-footer">
                 View Feedbacks <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>

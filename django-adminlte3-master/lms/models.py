@@ -1,9 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User,Group
 from datetime import datetime
+from django.shortcuts import render,HttpResponse
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+
 # Create your models here.
 def nothing():
     pass
+
 class notice(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
@@ -22,13 +27,11 @@ class notice(models.Model):
         externallink = request.POST['externallink']
         type = request.POST['type']
         now = datetime.now()
-        # print(vars(file))
         try:
             file = request.FILES['file']
             file._name=title+now.strftime("%m-%d-%Y, %H:%M:%S")+"."+file._name.split('.')[1]
         except:
             file = ''
-        # print(file._name)
         try:
             id = request.POST['id']
             note = notice.objects.all().get(id=id)
@@ -43,6 +46,8 @@ class notice(models.Model):
                           createdby=request.user,type=type)
             note.save()
 
+
+
 class certificate_request(models.Model):
     student_id = models.ForeignKey(User,on_delete=nothing)
     certificate_number = models.CharField(max_length=10)
@@ -54,15 +59,14 @@ class certificate_request(models.Model):
 
 class user_profile(models.Model):
     user_id = models.OneToOneField(User,on_delete=nothing)
-    student_performance_row = models.IntegerField(null=True)
-    student_profile_row = models.IntegerField(null=True)
+    student_performance_row = models.IntegerField(blank=True,null=True)
+    student_profile_row = models.IntegerField(blank=True,null=True)
     otp = models.CharField(max_length=6)
     photo = models.FileField(upload_to='profile_photo/')
-    certificate = models.ForeignKey(certificate_request,on_delete=nothing,null=True)
+    certificate = models.ForeignKey(certificate_request,on_delete=nothing,blank=True,null=True)
 
     def __str__(self):
         return self.user_id.username
-
 
 class extra_data(models.Model):
     name = models.CharField(max_length=20)
@@ -70,7 +74,6 @@ class extra_data(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class timeline(models.Model):
     generator = models.ForeignKey(User,on_delete=nothing)
@@ -81,6 +84,62 @@ class timeline(models.Model):
 
     def __str__(self):
         return self.title
+
+    ###
+    @login_required(login_url='')
+    def viewtimeline(request):
+        return render(request, 'student/timeline.html')
+
+    ###
+    @login_required(login_url='')
+    def addtimeline(request):
+
+        if request.method == "POST":
+            ti = timeline(generator=request.user, title=request.POST['title'], type=request.POST['type'],
+                          body=request.POST['body'])
+            ti.save()
+        return render(request, 'student/timeline.html')
+
+    ###
+    @login_required(login_url='')
+    def deletetimeline(request):
+        if request.method == "GET":
+            id = request.GET['id']
+            ti = timeline.objects.get(id=id)
+            ti.delete()
+        return render(request, 'student/timeline.html')
+
+    ###
+    @login_required(login_url='')
+    def timelinedata(request):
+        pre = int(request.GET['pre'])
+        data = timeline.objects.all().order_by('-id')[pre:pre + 20]
+
+        timel = []
+        if len(data) > 0:
+            for d in data:
+                vars(d)['_state'] = 'none'
+                vars(d)['name'] = User.objects.get(id=vars(d)['generator_id']).first_name
+                now = datetime.now(timezone.utc)
+                d.body = str(d.body).replace('"', '')
+                vars(d)['date'] = d.generatedtime.strftime('%d %B %Y')
+                if (now - d.generatedtime).days > 0:
+                    time = str((now - d.generatedtime).days) + " days"
+                else:
+                    time = ((now - d.generatedtime).seconds // 60)
+                    if time > 60:
+                        time = str(time // 60) + " hr"
+                    else:
+                        time = str(time) + " min"
+                vars(d)['time'] = time
+                vars(d)['generatedtime'] = ""
+                timel.append((vars(d)))
+
+        else:
+            timel = "-1"
+        timel = str(timel).replace("'", '"')
+
+        return HttpResponse(timel)
 
 
 class groupsinfo(models.Model):

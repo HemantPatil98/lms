@@ -21,9 +21,6 @@ urlpatterns = [
     path('',include('lms.urls')),
     path('',include('exam.urls')),
     path('',include('video.urls')),
-    # path('', include('adminlte3_theme.urls')),
     path('admin/', admin.site.urls),
-    # path('admin/include/addstudent/', views.addstudent, name='addstudent'),
-    # path('admin/include/view_data/<slug:table>/',views.viewstudent, name='viewstudent'),
-    # path('admin/include/view_data/<int:row>/<int:col>/<slug:value>/',sheetsapi.updatesheet,name='updatesheet')
+
 ]

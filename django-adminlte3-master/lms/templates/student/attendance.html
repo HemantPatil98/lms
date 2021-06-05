@@ -177,32 +177,24 @@ $(function () {
         },
           insertItem: $.noop,
           updateItem: function(rowIndex) { 
-            // console.log(rowIndex.present.join(","));
-            // alert(1);
-            // const col = Object.keys(db.data[0]);
-            // console.log(col.length-1);
             len = (Object.keys(window.db.data[0]).length-1).toString();
-            // console.log(len);
+
             sheetname = $("select[name='sheetname']").val();
-            // console.log(sheetname);
+
             Url = "";
             a = db.data[0];
+            Url = "{%url 'setdata' table='attendance'%}";
+            update = "";
             if(!a.hasOwnProperty(currentdate)){
-                Url = "{%url 'setdata' table='attendance'%}";
-
+              update=false;
             }else{
-                console.log("update");////else link for update attendance
-                Url = "{%url 'attendance_update'%}";
-
+                update=true;
             }
-                $.get(Url,{rowv:rowIndex.present,row:len,sheetname:sheetname},function(data,status){
-                    console.log(data);
+                $.get(Url,{rowv:rowIndex.present,row:len,sheetname:sheetname,update:update},function(data,status){
                 }).done(function(){
+                  window.location.replace(window.location.href);
 
                 });
-                  setTimeout('', 3000);
-                  window.location.replace(window.location.href);
-            load();
         },
           deleteItem: $.noop
         },
@@ -220,8 +212,7 @@ function addattendance(x){
   flag=true;
   console.log(x);
   for( var i = 0; i < present.length; i++){ 
-        if ( present[i] === x) { 
-    
+        if (present[i] === x) { 
             present.splice(i,1); 
             flag = false;
         }

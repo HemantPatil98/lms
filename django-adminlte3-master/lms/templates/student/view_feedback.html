@@ -99,18 +99,14 @@ $.get(url,{sheetname:sheetname},function(data,status){
 
     fields = []
     window.col = Object.keys(db.data[0]);
-    // console.log(col);
-    // fields.push({name:col[i],type:'checkbox',editing:true});
+
     for(i=0;i<col.length-1;i++){
-        // console.log(col[i]);
         fields.push({name:col[i],type:'text'});
     };
     fields[0]['css']='hide'
     $('#grid').jsGrid({fields:fields});
 
-// wndow.db=db;
-    // db.loadData;
-    // addaction();
+
     $(".jsgrid-grid-body").keypress(function(){var keycode = (event.keyCode ? event.keyCode : event.which);
           if(keycode == '13'){window.edit_row=this;$('#grid').jsGrid('updateItem')}});
 });
@@ -142,9 +138,7 @@ $(function () {
                     if (val2){
                       val2=filter[val].toString().toLowerCase();
                     }
-
                     if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
-
                     flag=true;
                     }else{
                         flag=false;

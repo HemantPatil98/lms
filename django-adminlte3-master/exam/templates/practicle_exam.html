@@ -251,7 +251,10 @@
     }, 1000);
   }
 
-
+function check(){
+  document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+      document.cookie = "que_ans=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+}
   window.onload = function () {
   if(getCookie('que_ans') != ""){
     que_ans = JSON.parse(getCookie('que_ans'));

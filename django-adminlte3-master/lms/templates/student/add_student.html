@@ -70,7 +70,7 @@
                   <div class="form-group col-md-6"></div>
                   <div class="form-group col-md-6">
                     <label>Profile Photo</label>
-                    <label for="photo" style="cursor: pointer;" onclick="(function(){$('#photo').trigger('click')})()"><i class="fas fa-camera fa-2x" {%if not request.session.ab.photo%} class="hide" id="photohover" {%endif%} style="color:#bfc6ce94"></i></label>
+                    <label for="photo" style="cursor: pointer;" ><i class="fas fa-camera fa-2x" {%if not request.session.ab.photo%} class="hide" id="photohover" {%endif%} style="color:#bfc6ce94"></i></label>
                     <input type="file" name="photo" id="photo" style="display: none;">
                   </div>
                   <div class="form-group col-md-6">
@@ -383,13 +383,17 @@
   <!-- /.content-wrapper -->
 {%block script%}
 <script>
-$("input[name='dateofadmission']").defaultValue = "2014-02-09";
+  var d = new Date();
+  day = d.getDate()>10?d.getDate():"0"+d.getDate();
+  month = d.getMonth()+1>10?d.getMonth()+1:"0"+(d.getMonth()+1);
+  year = d.getFullYear();
+  currentdate = year+"-"+month+'-'+day;
+  console.log(currentdate,day,month,year);
+$("input[name='dateofadmission']").val(currentdate);
   $("input[name='mode']").click(function(){
     mode=$("input[name='mode']:checked").val();
     if (mode=="LumpSum"){
-        // console.log($(this));
       $('#installment tbody tr').each(function(){
-        // console.log($(this));
         $.each($(this).children(),function(i){
           if (i>2){
           $(this).children('input').attr('readonly','readonly');
@@ -400,15 +404,11 @@ $("input[name='dateofadmission']").defaultValue = "2014-02-09";
     }
     else{
       $('#installment tbody tr').each(function(){
-        // console.log($(this));
         $.each($(this).children(),function(){
           $(this).children('input').removeAttr('readonly');
-        // console.log($(this).children('input').attr('readonly','readonly'));
-
         })
       })
     }
-    console.log(mode);
   });
 </script>
 {%endblock%}

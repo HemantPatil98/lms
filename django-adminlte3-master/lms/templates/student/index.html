@@ -61,7 +61,7 @@
     <!-- /.content-header -->
 
     <!-- Main content -->
-    {%block content%}
+    {%block content%}{{request.session.ab}}
     <section class="content">
       <div class="container-fluid">
         <div class="row">
@@ -75,7 +75,7 @@
                 <br>
                 <div class="text-center" id="popupReturn" on hover=>
                     <input type="text" class="knob knob1"  data-thickness="0.1" data-width="90" data-height="90"
-                           data-fgColor="#00a65a" readonly="true" value="{{performance|key_with_space:'Total Marks ( Out of 700 )'|div:7}}">
+                           data-fgColor="#00a65a" readonly="true" value="{{performance|key_with_space:'Total Marks (Out of 700)'|div:7}}">
 
                     <div class="knob-label">Average Performance</div>
                     <div id="tableContent" style="display:none">
@@ -84,7 +84,7 @@
                                 <div class="panel-heading">Performance</div>
                                 <div class="panel-body form-inline dept1">
                             <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'C Total Marks'}}"><br>C</div>
-                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'sql Total Marks'}}"><br>Sql</div>
+                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Sql Total Marks'}}"><br>Sql</div>
                             <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'WD Total Marks'}}"><br>WD</div>
                             <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Core Total Marks'}}"><br>Core</div>
                             <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Adv Total Marks'}}"><br>Adv</div>
@@ -491,15 +491,7 @@
     /* jQueryKnob */
 
     $('.knob').knob({
-      /*change : function (value) {
-       //console.log("change : " + value);
-       },
-       release : function (value) {
-       console.log("release : " + value);
-       },
-       cancel : function () {
-       console.log("cancel : " + this.value);
-       },*/
+
       draw: function () {
 
         // "tron" case
@@ -568,18 +560,6 @@
       });
     })
     
-
-    /* END JQUERY KNOB */
-
-    //INITIALIZE SPARKLINE CHARTS
-    // var sparkline1 = new Sparkline($('#sparkline-1')[0], { width: 240, height: 70, lineColor: '#92c1dc', endColor: '#92c1dc' })
-    // var sparkline2 = new Sparkline($('#sparkline-2')[0], { width: 240, height: 70, lineColor: '#f56954', endColor: '#f56954' })
-    // var sparkline3 = new Sparkline($('#sparkline-3')[0], { width: 240, height: 70, lineColor: '#3af221', endColor: '#3af221' })
-
-    // sparkline1.draw([1000, 1200, 920, 927, 931, 1027, 819, 930, 1021])
-    // sparkline2.draw([515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921])
-    // sparkline3.draw([15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21])
-
   })
 </script>
 <script type="text/javascript">

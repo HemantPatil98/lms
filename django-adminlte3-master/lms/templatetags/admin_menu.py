@@ -230,8 +230,17 @@ def replace1(txt):
 
 import math
 @register.filter(name='div')
-def sub(num1,num2):
-    return int(num1)//int(num2)
+def div(num1,num2):
+    # print(type(num1),num1)
+    try:
+        if type(num1) == 'str':
+            num1 = int(num1)
+        if type(num2)=='str':
+            num2 = int(num2)
+        return num1//num2
+    except:
+        return 0
+
 
 @register.filter(name='range')
 def sub(num):

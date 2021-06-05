@@ -223,7 +223,7 @@
         </div>
       </div>
     </section>
-    <button id="alertbutton2" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalmarks" style="display: none;">
+    <button id="alertbutton2" type="button" class="btn btn-primary" data-toggle="modal" data-target="#marksmodal" style="display: none;">
       Launch Primary Modal
     </button>
 
@@ -411,8 +411,9 @@ function startTimer(duration, display) {
       data = JSON.parse(data.replaceAll("'",'"'));
       // console.log(data);
       window.marks = parseInt(data.marks);
-      // $('#marks-head').append(marks);
-      // $('#marks-modal').append(marks);
+      $('#marks-head').append(marks);
+      $('#marks-modal').append(marks);
+      $('#alertbutton2').trigger('click');
       if(data.attempt == 'Attempts Overed'){
       $('#marks-head').append(" (Attempts Overed)");
       $('#attempts').append(" (Attempts Overed)");
@@ -533,7 +534,10 @@ function startTimer(duration, display) {
   $(function () {
     //Initialize Select2 Elements
     $('.select2').select2({
+      {%if request.user.is_staff%}
     	tags:true
+      {%endif%}
+
     })
 
     //Initialize Select2 Elements
