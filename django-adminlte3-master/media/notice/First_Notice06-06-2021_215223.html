@@ -1,0 +1,337 @@
+{%extends 'student/base.html'%}
+{%block style%}
+<style type="text/css">
+	#add_questions{
+		float: right;
+		border-radius: 10px;
+		padding: 10px;
+		margin-top: 7px;
+	}
+/*	#add_questions_form .col-md-5{
+		position: fixed;
+		top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	}
+	.hide{
+		display: none;
+	}*/
+</style>
+{%endblock%}
+{%load static%}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    {%block content_header%}
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Add Questions</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Add Questions</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    {%endblock%}
+
+    <!-- Main content -->
+    {%block content%}
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">Add Questions </h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form action="{%url 'add_questions'%}" method="POST" onsubmit="return validate()">
+                {%csrf_token%}
+                <div class="card-body">
+                	<div class="row">
+
+                  <!-- <div class="form-group col-md-6">
+                    <label for="nameInputEmail1">Group Name</label>
+                    <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
+                  </div> -->
+                  <div class="form-group col-md-4">
+                  <label>Course</label>
+                  <select class="form-control select2" style="width: 100%;" name="cname" {%if crs%}disabled{%endif%}>
+                    {%for course in courses%}
+                    <option {%if crs ==  course%}selected{%endif%}>{{course}}</option>
+                    {%endfor%}}
+                  </select>
+                  {%if crs%}
+                  <input type="hidden" name="cname" value="{{crs}}">
+                  {%endif%}
+                	</div>
+                	<div class="form-group col-md-4">
+                		<div class="row">
+                			<div class="col-md-6">
+                				<label>Section</label>
+		                		<select class="form-control select2" name="type" {%if crs%}disabled{%endif%}>
+		                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>MCQ</option>
+		                			<option {%if crs.type == 'PRACTICAL' %}selected{%endif%}>PRACTICAL</option>
+		                			<option {%if crs.type == 'PROGRAM' %}selected{%endif%}>PROGRAM</option>
+		                		</select>
+		                		{%if crs%}
+				                  <input type="hidden" name="type" value="{{crs.type}}">
+				                  {%endif%}
+		                	</div>
+		                	<div class="col-md-6">
+                				<label>Duration</label>
+		                		<input type="number" class="form-control center" name="time" placeholder="Duration in minutes" {%if crs%} value="{{crs.time}}" disabled{%else%}value="30"{%endif%} >
+		                		{%if crs%}
+				                  <input type="hidden" name="time" value="{{crs.time}}">
+				                  {%endif%}
+		                	</div>
+                		</div>
+                		
+                	</div>
+                	<div class="form-group col-md-4">
+                		{%if crs%}
+                		<button type="button" id="add_questions" class="btn btn-success" data-card-widget="collapse" onclick="addquestion()"><i class="fas fa-plus"></i> Add Questions</button>
+                		{%else%}
+                		<br>
+                		{%if courses%}
+                		<button type="button" id="sync" class="btn btn-info" onclick="syncquestions()"><i class="fas fa-sync "></i> Sync Questions</button>
+                		{%endif%}
+                		{%endif%}
+                	</div>
+                	</div>
+                 {%if not crs%}
+                 <hr>
+                 <div class="row">
+                   <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.mcq_sheet}}" target="new">MCQ Question Sheet</a></div>
+                   <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.practical_sheet}}" target="new">Practical Question Sheet</a></div>
+                   <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.program_sheet}}" target="new">Program Question Sheet</a></div>
+                 </div>
+                 {%endif%}
+                 <div>
+                 	<hr>
+                 	{%if crs%}
+                 	<div id="add_questions_form" class="row hide">
+                 		<div class="col-md-12">
+                 			<div class="card ">		
+				              <div class="card-header">
+				                <div class="form-group">
+				                	<i class="fas fa-info text-info"> Instructions</i><br>
+				                	<textarea class="form-control" name="instructions" rows="2" placeholder="Instructions">{{crs.instructions}}</textarea>
+				                </div>
+				              </div>
+				              
+				              <!-- /.card-header -->
+				              <!-- form start -->
+				                <div class="card-body" id="body" style="height: auto;">
+				                
+				                </div>
+				                
+				                <!-- /.card-body -->
+				            </div>
+                 		</div>
+                 	</div>
+                 	{%endif%}
+                 </div>
+                  
+                <!-- /.card-body -->
+            	</div>
+                <div class="card-footer">
+                  <input name="submit" type="submit" class="btn btn-primary">
+                  {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%}
+                </div>
+              </form>
+            </div>
+        </div>
+      </div>
+
+    </section>
+    {%endblock%}
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+    {%block script%}
+<script type="text/javascript">
+	
+$('#sync').hover(function(){
+	$('.fa-sync').addClass('fa-spin');
+},function(){
+	$('.fa-sync').removeClass('fa-spin');
+});
+
+function syncquestions(){
+	$('.fa-sync').addClass('fa-spin');
+	url = "{%url 'sync_questions'%}";
+	$.get(url,function(data){
+
+	}).done($('.fa-sync').removeClass('fa-spin'));
+};
+
+</script>
+{%if crs.type == 'MCQ'%}
+<script type="text/javascript">
+
+	var qcount = 0;
+	var ccount = 4;
+	function validate(){
+		console.log('validate');
+			for (i=1;i<=qcount;i++){
+			flag = false;
+				$("input[name='ans"+i+"']").each(function(){
+					console.log(this);
+					if(this.checked){
+						console.log(this);
+						return true;
+					}
+					else{
+						return false;
+					}
+				});
+			}
+	}
+
+	// function addchoice(a){
+	// 	var b = $($(a).parent().parent().children()[0]).children()[1];
+	// console.log($($(a).parent().parent().children()[0]).children()[1]);
+	// var qno = $(a).parent().parent().attr('id');
+	// 	ccount +=1;
+	// 	var choice=	`<div class="form-group col-md-6">
+	//                     <label>Choice `+ccount+`</label>
+	//                     <div class="input-group">
+	//                     <input type="input" class="form-control" name="choice`+qno+`" placeholder="Choice `+ccount+`">
+	// 				    <div class="input-group-append">
+	//                           <div class="input-group-text"><input type="checkbox" name="ans" value="`+ccount+`"></div>
+	//                       </div>
+	//                   </div>
+	//                 </div>`;
+	// 	$(b).append(choice);
+	// 	// console.lag(ccount);
+	// }
+
+	explanation_flag = true;
+
+	function addexplanation(a){
+			console.log();
+			var qno = $(a).parent().parent().attr('id');
+
+		if($(a).parent().parent().children().length==2){
+			b = $(a).parent().parent();
+			var exp = `<div class="form-group col-md-12">
+		                    <label>Explanation</label>
+		                    <div class="input-group">
+		                    <input type="input" class="form-control" name="explanation`+qno+`" placeholder="explanation">
+		                  </div>
+		                </div>`;
+			$(b).append(exp);
+			console.log($(a));
+			explanation_flag = false;
+		}
+		
+	}
+
+
+	function addquestion(){
+			qcount +=1;
+
+		question = `<div class='question`+qcount+`' id='`+qcount+`'>
+						<div>
+	                		<div class="form-group">
+			                    <label for="question">Question #`+qcount+`</label>
+			                    <textarea name="question`+qcount+`" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea>
+			                </div>
+	                  	<div id="choice" class="row">
+		                  	<div class="form-group col-md-6">
+			                    <label>Choice 1</label>
+			                    <div class="input-group">
+			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 1">
+							    <div class="input-group-append">
+			                          <div class="input-group-text">
+			                          	<input type="checkbox" name="ans`+qcount+`" value='0' onclick="selectoption(this)">
+			                          </div>
+			                    </div>
+			                  </div>
+			                </div>
+			                <div class="form-group col-md-6">
+			                    <label>Choice 2</label>
+			                    <div class="input-group">
+			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 2">
+							    <div class="input-group-append">
+			                          <div class="input-group-text">
+			                          <input type="checkbox" name="ans`+qcount+`" value='1' onclick="selectoption(this)">
+			                          </div>
+			                      </div>
+			                  </div>
+			                </div>
+			                <div class="form-group col-md-6">
+			                    <label>Choice 3</label>
+			                    <div class="input-group">
+			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 3">
+							    <div class="input-group-append">
+			                          <div class="input-group-text">
+			                          <input type="checkbox" name="ans`+qcount+`" value='2' onclick="selectoption(this)">
+			                          </div>
+			                      </div>
+			                  </div>
+			                </div>
+			                <div class="form-group col-md-6">
+			                    <label>Choice 4</label>
+			                    <div class="input-group">
+			                    <input type="input" class="form-control" name="choice`+qcount+`" placeholder="Choice 4">
+							    <div class="input-group-append">
+			                          <div class="input-group-text">
+			                          <input type="checkbox" name="ans`+qcount+`" value='3' onclick="selectoption(this)">
+			                          </div>
+			                      </div>
+			                  </div>
+			                </div>
+	                  </div>
+	                </div>
+	                <div class'actions>
+	                	<a class="btn" onclick="addexplanation(this)">
+	                	<i class="fas fa-lightbulb" style="color: grey"></i> Add explanation
+	                	</a>
+	                </div>
+	            </div>
+	                <hr>`;
+
+		$('#body').append(question);
+	}
+
+	function selectoption(a){
+		var name = $(a).attr('name');
+		$("input[name='"+name+"']").prop('checked', false);
+		console.log(name,$("input[name='"+name+"']"));
+		$(a).prop('checked', true);
+	}
+</script>
+{%elif crs.type == 'PRACTICAL' or crs.type == 'PROGRAM'%}
+<script type="text/javascript">
+	qcount = 0;
+	function addquestion(){
+		qcount += 1;
+
+		var question = `<div class='question`+qcount+`' id='`+qcount+`'>
+							<div>
+		                		<div class="form-group">
+				                    <label for="question">Question #`+qcount+`</label>
+				                    <textarea name="question`+qcount+`" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea>
+				                </div>
+			                </div>
+			            </div>`;
+
+		$('#body').append(question);
+	}
+</script>
+{%endif%}
+
+
+
+    {%endblock%}

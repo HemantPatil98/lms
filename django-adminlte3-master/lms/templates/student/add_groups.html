@@ -175,219 +175,201 @@
 </style>
 {%endblock%}
 {%load static%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>Add Group</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Add Group</li>
-            </ol>
-          </div>
-        </div>
-      </div><!-- /.container-fluid -->
-    </section>
-    {%endblock%}
 
-    <!-- Main content -->
-    {%block content%}
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-12">
-            <!-- general form elements -->
-            <div class="card card-primary">
-              <div class="card-header">
-                <h3 class="card-title">Groups </h3>
-              </div>
-              <!-- /.card-header -->
-              <!-- form start -->
-              <span><i>* For students groups please use abbrevations such as C_,SQL_,WD_,PYTHON_,JAVA_,TESTING_</i></span>
-              <form action="{%url 'addgroups'%}" method="POST" onsubmit="return save()">
-                {%csrf_token%}
-                <div class="card-body row">
-                  <!-- <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">Group Name</label>
-                    <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
-                  </div> -->
-                  <div class="form-group col-md-6">
-                    <label>Groups</label>
-                    <select class="form-control select2" style="width: 100%;" name="gname" {%if gname%}readonly{%endif%}>
-                      {%if gname%}
-                      <option selected>{{gname}}</option>
-                      {%else%}
-                      {%for group in groups%}
-                      <option {%if gname == group%}selected{%endif%}>{{group}}</option>
-                      {%endfor%}}
-                      {%endif%}
-                    </select>
-                  </div>
-                  <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
-                    <label>Course</label>
-                    <select class="form-control select2" style="width: 100%;" name="cname" {%if gname%}readonly{%endif%}>
-                      {%if gname%}
-                      <option selected>{{gpinfo.course}}</option>
-                      {%else%}
-                      {%for cname in courses%}
-                      <option {%if cname == group%}selected{%endif%} class="a">{{cname}}</option>
-                      {%endfor%}}
-                      {%endif%}
-                    </select>
-                  </div>
-                  <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
-                    <label>Start Date</label>
-                    <input type="date" name="startdate" class="form-control" value="{{gpinfo.startdate|date:'Y-m-d'}}" {%if gname%}readonly{%endif%}>
-                  </div>
-                  <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
-                    <label>End Date</label>
-                    <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}">
-                  </div>
+{%block page_link%}
+{%block page_title%}
+Add Groups
+{%endblock%}
+{%endblock%}
 
+{%block content%}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Groups </h3>
+          </div>
+          <!-- /.card-header -->
+          <!-- form start -->
+          <span><i>* For students groups please use abbrevations such as C_,SQL_,WD_,PYTHON_,JAVA_,TESTING_</i></span>
+          <form action="{%url 'addgroups'%}" method="POST" onsubmit="return save()">
+            {%csrf_token%}
+            <div class="card-body row">
+              <!-- <div class="form-group col-md-6">
+                <label for="nameInputEmail1">Group Name</label>
+                <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
+              </div> -->
+              <div class="form-group col-md-6">
+                <label>Groups</label>
+                <select class="form-control select2" style="width: 100%;" name="gname" {%if gname%}readonly{%endif%}>
                   {%if gname%}
-                  
-                    <div class="card card-default">
-                      <div class="card-header" style="background-color: #6f42c1cf;color: white">
-                        <h3 class="card-title">Select Permissions</h3>
-
-                        <div class="card-tools">
-                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                          </button>
-                        </div>
-                      </div>
-                      <!-- /.card-header -->
-                      <div class="card-body">
-                        <div class="row">
-                          <div class="col-12">
-                            <div class="form-group">
-                              <label>Sections</label>
-                              <div class="inputGroup">
-                                <input id="pervideo" name="pervideo" type="checkbox" {%if pre.video %}checked{%endif%}/>
-                                <label for="pervideo">Videos</label>
-                              </div>
-                              <div class="inputGroup">
-                                <input id="perexam" name="perexam" type="checkbox" {%if pre.exam %}checked{%endif%}/>
-                                <label for="perexam">Exam</label>
-                              </div>
-                              <div class="inputGroup">
-                                <input id="pernotes" name="pernotes" type="checkbox" {%if pre.notes %}checked{%endif%}/>
-                                <label for="pernotes">Notes</label>
-                              </div>
-                            </div>
-                            <!-- /.form-group -->
-                          </div>
-                          <!-- /.col -->
-                        </div>
-                        <!-- /.row -->
-                      </div>
-                      <!-- /.card-body -->
-                      <div class="card-footer">
-
-                      </div>
-                    </div>
-                    <!-- /.card -->
-                    <div class="card card-default">
-                      <div class="card-header"  style="background-color: #6f42c1cf;color: white">
-                        <h3 class="card-title">Video Permissions</h3>
-
-                        <div class="card-tools">
-                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                          </button>
-                          <!-- <button type="button" class="btn btn-tool" data-card-widget="remove">
-                            <i class="fas fa-times"></i>
-                          </button> -->
-                        </div>
-                      </div>
-                      <!-- /.card-header -->
-                      <div class="card-body">
-                        <div class="row">
-                          <div class="col-12">
-                            <div class="form-group">
-                              <!-- <label>Allow and block videos</label>-->
-    
-                              <div class="">
-                                <ul class="ks-cboxtags">
-
-                                  {%for vp in vpermissions%}
-                                  <li><input type="checkbox" name='videopermission' id="{{vp}}" value="{{vp}}" {%if gname.permissions.all|has_per:vp%}checked{%endif%}><label for="{{vp}}">{{vp}}
-                                  </label></li>
-
-                                  {%endfor%}
-                                </ul>
-                                                                  
-                              </div>
-                            </div>
-                            <!-- /.form-group -->
-                          </div>
-                          <!-- /.col -->
-                        </div>
-                        <!-- /.row -->
-                      </div>
-                      <!-- /.card-body -->
-                      <div class="card-footer">
-
-                      </div>
-                    </div>
-                    <!-- /.card -->
-                    <div class="card card-default col-sm-12">
-                      <div class="card-header" style="background-color: #6f42c1cf;color: white">
-                        <h3 class="card-title">Select Users</h3>
-
-                        <div class="card-tools">
-                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                          </button>
-                          
-                        </div>
-                      </div>
-                      <!-- /.card-header -->
-                      <div class="card-body">
-                        <div class="row">
-                          <div class="col-12">
-                            <div class="form-group">
-                              <label>Add students</label>
-                              <div class="transfer"></div>
-                              <input type="hidden" name="students">
-                            </div>
-                            <!-- /.form-group -->
-                          </div>
-                          <!-- /.col -->
-                        </div>
-                        <!-- /.row -->
-                      </div>
-                      <!-- /.card-body -->
-
-                      <div class="card-footer">
-
-                      </div>
-                    </div>
+                  <option selected>{{gname}}</option>
+                  {%else%}
+                  {%for group in groups%}
+                  <option {%if gname == group%}selected{%endif%}>{{group}}</option>
+                  {%endfor%}}
                   {%endif%}
+                </select>
+              </div>
+              <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
+                <label>Course</label>
+                <select class="form-control select2" style="width: 100%;" name="cname" {%if gname%}readonly{%endif%}>
+                  {%if gname%}
+                  <option selected>{{gpinfo.course}}</option>
+                  {%else%}
+                  {%for cname in courses%}
+                  <option {%if cname == group%}selected{%endif%} class="a">{{cname}}</option>
+                  {%endfor%}}
+                  {%endif%}
+                </select>
+              </div>
+              <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
+                <label>Start Date</label>
+                <input type="date" name="startdate" class="form-control" value="{{gpinfo.startdate|date:'Y-m-d'}}" {%if gname%}readonly{%endif%}>
+              </div>
+              <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
+                <label>End Date</label>
+                <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}">
+              </div>
 
-                </div>
-                <!-- /.card-body -->
+              {%if gname%}
+              
+                <div class="card card-default">
+                  <div class="card-header" style="background-color: #6f42c1cf;color: white">
+                    <h3 class="card-title">Select Permissions</h3>
 
-                <div class="card-footer">
-                  <button type="submit" class="btn btn-primary">Submit</button>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="form-group">
+                          <label>Sections</label>
+                          <div class="inputGroup">
+                            <input id="pervideo" name="pervideo" type="checkbox" {%if pre.video %}checked{%endif%}/>
+                            <label for="pervideo">Videos</label>
+                          </div>
+                          <div class="inputGroup">
+                            <input id="perexam" name="perexam" type="checkbox" {%if pre.exam %}checked{%endif%}/>
+                            <label for="perexam">Exam</label>
+                          </div>
+                          <div class="inputGroup">
+                            <input id="pernotes" name="pernotes" type="checkbox" {%if pre.notes %}checked{%endif%}/>
+                            <label for="pernotes">Notes</label>
+                          </div>
+                        </div>
+                        <!-- /.form-group -->
+                      </div>
+                      <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                  </div>
+                  <!-- /.card-body -->
+                  <div class="card-footer">
+
+                  </div>
                 </div>
-              </form>
+                <!-- /.card -->
+                <div class="card card-default">
+                  <div class="card-header"  style="background-color: #6f42c1cf;color: white">
+                    <h3 class="card-title">Video Permissions</h3>
+
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                      </button>
+                      <!-- <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                      </button> -->
+                    </div>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="form-group">
+                          <!-- <label>Allow and block videos</label>-->
+
+                          <div class="">
+                            <ul class="ks-cboxtags">
+
+                              {%for vp in vpermissions%}
+                              <li><input type="checkbox" name='videopermission' id="{{vp}}" value="{{vp}}" {%if gname.permissions.all|has_per:vp%}checked{%endif%}><label for="{{vp}}">{{vp}}
+                              </label></li>
+
+                              {%endfor%}
+                            </ul>
+                                                              
+                          </div>
+                        </div>
+                        <!-- /.form-group -->
+                      </div>
+                      <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                  </div>
+                  <!-- /.card-body -->
+                  <div class="card-footer">
+
+                  </div>
+                </div>
+                <!-- /.card -->
+                <div class="card card-default col-sm-12">
+                  <div class="card-header" style="background-color: #6f42c1cf;color: white">
+                    <h3 class="card-title">Select Users</h3>
+
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                      </button>
+                      
+                    </div>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="form-group">
+                          <label>Add students</label>
+                          <div class="transfer"></div>
+                          <input type="hidden" name="students">
+                        </div>
+                        <!-- /.form-group -->
+                      </div>
+                      <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                  </div>
+                  <!-- /.card-body -->
+
+                  <div class="card-footer">
+
+                  </div>
+                </div>
+              {%endif%}
+
             </div>
-        </div>
-      </div>
-    </section>
-    {%endblock%}
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
+            <!-- /.card-body -->
 
-    {%block script%}
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</section>
+{%endblock%}
+
+{%block script%}
 <script src="{%static 'js/jquery.transfer.js'%}"></script>
 {%if gname%}
 <script type="text/javascript">
@@ -467,7 +449,7 @@ function save(){
   $(function () {
     //Initialize Select2 Elements
     $('.select2').select2({
-      {%if view != 'true'%}
+      {%if not view and not gname %}
           tags:true
           {%endif%}
           })

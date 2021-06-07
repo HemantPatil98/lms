@@ -11,14 +11,20 @@ import os
 
 from .models import notice,user_profile,extra_data,certificate_request,groupsinfo
 from .extra_functions import randomstring,mail,mailletter
-from .sheetfields import student_profile,student_performance,attendance,batch_schedule,feedback
+from .sheetfields import student_profile,student_performance,batch_schedule,attendance,feedback,mcq,program,all_fields_index,marks
 from .pdfgenerator import Render,Pdf
-from . import sheetsapi
+from . import sheetsapi, sheetfields
 from exam.models import course
 
 # Create your views here.
 
 ###
+def config():
+    sheetsapi.startsheet()
+    sheetfields.indexing_fields()
+    sheetfields.make_media_directory()
+    return HttpResponse("")
+# 3PM8SFS
 def log_in(request):
     if request.method=="POST":
         username = request.POST['username']
@@ -26,20 +32,13 @@ def log_in(request):
         us = authenticate(request, username=username, password=password)
 
         if us is not None:
-            try:
-                ab = user_profile.objects.get(user_id=us.id)
-                vars(ab)['_state'] = None
-                request.session['ab']=vars(ab)
-                # print(vars(request.session))
-            except:
-                pass
             messages.info(request, "Successfully Log In")
             if us.last_login !=None:
                 login(request, us)
+                request.session['profile_photo'] = str(user_profile.objects.get(user_id=request.user.id).photo)
                 return redirect(index)
             else:
-                login(request, us)
-
+                request.session['profile_photo'] = str(user_profile.objects.get(user_id=request.user.id).photo)
                 return redirect(reset_password)
         else:
             messages.error(request, "Username and password not match")
@@ -111,7 +110,7 @@ def index(request):
     if request.user.is_staff:
         from .models import notice
         try:
-            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+            notice1 = notice.objects.all().order_by('-id')[0:5]
         except:
             notice1 = ""
 
@@ -154,20 +153,26 @@ def index(request):
                         cper.append('exam')
                     per[c]=cper
 
+        print(per)
+
 
         from .models import notice
 
         try:
-            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+            notice1 = notice.objects.all().order_by('-id')[0:5]
         except:
             notice1 = ""
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
+
+        print(performance,values)
         return render(request, 'student/index.html', {'performance': performance,'notice':notice1,'up':up,'per':per,'profile':""})
 
 ###
 @login_required(login_url='')
 def addstudent(request):
     if request.method == 'POST':
+        y = request.user.date_joined.strftime('%Y')
+        SHEET_NAME = "Apr - Mar " + y
         from .models import user_profile
         profile = [['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-4)+1)', ""], ["", ""], ["", ""], ["", ""]]
         for field in itertools.islice(request.POST, 2, None):
@@ -184,24 +189,19 @@ def addstudent(request):
             # print(performance)
 
             SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
-            # print(len(performance),[""]*len(student_performance),len(student_performance)-len(performance),performance)
             performance = performance + [""]*(len(student_performance)-len(performance)) if len(performance)<len(student_performance) else performance
-            print(len(performance),performance)
-            performance[student_performance.index('C Total Marks')] = '=sum(INDIRECT("N"&row()),INDIRECT("O"&row()),INDIRECT("P"&row()))'
-            performance[student_performance.index('Sql Total Marks')] = '=sum(INDIRECT("U"&row()),INDIRECT("V"&row()),INDIRECT("W"&row()))'
-            performance[student_performance.index('WD Total Marks')] = '=sum(INDIRECT("AB"&row()),INDIRECT("AC"&row()))'
-            performance[student_performance.index('Core Total Marks')] = '=sum(INDIRECT("AL"&row()),INDIRECT("AM"&row()),INDIRECT("AN"&row()))'
-            performance[student_performance.index('Adv Total Marks')] = '=sum(INDIRECT("AT"&row()),INDIRECT("AU"&row(),INDIRECT("AV"&row()))'
-            performance[student_performance.index('Total Marks (Out of 700)')] = '=sum(INDIRECT("Q"&row()),INDIRECT(&row()),INDIRECT("AD"&row()),INDIRECT("AM"&row()),INDIRECT("AU"&row()),INDIRECT("BA"&row()))'
-            performance[student_performance.index('Eligible For Certificate(Y/N)')] = '''=IF(AND(INDIRECT("N"&ROW())>27,INDIRECT("O"&ROW())>27,INDIRECT("P"&ROW())>13,INDIRECT("U"&ROW())>27,INDIRECT("V"&ROW())>27,INDIRECT("W"&ROW())>27,INDIRECT("AB"&ROW())>105,INDIRECT("AC"&ROW())>17,NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),INDIRECT("AJ"&ROW())>27,INDIRECT("AK"&ROW())>27,INDIRECT("AL"&ROW())>13,NOT(ISBLANK(INDIRECT("AN"&ROW()))),INDIRECT("AR"&ROW())>27,INDIRECT("AS"&ROW())>27,INDIRECT("AT"&ROW())>13,NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),INDIRECT("BA"&ROW())>70,NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
-            performance[student_performance.index('Eligible For Placement(Y/N)')] = '''=IF(AND(,NOT(ISBLANK(INDIRECT("N"&ROW()))),NOT(ISBLANK(INDIRECT("O"&ROW()))),NOT(ISBLANK(INDIRECT("P"&ROW()))),NOT(ISBLANK(INDIRECT("U"&ROW()))),NOT(ISBLANK(INDIRECT("V"&ROW()))),NOT(ISBLANK(INDIRECT("W"&ROW()))),NOT(ISBLANK(INDIRECT("AB"&ROW()))),NOT(ISBLANK(INDIRECT("AC"&ROW()))),NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),NOT(ISBLANK(INDIRECT("AJ"&ROW()))),NOT(ISBLANK(INDIRECT("AK"&ROW()))),NOT(ISBLANK(INDIRECT("AL"&ROW()))),NOT(ISBLANK(INDIRECT("AN"&ROW()))),NOT(ISBLANK(INDIRECT("AR"&ROW()))),NOT(ISBLANK(INDIRECT("AS"&ROW()))),NOT(ISBLANK(INDIRECT("AT"&ROW()))),NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),NOT(ISBLANK(INDIRECT("BA"&ROW()))),NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
-
+            performance[all_fields_index['student_performance']['C Total Marks (Out of 100)']] = marks['C Total Marks (Out of 100)']
+            performance[all_fields_index['student_performance']['Sql Total Marks (Out of 100)']] = marks['Sql Total Marks (Out of 100)']
+            performance[all_fields_index['student_performance']['WD Total Marks (Out of 200)']] = marks['WD Total Marks (Out of 200)']
+            performance[all_fields_index['student_performance']['Core Total Marks (Out of 100)']] = marks['Core Total Marks (Out of 100)']
+            performance[all_fields_index['student_performance']['Adv Total Marks (Out of 100)']] = marks['Adv Total Marks (Out of 100)']
+            performance[all_fields_index['student_performance']['Total Marks (Out of 700)']] = marks['Total Marks (Out of 700)']
+            performance[all_fields_index['student_performance'][('Eligible For Certificate(Y/N)')]] = '''=IF(AND(INDIRECT("N"&ROW())>27,INDIRECT("O"&ROW())>27,INDIRECT("P"&ROW())>13,INDIRECT("U"&ROW())>27,INDIRECT("V"&ROW())>27,INDIRECT("W"&ROW())>27,INDIRECT("AB"&ROW())>105,INDIRECT("AC"&ROW())>17,NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),INDIRECT("AJ"&ROW())>27,INDIRECT("AK"&ROW())>27,INDIRECT("AL"&ROW())>13,NOT(ISBLANK(INDIRECT("AN"&ROW()))),INDIRECT("AR"&ROW())>27,INDIRECT("AS"&ROW())>27,INDIRECT("AT"&ROW())>13,NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),INDIRECT("BA"&ROW())>70,NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
+            performance[all_fields_index['student_performance'][('Eligible For Placement(Y/N)')]] = '''=IF(AND(,NOT(ISBLANK(INDIRECT("N"&ROW()))),NOT(ISBLANK(INDIRECT("O"&ROW()))),NOT(ISBLANK(INDIRECT("P"&ROW()))),NOT(ISBLANK(INDIRECT("U"&ROW()))),NOT(ISBLANK(INDIRECT("V"&ROW()))),NOT(ISBLANK(INDIRECT("W"&ROW()))),NOT(ISBLANK(INDIRECT("AB"&ROW()))),NOT(ISBLANK(INDIRECT("AC"&ROW()))),NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),NOT(ISBLANK(INDIRECT("AJ"&ROW()))),NOT(ISBLANK(INDIRECT("AK"&ROW()))),NOT(ISBLANK(INDIRECT("AL"&ROW()))),NOT(ISBLANK(INDIRECT("AN"&ROW()))),NOT(ISBLANK(INDIRECT("AR"&ROW()))),NOT(ISBLANK(INDIRECT("AS"&ROW()))),NOT(ISBLANK(INDIRECT("AT"&ROW()))),NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),NOT(ISBLANK(INDIRECT("BA"&ROW()))),NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
             if request.user.is_staff:
                 performance_row = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=[performance])
             else:
                 sp = user_profile.objects.get(id=request.user.id)
-                y = request.user.date_joined.strftime('%Y')
-                SHEET_NAME = "Apr - Mar " + y
                 performance_row = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=sp.student_performance_row,
                                                         value=[performance])
 
@@ -222,7 +222,7 @@ def addstudent(request):
             us.save()
             try:
                 file = request.FILES['photo']
-                file._name = str(request.POST['name']) +"."+ file._name.split('.')[1]
+                file._name = str(request.user.username) +"."+ file._name.split('.')[1]
             except:
                 file = ""
             from .models import user_profile
@@ -252,7 +252,7 @@ def addstudent(request):
             print(message)
 
             mailletter(us.email,message)
-
+            request.session['profile_photo'] = us_profile.photo
             messages.info(request,'Student added successfully')
         else:
             from .models import user_profile
@@ -264,14 +264,14 @@ def addstudent(request):
             us_profile = user_profile.objects.get(user_id=request.user.id)
             us_profile.photo=file
             us_profile.save()
-            vars(us_profile)['_state'] = None
-            request.session['ab']=vars(us_profile)
+            # vars(us_profile)['_state'] = None
+            # request.session['ab']=vars(us_profile)
             messages.info(request,'Profile updated successfully')
-
+        request.session['profile_photo'] = us_profile.photo
         return redirect('index')
 
     try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        notice1 = notice.objects.all().order_by('-id')[0:5]
     except:
         notice1 = ""
 
@@ -280,7 +280,7 @@ def addstudent(request):
 
 ### #####
 @login_required(login_url='')
-def addgroups(request,view="false"):
+def addgroups(request,view=False):
     if request.method == 'POST':
         gname = request.POST['gname']
         gp = Group.objects.filter(name=gname)
@@ -289,13 +289,16 @@ def addgroups(request,view="false"):
             startdate = request.POST['startdate']
             enddate = request.POST['enddate']
             gp=Group(name=gname)
+            videos = "media/videos/courses/" + cname
+            os.mkdir(videos)
             gp.save()
             gpinfo = groupsinfo(group=gp,course=cname,startdate=startdate,enddate=enddate)
             gpinfo.save()
             messages.info(request,'Group created')
-            SPREADSHEET_ID = extra_data.objects.get(name='Attendance').value
+            SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
 
-            sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,columns=attendance)
+            print(sheetfields.attendance)
+            sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,columns=sheetfields.attendance)
             messages.info(request, gname + " is added in sheet")
         else:
             gp=gp[0]
@@ -307,7 +310,7 @@ def addgroups(request,view="false"):
                 pass
             cname = request.POST['cname']
 
-        if request.POST.get('videopermission'):
+        if 'videopermission' in request.POST:
             for p in gp.permissions.all():
                 if p.name not in request.POST.getlist('videopermission'):
                     gp.permissions.remove(p.id)
@@ -316,7 +319,7 @@ def addgroups(request,view="false"):
                 if p not in gp.permissions.all():
                     gp.permissions.add(p)
 
-        if request.POST.get('pervideo') or request.POST.get('perexam') or request.POST.get('pernotes'):
+        if 'pervideo' in request.POST or 'perexam' in request.POST or 'pernotes' in request.POST:
             permissions = {'video': request.POST.get('pervideo'), 'exam': request.POST.get('perexam'),
                            'notes': request.POST.get('pernotes')}
             for p in permissions:
@@ -347,7 +350,7 @@ def addgroups(request,view="false"):
                 else:
                     if m.id in request_member:
                         m.groups.add(gp.id)
-                        SPREADSHEET_ID = extra_data.objects.get(name='Attendance').value
+                        SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
                         index = '=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)'
                         values = [index,m.id,m.first_name,m.last_name,m.email]
                         sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,values=[values])
@@ -360,12 +363,12 @@ def addgroups(request,view="false"):
 
         videolist = []
 
-        videos = "media/videos/courses/" + cname
+        videos = "media/videos/courses/" + gpinfo.course
         for v in os.listdir(videos):
             videolist.append(v.split(".")[0])
 
         try:
-            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+            notice1 = notice.objects.all().order_by('-id')[0:5]
         except:
             notice1 = ""
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
@@ -427,7 +430,7 @@ def addusers(request):
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
 
         try:
-            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+            notice1 = notice.objects.all().order_by('-id')[0:5]
         except:
             notice1 = ""
         return render(request, 'student/add_users.html', {'groups': Group.objects.all(),'gname':gp.name,'perm':perm,
@@ -435,7 +438,7 @@ def addusers(request):
                                                           'notice':notice1})
 
     try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        notice1 = notice.objects.all().order_by('-id')[0:5]
     except:
         notice1 = ""
     up = user_profile.objects.all().filter(user_id=request.user.id)[0]
@@ -462,7 +465,7 @@ def sheetdata(request,table):
     SHEET_NAMES = sheetsapi.getsheetnames(SPREADSHEET_ID=SPREADSHEET_ID)
 
     try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        notice1 = notice.objects.all().order_by('-id')[0:5]
     except:
         notice1 = ""
 
@@ -479,7 +482,7 @@ def viewmembers(request):
         gnames.append(g.name)
 
     try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        notice1 = notice.objects.all().order_by('-id')[0:5]
     except:
         notice1 = ""
     return render(request, 'student/view_users.html', {'sheetnames': gnames,'notice':notice1})
@@ -503,7 +506,7 @@ def viewprofile(request):
         rc = ""
 
     try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        notice1 = notice.objects.all().order_by('-id')[0:5]
     except:
         notice1 = ""
 
@@ -520,28 +523,6 @@ def viewprofile(request):
     return render(request,'student/profile.html',{'profile':profile,'up':up,'rc':rc,'notice':notice1,
                                                   'performance':performance})
 
-###
-@login_required(login_url='')
-def viewnotice(request):
-    data = notice.objects.all().order_by('-generateddate')
-    try:
-        pageno = request.GET['page']
-    except:
-        pageno = 1
-
-    if pageno == 1:
-        p = Paginator(data, 11)
-    else:
-        p = Paginator(data, 12)
-    page = p.page(pageno)
-
-    up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-
-    try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
-    except:
-        notice1 = ""
-    return render(request,'student/view_notice.html',{'up':up,'data':page,'notice':notice1})
 
 ###
 @login_required(login_url='')
@@ -550,7 +531,7 @@ def attendance(request):
     SHEET_NAMES = sheetsapi.getsheetnames(SPREADSHEET_ID=SPREADSHEET_ID)
 
     try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        notice1 = notice.objects.all().order_by('-id')[0:5]
     except:
         notice1 = ""
     return render(request,'student/attendance.html',{'sheetnames':SHEET_NAMES,'notice':notice1})
@@ -561,7 +542,7 @@ def studentattendance(request):
     us = User.objects.get(id=request.user.id)
     gps = us.groups.all()
     data =[]
-    SPREADSHEET_ID = extra_data.objects.get(name='Attendance').value
+    SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
     for g in gps:
         c = groupsinfo.objects.get(group=g.id).course
         value = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=g.name)
@@ -572,35 +553,12 @@ def studentattendance(request):
                 data.append({'course':c,'per':round(v.count('p')/(len(v)-6)*100,2)})
 
     try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        notice1 = notice.objects.all().order_by('-id')[0:5]
     except:
         notice1 = ""
     return render(request,'student/studentattendance.html',{'notice':notice1,'data':data,'gps':gps})
 
-###
-@login_required(login_url='')
-def addnotice(request):
-    if request.method == 'POST':
-        notice.addnoticein(request)
-    data = notice.objects.all().order_by('-generateddate').filter(createdby=request.user)
-    try:
-        pageno = request.GET['page']
-    except:
-        pageno = 1
 
-    if pageno == 1:
-        p = Paginator(data,11)
-    else:
-        p = Paginator(data,12)
-    page = p.page(pageno)
-
-    up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-
-    try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
-    except:
-        notice1 = ""
-    return render(request,'student/add_notice.html',{'data':page,'up':up,'notice':notice1})
 
 ###
 @login_required(login_url='')
@@ -617,7 +575,7 @@ def request_certificate(request):
 @login_required(login_url='')
 def addcertificate(request):
     try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        notice1 = notice.objects.all().order_by('-id')[0:5]
     except:
         notice1 = ""
     return render(request,'student/add_certificate.html',{'notice':notice1})
@@ -683,7 +641,7 @@ def viewfeedback(request):
     SHEET_NAMES = sheetsapi.getsheetnames(SPREADSHEET_ID=SPREADSHEET_ID)
 
     try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        notice1 = notice.objects.all().order_by('-id')[0:5]
     except:
         notice1 = ""
 
@@ -693,7 +651,7 @@ def viewfeedback(request):
 @login_required(login_url='')
 def schedule(request):
     try:
-        notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+        notice1 = notice.objects.all().order_by('-id')[0:5]
     except:
         notice1 = ""
     return render(request,'student/schedule.html',{'notice': notice1})
@@ -738,94 +696,92 @@ def get_data(request,table):
 ###
 @login_required(login_url='')
 def set_data(request,table):
-    print(request.GET)
-    if table != 'attendance':
-        rowv = request.GET.getlist('rowv[]')
-        row = rowv[0]
-        rowv = rowv[1::]
-        SHEET_NAME = request.GET['sheetname']
-        if table == 'student_profile':
-            SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
-        if table == 'student_performance':
-            SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
-            rowv[student_performance.index('C Total Marks')] = '=sum(INDIRECT("N"&row()),INDIRECT("O"&row()),INDIRECT("P"&row()))'
-            rowv[student_performance.index('Sql Total Marks')] = '=sum(INDIRECT("U"&row()),INDIRECT("V"&row()),INDIRECT("W"&row()))'
-            rowv[student_performance.index('WD Total Marks')] = '=sum(INDIRECT("AB"&row()),INDIRECT("AC"&row()))'
-            rowv[student_performance.index('Core Total Marks')] = '=sum(INDIRECT("AL"&row()),INDIRECT("AM"&row()),INDIRECT("AN"&row()))'
-            rowv[student_performance.index('Adv Total Marks')] = '=sum(INDIRECT("AT"&row()),INDIRECT("AU"&row(),INDIRECT("AV"&row()))'
-            rowv[student_performance.index('Total Marks (Out of 700)')] = '=sum(INDIRECT("Q"&row()),INDIRECT(&row()),INDIRECT("AD"&row()),INDIRECT("AM"&row()),INDIRECT("AU"&row()),INDIRECT("BA"&row()))'
-            rowv[student_performance.index('Eligible For Certificate(Y/N)')] = '''=IF(AND(INDIRECT("N"&ROW())>27,INDIRECT("O"&ROW())>27,INDIRECT("P"&ROW())>13,INDIRECT("U"&ROW())>27,INDIRECT("V"&ROW())>27,INDIRECT("W"&ROW())>27,INDIRECT("AB"&ROW())>105,INDIRECT("AC"&ROW())>17,NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),INDIRECT("AJ"&ROW())>27,INDIRECT("AK"&ROW())>27,INDIRECT("AL"&ROW())>13,NOT(ISBLANK(INDIRECT("AN"&ROW()))),INDIRECT("AR"&ROW())>27,INDIRECT("AS"&ROW())>27,INDIRECT("AT"&ROW())>13,NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),INDIRECT("BA"&ROW())>70,NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
-            rowv[student_performance.index('Eligible For Placement(Y/N)')] = '''=IF(AND(,NOT(ISBLANK(INDIRECT("N"&ROW()))),NOT(ISBLANK(INDIRECT("O"&ROW()))),NOT(ISBLANK(INDIRECT("P"&ROW()))),NOT(ISBLANK(INDIRECT("U"&ROW()))),NOT(ISBLANK(INDIRECT("V"&ROW()))),NOT(ISBLANK(INDIRECT("W"&ROW()))),NOT(ISBLANK(INDIRECT("AB"&ROW()))),NOT(ISBLANK(INDIRECT("AC"&ROW()))),NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),NOT(ISBLANK(INDIRECT("AJ"&ROW()))),NOT(ISBLANK(INDIRECT("AK"&ROW()))),NOT(ISBLANK(INDIRECT("AL"&ROW()))),NOT(ISBLANK(INDIRECT("AN"&ROW()))),NOT(ISBLANK(INDIRECT("AR"&ROW()))),NOT(ISBLANK(INDIRECT("AS"&ROW()))),NOT(ISBLANK(INDIRECT("AT"&ROW()))),NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),NOT(ISBLANK(INDIRECT("BA"&ROW()))),NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
-        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME, row=int(row)+1, value=[rowv])
-    elif table == 'attendance':
+    try:
+        if table != 'attendance':
+            rowv = request.GET.getlist('rowv[]')
+            row = rowv[0]
+            rowv = rowv[1::]
+            SHEET_NAME = request.GET['sheetname']
+            if table == 'student_profile':
+                SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
+            if table == 'student_performance':
+                SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
+                rowv[all_fields_index['student_performance']['C Total Marks (Out of 100)']] = marks['C Total Marks (Out of 100)']
+                rowv[all_fields_index['student_performance']['Sql Total Marks (Out of 100)']] = marks['Sql Total Marks (Out of 100)']
+                rowv[all_fields_index['student_performance']['WD Total Marks (Out of 200)']] = marks['WD Total Marks (Out of 200)']
+                rowv[all_fields_index['student_performance']['Core Total Marks (Out of 100)']] = marks['Core Total Marks (Out of 100)']
+                rowv[all_fields_index['student_performance']['Adv Total Marks (Out of 100)']] = marks['Adv Total Marks (Out of 100)']
+                rowv[all_fields_index['student_performance']['Total Marks (Out of 700)']] = marks['Total Marks (Out of 700)']
+                rowv[student_performance.index('Eligible For Certificate(Y/N)')] = '''=IF(AND(INDIRECT("N"&ROW())>27,INDIRECT("O"&ROW())>27,INDIRECT("P"&ROW())>13,INDIRECT("U"&ROW())>27,INDIRECT("V"&ROW())>27,INDIRECT("W"&ROW())>27,INDIRECT("AB"&ROW())>105,INDIRECT("AC"&ROW())>17,NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),INDIRECT("AJ"&ROW())>27,INDIRECT("AK"&ROW())>27,INDIRECT("AL"&ROW())>13,NOT(ISBLANK(INDIRECT("AN"&ROW()))),INDIRECT("AR"&ROW())>27,INDIRECT("AS"&ROW())>27,INDIRECT("AT"&ROW())>13,NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),INDIRECT("BA"&ROW())>70,NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
+                rowv[student_performance.index('Eligible For Placement(Y/N)')] = '''=IF(AND(,NOT(ISBLANK(INDIRECT("N"&ROW()))),NOT(ISBLANK(INDIRECT("O"&ROW()))),NOT(ISBLANK(INDIRECT("P"&ROW()))),NOT(ISBLANK(INDIRECT("U"&ROW()))),NOT(ISBLANK(INDIRECT("V"&ROW()))),NOT(ISBLANK(INDIRECT("W"&ROW()))),NOT(ISBLANK(INDIRECT("AB"&ROW()))),NOT(ISBLANK(INDIRECT("AC"&ROW()))),NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),NOT(ISBLANK(INDIRECT("AJ"&ROW()))),NOT(ISBLANK(INDIRECT("AK"&ROW()))),NOT(ISBLANK(INDIRECT("AL"&ROW()))),NOT(ISBLANK(INDIRECT("AN"&ROW()))),NOT(ISBLANK(INDIRECT("AR"&ROW()))),NOT(ISBLANK(INDIRECT("AS"&ROW()))),NOT(ISBLANK(INDIRECT("AT"&ROW()))),NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),NOT(ISBLANK(INDIRECT("BA"&ROW()))),NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
+            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME, row=int(row)+1, value=[rowv])
+        elif table == 'attendance':
+            SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
+            rowv = request.GET.getlist('rowv[]')
+            row = request.GET['row']
+            SHEET_NAME = request.GET['sheetname']
+
+            if (type(rowv[0])==int):
+                rowv = [x for x in rowv]
+            else:
+                rowv = [int(x) for x in rowv]
+
+            date = datetime.now()
+            day = date.strftime("%d")
+            month = date.strftime("%m")
+            year = date.strftime("%Y")
+
+            currentdate=day+"/"+month+"/"+year
+            present = [currentdate]
+
+            for i in range(0,max(rowv)+1):
+                if i in rowv:
+                    present.append("p")
+                else:
+                    present.append("")
+            print(rowv,max(rowv),present)
+            row = int(row) if request.GET['update']=='true' else int(row)+1
+
+            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,value=[present],SHEET_NAME=SHEET_NAME,col=row,row=0,dimension="COLUMNS")
+            return HttpResponse('Success')
+    except:
+        return HttpResponse('Failed')
+
+###
+@login_required(login_url='')
+def attendance_update(request):
+    try:
         SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
         rowv = request.GET.getlist('rowv[]')
         row = request.GET['row']
         SHEET_NAME = request.GET['sheetname']
-        # print(rowv)
-        if (type(rowv[0])==int):
+
+        if (type(rowv[0]) == int):
             rowv = [x for x in rowv]
         else:
             rowv = [int(x) for x in rowv]
-        # print(rowv)
 
-        # rowv.sort()
         date = datetime.now()
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
 
-        currentdate=day+"/"+month+"/"+year
+        currentdate = day + "/" + month + "/" + year
         present = [currentdate]
 
-        for i in range(0,max(rowv)+1):
+        for i in range(0, max(rowv) + 1):
             if i in rowv:
                 present.append("p")
             else:
                 present.append("")
-        print(rowv,max(rowv),present)
-        row = int(row) if request.GET['update']=='true' else int(row)+1
-        # col=""
-        # while row>1:
-        #     col+=(chr((row%26)+65))
-        #     row = row/26
 
-        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,value=[present],SHEET_NAME=SHEET_NAME,col=row,row=0,dimension="COLUMNS")
-        # messages.info(request,'Data saved successfully')
-    return HttpResponse("success")
+        row = int(row)
+        col = row
 
-###
-@login_required(login_url='')
-def attendance_update(request):
-    SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
-    rowv = request.GET.getlist('rowv[]')
-    row = request.GET['row']
-    SHEET_NAME = request.GET['sheetname']
-
-    if (type(rowv[0]) == int):
-        rowv = [x for x in rowv]
-    else:
-        rowv = [int(x) for x in rowv]
-
-    date = datetime.now()
-    day = date.strftime("%d")
-    month = date.strftime("%m")
-    year = date.strftime("%Y")
-
-    currentdate = day + "/" + month + "/" + year
-    present = [currentdate]
-
-    for i in range(0, max(rowv) + 1):
-        if i in rowv:
-            present.append("p")
-        else:
-            present.append("")
-
-    row = int(row)
-    col = row
-
-    sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, value=present, SHEET_NAME=SHEET_NAME,col=col,row=1, dimension="COLUMNS")
-    return HttpResponse("")
+        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, value=present, SHEET_NAME=SHEET_NAME,col=col,row=1, dimension="COLUMNS")
+        return HttpResponse('Success')
+    except:
+        return HttpResponse('Failed')
 
 ###
 @login_required(login_url='')
@@ -850,17 +806,20 @@ def get_user(request):
 ###
 @login_required(login_url='')
 def set_user(request):
-    values = request.GET['values'].replace('{','').replace('}','').replace('"','').replace("'",'').split(',')
-    val={}
-    for i in values:
-        kv=i.split(':')
-        val[kv[0].lower()]=kv[1]
-    us = User.objects.get(id=val['id'])
-    us.is_staff = val['is_staff'].capitalize()
-    us.is_active = val['is_active'].capitalize()
-    us.save()
-    # messages.info(request,'Changes saved successfully')
-    return HttpResponse('succcess')
+    try:
+        values = request.GET['values'].replace('{','').replace('}','').replace('"','').replace("'",'').split(',')
+        val={}
+        for i in values:
+            kv=i.split(':')
+            val[kv[0].lower()]=kv[1]
+        us = User.objects.get(id=val['id'])
+        us.is_staff = val['is_staff'].capitalize()
+        us.is_active = val['is_active'].capitalize()
+        us.save()
+        return HttpResponse('Success')
+    except:
+        return HttpResponse('Failed')
+
 
 ###
 @login_required(login_url='')

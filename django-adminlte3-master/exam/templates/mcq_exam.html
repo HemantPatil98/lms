@@ -41,257 +41,225 @@
 </style>
 {%endblock%}
 {%load static%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>MCQ Test</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">MCQ Test</li>
-            </ol>
-          </div>
-        </div>
-      </div><!-- /.container-fluid -->
-    </section>
-    {%endblock%}
 
-    <!-- Main content -->
-    {%block content%}
-    <span id="timer"><i class="fas fa-stopwatch" aria-hidden="true"></i> <span></span></span>
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-12">
-            <!-- general form elements -->
-            <div class="card card-primary">
-              <div class="card-header bg-info">
-                <div class="form-group">
-                  <i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
-                  {{crs.instructions}}
-                </div>
+{%block page_link%}
+{%block page_title%}
+Exam
+{%endblock%}
+{%endblock%}
+
+{%block content%}
+<span id="timer"><i class="fas fa-stopwatch" aria-hidden="true"></i> <span></span></span>
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="card card-primary">
+          <div class="card-header bg-info">
+            <div class="form-group">
+              <i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
+              {{crs.instructions}}
+            </div>
+          </div>
+          <!-- /.card-header -->
+          <!-- form start -->
+          <form action="{%if not crs%}{%url 'mcq_exam'%}{%endif%}#" method="POST">
+            {%csrf_token%}
+            <div class="card-body" style="border: 2px solid #17a2b8;">
+            	<div class="row">
+
+              <div class="form-group col-md-4">
+              <label>Course</label>
+              {%if crs%}
+              <div class="form-group">
+                <input type="text" name="cname" value="{{crs}}" class="form-control" readonly="">
               </div>
-              <!-- /.card-header -->
-              <!-- form start -->
-              <form action="{%if not crs%}{%url 'mcq_exam'%}{%endif%}#" method="POST">
-                {%csrf_token%}
-                <div class="card-body" style="border: 2px solid #17a2b8;">
-                	<div class="row">
-
-                  <!-- <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">Group Name</label>
-                    <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
-                  </div> -->
-                  <div class="form-group col-md-4">
-                  <label>Course</label>
-                  {%if crs%}
-                  <div class="form-group">
-                    <input type="text" name="cname" value="{{crs}}" class="form-control" readonly="">
-                  </div>
-                  {%else%}
-                  <select class="form-control {%if not crs%}select2{%endif%}" style="width: 100%;" name="cname" {%if crs%}disabled{%endif%}>
-                    {%for course in courses%}
-                    <option {%if crs ==  course%}selected{%endif%}>{{course}}</option>
-                    {%endfor%}}
-                  </select>
-                  {%endif%}
-                	</div>
-                	<div class="form-group col-md-4">
-                		<div class="row">
-                			<div class="col-md-6">
-                				<label>Section</label>
-		                		<select class="form-control select2" name="type" {%if crs%}disabled{%endif%}>
-		                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>MCQ</option>
-                          <option {%if crs.type == 'PRACTICAL' %}selected{%endif%}>PRACTICAL</option>
-		                			<option {%if crs.type == 'PROGRAM' %}selected{%endif%}>PROGRAM</option>
-		                		</select>
-		                		{%if crs%}
-				                  <input type="hidden" name="type" value="{{crs.type}}">
-				                  {%endif%}
-		                	</div>
-		                	<div class="col-md-6">
-                        {%if crs%}
-                				<label>Duration</label><br>
-		                		<span id="time" style="font-size: xx-large;"><input type="number" class="form-control center" name="time" placeholder="Duration in minutes" value="{{crs.time}}"  {%if crs%}disabled{%endif%}></span>
-		                		{%endif%}
-		                	</div>
-                		</div>
-                		
-                	</div>
-                	<div class="form-group col-md-4">
-                		<!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
-                    <div class="row">
-                      <div class="col-md-6">
-                        <label id='marks-head'>Marks Scored: </label><br>
-                        <label>Out Off: 40</label>
-                      </div>
-                      <div class="col-md-6">
-                        <label>Previous Attempts: {{attempt}}</label><br>
-                        <label>Total Attempts : {{crs.attempts_allowed}}</label>
-                      </div>
-
-                    </div>
-                	</div>
-                	</div>
-                 {%if crs%}
-                 <div>
-                 	<hr>
-                 	<div id="add_questions_form" class="row hide">
-                 		<div class="col-md-12">
-                 			<div class="card ">
-				              <!-- <div class="card-header bg-info">
-				                <div class="form-group">
-				                	<i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
-                          {{crs.instructions}}
-				                </div>
-				              </div> -->
-				              <!-- /.card-header -->
-				              <!-- form start -->
-				                <div class="card-body" id="body" style="height: 800px;overflow: auto;">
-				                {%for que in ques_set%}
-                        <div class='question' id='{{que.id}}'>
-                         <div>
-                            <div class="form-group">
-                                <label for="question">Question #{{forloop.counter}}</label>
-                                <!-- <textarea name="question" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea> -->
-                                <div class="form-control">{{que.question}}</div>
-                            </div>
-                            <div id="choice" class="row">
-                            
-                            <div class="form-group col-md-6">
-                                <div class="input-group">
-                                  <div class="input-group-append">
-                                      <div class="input-group-text"><input type="radio" id="option1{{que.id}}" name="ans{{que.id}}" value="{{que.option1}}"></div>
-                                </div>
-                                <label for="option1{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option1}}</label>  
-                              </div>
-                              </div>
-                            <div class="form-group col-md-6">
-                                <div class="input-group">
-                                  <div class="input-group-append">
-                                      <div class="input-group-text"><input type="radio" id="option2{{que.id}}" name="ans{{que.id}}" value="{{que.option2}}"></div>
-                                </div>
-                                <label for="option2{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option2}}</label>  
-                              </div>
-                              </div>
-                              <div class="form-group col-md-6">
-                                <div class="input-group">
-                                  <div class="input-group-append">
-                                      <div class="input-group-text"><input type="radio" id="option3{{que.id}}" name="ans{{que.id}}" value="{{que.option3}}"></div>
-                                </div>
-                                <label for="option3{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option3}}</label>  
-                              </div>
-                              </div>
-                              <div class="form-group col-md-6">
-                                <div class="input-group">
-                                  <div class="input-group-append">
-                                      <div class="input-group-text"><input type="radio" id="option4{{que.id}}" name="ans{{que.id}}" value="{{que.option4}}"></div>
-                                </div>
-                                <label for="option4{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option4}}</label>  
-                              </div>
-                              </div>
-                          </div>
-                        </div>
-                    </div>
-                        <hr>
-
-
-                        {%endfor%}
-				                </div>
-				                
-				                <!-- /.card-body -->
-				            </div>
-                 		</div>
-                 	</div>
-                 </div>
-                  
-                 {%endif%}
-                <!-- /.card-body -->
+              {%else%}
+              <select class="form-control {%if not crs%}select2{%endif%}" style="width: 100%;" name="cname" {%if crs%}disabled{%endif%}>
+                {%for course in courses%}
+                <option {%if crs ==  course%}selected{%endif%}>{{course}}</option>
+                {%endfor%}}
+              </select>
+              {%endif%}
             	</div>
-                <div class="card-footer">
-                  <input name="submit" type="submit" class="btn btn-primary">
-                  <!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
-                </div>
-              </form>
-            </div>
-        </div>
-      </div>
-    </section>
-    <button id="alertbutton2" type="button" class="btn btn-primary" data-toggle="modal" data-target="#marksmodal" style="display: none;">
-      Launch Primary Modal
-    </button>
+            	<div class="form-group col-md-4">
+            		<div class="row">
+            			<div class="col-md-6">
+            				<label>Section</label>
+                		<select class="form-control select2" name="type" {%if crs%}disabled{%endif%}>
+                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>MCQ</option>
+                      <option {%if crs.type == 'PRACTICAL' %}selected{%endif%}>PRACTICAL</option>
+                			<option {%if crs.type == 'PROGRAM' %}selected{%endif%}>PROGRAM</option>
+                		</select>
+                		{%if crs%}
+		                  <input type="hidden" name="type" value="{{crs.type}}">
+		                  {%endif%}
+                	</div>
+                	<div class="col-md-6">
+                    {%if crs%}
+            				<label>Duration</label><br>
+                		<span id="time" style="font-size: xx-large;"><input type="number" class="form-control center" name="time" placeholder="Duration in minutes" value="{{crs.time}}"  {%if crs%}disabled{%endif%}></span>
+                		{%endif%}
+                	</div>
+            		</div>
+            		
+            	</div>
+            	<div class="form-group col-md-4">
+            		<!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
+                <div class="row">
+                  <div class="col-md-6">
+                    <label id='marks-head'>Marks Scored: </label><br>
+                    <label>Out Off: 40</label>
+                  </div>
+                  <div class="col-md-6">
+                    <label>Previous Attempts: {{attempt}}</label><br>
+                    <label>Total Attempts : {{crs.attempts_allowed}}</label>
+                  </div>
 
-      <div class="modal fade" id="marksmodal">
-        <div class="modal-dialog">
-          <div class="modal-content bg-success">
-            <div class="modal-header">
-              <h4 class="modal-title" style="margin-right: 35px;">Course : {{crs.name}}</h4>
-              <h4 class="modal-title" style="right: 0;">Type : {{crs.type}}</h4>
-              <button type="button" class="close closelink" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-           
-            <div class="modal-body">
-              <!-- <p>One fine body&hellip;</p> -->
+                </div>
+            	</div>
+            	</div>
+             {%if crs%}
+             <div>
+             	<hr>
+             	<div id="add_questions_form" class="row hide">
+             		<div class="col-md-12">
+             			<div class="card ">
+		                <div class="card-body" id="body" style="height: 800px;overflow: auto;">
+		                {%for que in ques_set%}
+                    <div class='question' id='{{que.id}}'>
+                     <div>
+                        <div class="form-group">
+                            <label for="question">Question #{{forloop.counter}}</label>
+                            <div class="form-control">{{que.question}}</div>
+                        </div>
+                        <div id="choice" class="row">
+                        
+                        <div class="form-group col-md-6">
+                            <div class="input-group">
+                              <div class="input-group-append">
+                                  <div class="input-group-text"><input type="radio" id="option1{{que.id}}" name="ans{{que.id}}" value="{{que.option1}}"></div>
+                            </div>
+                            <label for="option1{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option1}}</label>  
+                          </div>
+                          </div>
+                        <div class="form-group col-md-6">
+                            <div class="input-group">
+                              <div class="input-group-append">
+                                  <div class="input-group-text"><input type="radio" id="option2{{que.id}}" name="ans{{que.id}}" value="{{que.option2}}"></div>
+                            </div>
+                            <label for="option2{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option2}}</label>  
+                          </div>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <div class="input-group">
+                              <div class="input-group-append">
+                                  <div class="input-group-text"><input type="radio" id="option3{{que.id}}" name="ans{{que.id}}" value="{{que.option3}}"></div>
+                            </div>
+                            <label for="option3{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option3}}</label>  
+                          </div>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <div class="input-group">
+                              <div class="input-group-append">
+                                  <div class="input-group-text"><input type="radio" id="option4{{que.id}}" name="ans{{que.id}}" value="{{que.option4}}"></div>
+                            </div>
+                            <label for="option4{{que.id}}" qno={{que.id}} class="form-control" onclick="option(this)">{{que.option4}}</label>  
+                          </div>
+                          </div>
+                      </div>
+                    </div>
+                </div>
+                    <hr>
+
+
+                    {%endfor%}
+		                </div>
+		                
+		                <!-- /.card-body -->
+		            </div>
+             		</div>
+             	</div>
+             </div>
               
-              <h2 class="modal-title" id="marks-modal">Marks Scored : </h2>
-              <h2 class="modal-title" id="attempts">Attempt remaining: </h2>
+             {%endif%}
+            <!-- /.card-body -->
+        	</div>
+            <div class="card-footer">
+              <input name="submit" type="submit" class="btn btn-primary">
+              <!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
             </div>
-            <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-outline-light closelink" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-outline-light reattempt">Re attempt</button>
-            </div>
-          </div>
-          <!-- /.modal-content -->
+          </form>
         </div>
-        <!-- /.modal-dialog -->
+    </div>
+  </div>
+</section>
+<button id="alertbutton2" type="button" class="btn btn-primary" data-toggle="modal" data-target="#marksmodal" style="display: none;">
+  Launch Primary Modal
+</button>
+
+  <div class="modal fade" id="marksmodal">
+    <div class="modal-dialog">
+      <div class="modal-content bg-success">
+        <div class="modal-header">
+          <h4 class="modal-title" style="margin-right: 35px;">Course : {{crs.name}}</h4>
+          <h4 class="modal-title" style="right: 0;">Type : {{crs.type}}</h4>
+          <button type="button" class="close closelink" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+       
+        <div class="modal-body">
+          <!-- <p>One fine body&hellip;</p> -->
+          
+          <h2 class="modal-title" id="marks-modal">Marks Scored : </h2>
+          <h2 class="modal-title" id="attempts">Attempt remaining: </h2>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-outline-light closelink" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-outline-light reattempt">Re attempt</button>
+        </div>
       </div>
-      <!-- /.modal -->
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
 <button id="alertbutton1" type="button" class="btn btn-primary" data-toggle="modal" data-target="#alertmodal" style="display: none;">
       Launch Primary Modal
     </button>
 
-      <div class="modal fade" id="alertmodal">
-        <div class="modal-dialog">
-          <div class="modal-content bg-warning">
-            <div class="modal-header">
-              <h4 class="modal-title">Warning! </h4>
-              <!-- <h4 class="modal-title" style="right: 0;">Type : {{crs.type}}</h4> -->
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-           
-            <div class="modal-body" id="alertbody">
-              <!-- <p>One fine body&hellip;</p> -->
-              
-              <h4 class="modal-title">Your are not allowed to leave this page while exam.</h4>
-              <h4 class="modal-title">Next time exam will get automatically submit</h4>
-            </div>
-            <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
-              <!-- <button type="button" class="btn btn-outline-light">Re attempt</button> -->
-            </div>
-          </div>
-          <!-- /.modal-content -->
+  <div class="modal fade" id="alertmodal">
+    <div class="modal-dialog">
+      <div class="modal-content bg-warning">
+        <div class="modal-header">
+          <h4 class="modal-title">Warning! </h4>
+          <!-- <h4 class="modal-title" style="right: 0;">Type : {{crs.type}}</h4> -->
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-        <!-- /.modal-dialog -->
+       
+        <div class="modal-body" id="alertbody">
+          <!-- <p>One fine body&hellip;</p> -->
+          
+          <h4 class="modal-title">Your are not allowed to leave this page while exam.</h4>
+          <h4 class="modal-title">Next time exam will get automatically submit</h4>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+          <!-- <button type="button" class="btn btn-outline-light">Re attempt</button> -->
+        </div>
       </div>
-      <!-- /.modal -->
-
-    {%endblock%}
-    <!-- /.content -->
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
   </div>
-  <!-- /.content-wrapper -->
+  <!-- /.modal -->
+{%endblock%}
 
-    {%block script%}
+{%block script%}
 {%if crs%}
 {%if crs.type == 'MCQ'%}
 <script type="text/javascript">
@@ -315,14 +283,10 @@ function startTimer(duration, display) {
         }
 
         if (--timer < 0) {
-            // exit();
-            // stopTimer(fiveMinutes);
             $('#time').addClass('text-danger');
             $('#timer').addClass('text-danger');
             $("input[name='submit']").trigger('click');
-            // $("input[name='submit']").trigger('click');
             clearInterval(window.a);
-            // exit();
         }
     }, 1000);
   }
@@ -332,18 +296,11 @@ function startTimer(duration, display) {
   if(getCookie('que_ans') != ""){
     que_ans = JSON.parse(getCookie('que_ans'));
     keys = Object.keys(que_ans);
-    // console.log(que_ans);
-    // console.log(keys);
    for (i=0;i<que_ans.length;i++){
     a = que_ans[i];
-    // console.log(a.pno);
     program = $('.program')[i];
     $(program).attr('id','que'+a.pno);
     $(program).text(a.pro);
-    // console.log($('.program')[i]);
-    // ans = $('.ans')[i];
-    // $(ans).val(a.ans);
-    // $(ans).attr('name','ans'+a.pno);
    }
 
   }
@@ -354,7 +311,6 @@ function startTimer(duration, display) {
     startTimer(fiveMinutes, display);
   }
   else{
-    // duration = $("input[name='time']").val();
     var fiveMinutes = parseInt(getCookie('timer'),10),
         display = document.querySelector("#time");
     startTimer(fiveMinutes, display);
@@ -398,18 +354,26 @@ function startTimer(duration, display) {
     qno = [];
     $(".question").each(function(){
       qno.push($(this).attr('id'));
-      // console.log($("input[name='"+qno+"']"))
+
     })
     clearInterval(window.a);
-    // console.log(qno);
-    // console.log( $("form" ).serialize()+"&qnos="+qno );
+
     $.post( "{%url 'mcq_validate'%}", $( "form" ).serialize()+"&qnos="+qno ).done(function(data){
-    $('form input').attr('disabled','disabled');
-    $('form label').attr('onclick','false');
-    // console.log(data.replaceAll("'",'"'));
-      // console.log(JSON.parse(data.replaceAll("'",'"')));
+      document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+      document.cookie = "que_ans=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+      x = $('html');
+        if (x.removeEventListener) {
+          x.removeEventListener("mousemove", myFunction);
+        } else if (x.detachEvent) {
+          x.detachEvent("onmousemove", myFunction);
+        }
+
+        window.alertf = 2;
+      $('form input').attr('disabled','disabled');
+      $('form label').attr('onclick','false');
+
       data = JSON.parse(data.replaceAll("'",'"'));
-      // console.log(data);
+
       window.marks = parseInt(data.marks);
       $('#marks-head').append(marks);
       $('#marks-modal').append(marks);
@@ -427,12 +391,11 @@ function startTimer(duration, display) {
         $('#marks-head').addClass('text-danger');
         $('.modal-content').addClass('bg-danger');
       }
-      $('#attempts').append(data.attempt);
-      // $("input[name='submit']").trigger('click');
+      $('#attempts').append(data.attempt-1);
+
       $.each(data.answers,function(){
         qno = this.question;
-        // console.log(qno);
-          // console.log($("label[for=option1"+qno+"]").text(),this.answer);
+
         if($("label[for=option1"+qno+"]").text() == this.answer){
           if ($("label[for=option1"+qno+"]").hasClass('btn-info')) {
             $("label[for=option1"+qno+"]").removeClass('btn-info');
@@ -489,8 +452,7 @@ function startTimer(duration, display) {
             $("label[for=option4"+qno+"]").removeClass('btn-info');
           }
         }
-         document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
-      document.cookie = "que_ans=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+
       });
     });
 
@@ -504,11 +466,9 @@ function startTimer(duration, display) {
 
 
 <script>
-  var alertf = 0;
+  window.alertf = 0;
   var result =true;
-  $('.closelink').click(function(){
-    window.location.href = "{%url 'index'%}";
-  });
+
   $('.reattempt').click(function(){
     window.location.href = "{%url 'mcq_exam'%}";
   });
@@ -516,15 +476,15 @@ function startTimer(duration, display) {
   // $('.content').attr('onmouseleave',"alert('')");
   $('html').mouseleave(function(){
     // alert(alertf==0);
-    if (alertf==0){
+    if (window.alertf==0){
       $('#alertbutton1').trigger('click');
       alertf +=1;
     }
-    else if(alertf==1){
+    else if(window.alertf==1){
       if (result) {
         $('#alertbutton1').trigger('click');
       $("input[type='submit']").trigger('click');
-      result=false;alertf+=1
+      result=false;window.alertf=2;
       }
       
     }

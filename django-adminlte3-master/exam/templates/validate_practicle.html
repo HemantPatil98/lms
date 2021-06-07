@@ -22,72 +22,54 @@
   }
 </style>
 {%endblock%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Student Data</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Student Data</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    {%endblock%}
-    <!-- /.content-header -->
 
-    <!-- Main content -->
-    {%block content%}
-    <section class="content">
-      <div class="card card-primary">
-        <div class="card-header row">
-          <h3 class="card-title col-md-8 col-sm-6">Student Profile</h3>
+{%block page_link%}
+{%block page_title%}
+Validate Practical
+{%endblock%}
+{%endblock%}
 
-          <div class="col-md-4 col-sm-5">
-            <!-- <label>Custom Select</label> -->
-            <select name="cname" class="custom-select col-6" onchange="load()">
-              {%for course in courses%}
-              <option value="{{course}}">{{course}}</option>
-              {%endfor%}
-            </select>
-            <select name="type" class="custom-select col-5" onchange="load()">
-              <option value="MCQ">MCQ</option>
-              <option value="PRACTICAL">PRACTICAL</option>
-              <option value="PROGRAM">PROGRAM</option>
-            </select>
-          </div>
-        </div>
-        <!-- /.card-header -->
-        <div class="card-body">
-          <div id="grid"></div>
-        </div>
-        <!-- /.card-body -->
+{%block content%}
+<section class="content">
+  <div class="card card-primary">
+    <div class="card-header row">
+      <h3 class="card-title col-md-8 col-sm-6">Student Profile</h3>
+
+      <div class="col-md-4 col-sm-5">
+        <!-- <label>Custom Select</label> -->
+        <select name="cname" class="custom-select col-6" onchange="load()">
+          {%for course in courses%}
+          <option value="{{course}}">{{course}}</option>
+          {%endfor%}
+        </select>
+        <select name="type" class="custom-select col-5" onchange="load()">
+          <option value="MCQ">MCQ</option>
+          <option value="PRACTICAL">PRACTICAL</option>
+          <option value="PROGRAM">PROGRAM</option>
+        </select>
       </div>
-      <!-- /.card -->
-    </section>
-    {%endblock%}
-    <!-- /.content -->
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+      <div id="grid"></div>
+    </div>
+    <!-- /.card-body -->
   </div>
-  <!-- /.content-wrapper -->
+  <!-- /.card -->
+</section>
+{%endblock%}
+
 {%block script%}
 <style type="text/css">
   .hide{
     display: none;
   }
 </style>
-<!-- <script type="text/javascript" src="{%static 'student/dist/js/student_profile.js'%}"></script> -->
+
 <script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
 
 <script type="text/javascript">
-  // window.db = db;
+
   var db = {};
   load();
  function load(){
@@ -115,7 +97,7 @@ console.log(type);
             { name: "ATTEMPT", type: "text",width:70,editing:false},
             { name: "MARKS", type: "text",width:100,editing:false},
             { name: "PROGRAMS", type: "text",width:100,editing:false,itemTemplate: function(value) {
-              return "<a class='btn btn-success' href='http://127.0.0.1:8000/view/practicle/"+value+"'><i class='fa fa-eye'></i> OPEN</a>";},},
+              return "<a class='btn btn-success' href='http://127.0.0.1:8000/view/practicle/"+value+"'target='new'><i class='fa fa-eye'></i> OPEN</a>";},},
         ]
   }
   else if(type=='PROGRAM'){
@@ -136,16 +118,12 @@ console.log(type);
     $('#grid').jsGrid({fields:field});
 
 $.get(url,{cname:cname,type:type},function(data,status){
-    console.log(data);
-    console.log(JSON.parse(data.replaceAll("'",'"')));
-    // db = {};
+
     data = data.replaceAll("'",'"');
     db.data=JSON.parse(data);
-    // console.log(db.data);
+
     $('#grid').jsGrid({data:db.data});
-// wndow.db=db;
-    // db.loadData;
-    // addaction();
+
     $(".jsgrid-grid-body").keypress(function(){var keycode = (event.keyCode ? event.keyCode : event.which);
           if(keycode == '13'){window.edit_row=this;$('#grid').jsGrid('updateItem')}});
 });
@@ -189,16 +167,12 @@ $(function () {
         },
           insertItem: $.noop,
           updateItem: function(item) {
-            // console.log(Object.values(item));
-            // console.log(item);
-            // sheetname = $("select[name='sheetname']").val();
-            // console.log(sheetname);
             Url = "{%url 'setprogrammarks'%}"
             data={
                 row:item,
             }
                 $.get(Url,{id:item.ID,value:item.MARKS},function(data,status){
-                    console.log(data);
+
                 });
             },
           deleteItem: $.noop
@@ -211,8 +185,6 @@ $(function () {
             { name: "TYPE", type: "text", width: 70,editing:false},
             { name: "ATTEMPT", type: "text",width:100,editing:false},
             { name: "MARKS", type: "text",width:100,editing:true},
-            // { name: "PROGRAMS", type: "text",width:100,editing:false,itemTemplate: function(value) {
-            //   return "<a href='window.location.origin/view/practicle/"+value+"'>Link</a>";},},
         ]
     });
   });

@@ -1,4 +1,5 @@
 {%extends 'student/base.html'%}
+{%load static%}
 {%load admin_menu%}
 {%block style%}
 <style type="text/css">
@@ -8,15 +9,7 @@
 		padding: 10px;
 		margin-top: 7px;
 	}
-/*	#add_questions_form .col-md-5{
-		position: fixed;
-		top: 50%;
-	    left: 50%;
-	    transform: translate(-50%, -50%);
-	}
-	.hide{
-		display: none;
-	}*/
+
   body{
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -27,223 +20,202 @@
 }
 </style>
 {%endblock%}
-{%load static%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>MCQ Test</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">MCQ Test</li>
-            </ol>
-          </div>
-        </div>
-      </div><!-- /.container-fluid -->
-    </section>
-    {%endblock%}
 
-    <!-- Main content -->
-    {%block content%}
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-12">
-            <!-- general form elements -->
-            <div class="card card-primary">
-              <div class="card-header bg-info">
-                <div class="form-group">
-                  <i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
-                  {{crs.instructions}}
+{%block page_link%}
+{%block page_title%}
+Timeline
+{%endblock%}
+{%endblock%}
+
+{%block content%}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="card card-primary">
+          <div class="card-header bg-info">
+            <div class="form-group">
+              <i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
+              {{crs.instructions}}
+            </div>
+          </div>
+          <!-- /.card-header -->
+          <!-- form start -->
+          <form action="{%if not crs%}{%url 'view_questions' pageno=1%}{%endif%}#" method="POST">
+            {%csrf_token%}
+            <input type="hidden" name="page" value="1">
+            <div class="card-body" style="border: 2px solid #17a2b8;">
+            	<div class="row">
+
+              <!-- <div class="form-group col-md-6">
+                <label for="nameInputEmail1">Group Name</label>
+                <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
+              </div> -->
+              <div class="form-group col-md-4">
+              <label>Course</label>
+              <select class="form-control select2" style="width: 100%;" name="cname" {%if crs%}disabled{%endif%}>
+                {%for course in courses%}
+                <option {%if crs ==  course%}selected{%endif%}>{{course}}</option>
+                {%endfor%}}
+              </select>
+              {%if crs%}
+              <input type="hidden" name="cname" value="{{crs}}">
+              {%endif%}
+            	</div>
+            	<div class="form-group col-md-4">
+            		<div class="row">
+            			<div class="col-md-6">
+            				<label>Section</label>
+                		<select class="form-control select2" name="type" {%if crs%}disabled{%endif%}>
+                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>MCQ</option>
+                			<option {%if crs.type == 'PROGRAM' %}selected{%endif%}>PROGRAM</option>
+                		</select>
+                		{%if crs%}
+		                  <input type="hidden" name="type" value="{{crs.type}}">
+		                  {%endif%}
+                	</div>
+                	<div class="col-md-6">
+                    {%if crs%}
+            				<label>Duration</label><br>
+                		<span id="time" style="font-size: xx-large;"><input type="number" class="form-control center" name="time" placeholder="Duration in minutes" value="{{crs.time}}"  {%if crs%}disabled{%endif%}></span>
+                		{%endif%}
+                	</div>
+            		</div>
+            		
+            	</div>
+            	<div class="form-group col-md-4">
+            		<!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
+                <div class="row">
+                  <div class="col-md-6">
+                    <label id='marks'>Marks Scored: </label><br>
+                    <label>Out Off: 40</label>
+                  </div>
                 </div>
-              </div>
-              <!-- /.card-header -->
-              <!-- form start -->
-              <form action="{%if not crs%}{%url 'view_questions' pageno=1%}{%endif%}#" method="POST">
-                {%csrf_token%}
-                <input type="hidden" name="page" value="1">
-                <div class="card-body" style="border: 2px solid #17a2b8;">
-                	<div class="row">
-
-                  <!-- <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">Group Name</label>
-                    <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
-                  </div> -->
-                  <div class="form-group col-md-4">
-                  <label>Course</label>
-                  <select class="form-control select2" style="width: 100%;" name="cname" {%if crs%}disabled{%endif%}>
-                    {%for course in courses%}
-                    <option {%if crs ==  course%}selected{%endif%}>{{course}}</option>
-                    {%endfor%}}
-                  </select>
-                  {%if crs%}
-                  <input type="hidden" name="cname" value="{{crs}}">
-                  {%endif%}
-                	</div>
-                	<div class="form-group col-md-4">
-                		<div class="row">
-                			<div class="col-md-6">
-                				<label>Section</label>
-		                		<select class="form-control select2" name="type" {%if crs%}disabled{%endif%}>
-		                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>MCQ</option>
-		                			<option {%if crs.type == 'PROGRAM' %}selected{%endif%}>PROGRAM</option>
-		                		</select>
-		                		{%if crs%}
-				                  <input type="hidden" name="type" value="{{crs.type}}">
-				                  {%endif%}
-		                	</div>
-		                	<div class="col-md-6">
-                        {%if crs%}
-                				<label>Duration</label><br>
-		                		<span id="time" style="font-size: xx-large;"><input type="number" class="form-control center" name="time" placeholder="Duration in minutes" value="{{crs.time}}"  {%if crs%}disabled{%endif%}></span>
-		                		{%endif%}
-		                	</div>
-                		</div>
-                		
-                	</div>
-                	<div class="form-group col-md-4">
-                		<!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
-                    <div class="row">
-                      <div class="col-md-6">
-                        <label id='marks'>Marks Scored: </label><br>
-                        <label>Out Off: 40</label>
+            	</div>
+            	</div>
+             {%if crs%}
+             <div>
+             	<hr>
+             	<div id="add_questions_form" class="row hide">
+             		<div class="col-md-12">
+             			<div class="card ">
+		              <!-- <div class="card-header bg-info">
+		                <div class="form-group">
+		                	<i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
+                      {{crs.instructions}}
+		                </div>
+		              </div> -->
+		              <!-- /.card-header -->
+		              <!-- form start -->
+		                <div class="card-body" id="body">
+		                {%for que in ques_set%}
+                    <div class='question' id='{{que.id}}'>
+                     <div>
+                        <div class="form-group">
+                            <label for="question">Question #{{forloop.counter}}</label>
+                            <!-- <textarea name="question" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea> -->
+                            <div class="form-control">{{que.question}}</div>
+                        </div>
+                        <div id="choice" class="row">
+                        
+                        <div class="form-group col-md-6">
+                            <div class="input-group">
+                              <div class="input-group-append">
+                                  <div class="input-group-text"><input type="radio" id="option1{{que.id}}" name="ans{{que.id}}" value="{{que.option1}}" {%if que.option1 == que.answer%} checked {%endif%} disabled></div>
+                            </div>
+                            <label for="option1{{que.id}}" qno={{que.id}} class="form-control {%if que.option1 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option1}}</label>  
+                          </div>
+                          </div>
+                        <div class="form-group col-md-6">
+                            <div class="input-group">
+                              <div class="input-group-append">
+                                  <div class="input-group-text"><input type="radio" id="option2{{que.id}}" name="ans{{que.id}}" value="{{que.option2}}" {%if que.option2 == que.answer%} checked {%endif%} disabled></div>
+                            </div>
+                            <label for="option2{{que.id}}" qno={{que.id}} class="form-control {%if que.option2 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option2}}</label>  
+                          </div>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <div class="input-group">
+                              <div class="input-group-append">
+                                  <div class="input-group-text"><input type="radio" id="option3{{que.id}}" name="ans{{que.id}}" value="{{que.option3}}" {%if que.option3 == que.answer%} checked {%endif%} disabled></div>
+                            </div>
+                            <label for="option3{{que.id}}" qno={{que.id}} class="form-control {%if que.option3 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option3}}</label>  
+                          </div>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <div class="input-group">
+                              <div class="input-group-append">
+                                  <div class="input-group-text"><input type="radio" id="option4{{que.id}}" name="ans{{que.id}}" value="{{que.option4}}" {%if que.option4 == que.answer%} checked {%endif%} disabled></div>
+                            </div>
+                            <label for="option4{{que.id}}" qno={{que.id}} class="form-control {%if que.option4 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option4}}</label>  
+                          </div>
+                          </div>
                       </div>
                     </div>
-                	</div>
-                	</div>
-                 {%if crs%}
-                 <div>
-                 	<hr>
-                 	<div id="add_questions_form" class="row hide">
-                 		<div class="col-md-12">
-                 			<div class="card ">
-				              <!-- <div class="card-header bg-info">
-				                <div class="form-group">
-				                	<i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
-                          {{crs.instructions}}
-				                </div>
-				              </div> -->
-				              <!-- /.card-header -->
-				              <!-- form start -->
-				                <div class="card-body" id="body">
-				                {%for que in ques_set%}
-                        <div class='question' id='{{que.id}}'>
-                         <div>
-                            <div class="form-group">
-                                <label for="question">Question #{{forloop.counter}}</label>
-                                <!-- <textarea name="question" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea> -->
-                                <div class="form-control">{{que.question}}</div>
-                            </div>
-                            <div id="choice" class="row">
-                            
-                            <div class="form-group col-md-6">
-                                <div class="input-group">
-                                  <div class="input-group-append">
-                                      <div class="input-group-text"><input type="radio" id="option1{{que.id}}" name="ans{{que.id}}" value="{{que.option1}}" {%if que.option1 == que.answer%} checked {%endif%} disabled></div>
-                                </div>
-                                <label for="option1{{que.id}}" qno={{que.id}} class="form-control {%if que.option1 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option1}}</label>  
-                              </div>
-                              </div>
-                            <div class="form-group col-md-6">
-                                <div class="input-group">
-                                  <div class="input-group-append">
-                                      <div class="input-group-text"><input type="radio" id="option2{{que.id}}" name="ans{{que.id}}" value="{{que.option2}}" {%if que.option2 == que.answer%} checked {%endif%} disabled></div>
-                                </div>
-                                <label for="option2{{que.id}}" qno={{que.id}} class="form-control {%if que.option2 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option2}}</label>  
-                              </div>
-                              </div>
-                              <div class="form-group col-md-6">
-                                <div class="input-group">
-                                  <div class="input-group-append">
-                                      <div class="input-group-text"><input type="radio" id="option3{{que.id}}" name="ans{{que.id}}" value="{{que.option3}}" {%if que.option3 == que.answer%} checked {%endif%} disabled></div>
-                                </div>
-                                <label for="option3{{que.id}}" qno={{que.id}} class="form-control {%if que.option3 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option3}}</label>  
-                              </div>
-                              </div>
-                              <div class="form-group col-md-6">
-                                <div class="input-group">
-                                  <div class="input-group-append">
-                                      <div class="input-group-text"><input type="radio" id="option4{{que.id}}" name="ans{{que.id}}" value="{{que.option4}}" {%if que.option4 == que.answer%} checked {%endif%} disabled></div>
-                                </div>
-                                <label for="option4{{que.id}}" qno={{que.id}} class="form-control {%if que.option4 == que.answer%} btn-success {%endif%}" onclick="option(this)">{{que.option4}}</label>  
-                              </div>
-                              </div>
-                          </div>
-                        </div>
-                    </div>
-                        <hr>
-
-
-                        {%endfor%}
-				                </div>
-				                
-				                <!-- /.card-body -->
-                        <div class="card-footer">
-                                <nav aria-label="Page navigation example">
-          <ul class="pagination justify-content-end">
-            {% if ques_set.has_previous %}
-            <li class="page-item {%if ques_set.number == 1%} hide{%endif%}">
-                    <a class="page-link" id="1" onclick="page(this)">&laquo; First</a>
-                  </li>
-            <li class="page-item {%if ques_set.number == 1%} hide{%endif%}">
-                    <a class="page-link" id="{{ ques_set.previous_page_number }}" onclick="page(this)">< Previous</a>
-                  </li>
-            {% endif %}
-            
-            {%for i in ques_set.paginator.num_pages|range%}
-            {%if forloop.counter < 5%}
-            <li class="page-item  {%if ques_set.number == i%}active{%endif%}">
-              {%if forloop.counter == 5%}
-              <a class="page-link" href="">...</a>
-              {%else%}
-              <a class="page-link" id="{{i}}" onclick="page(this)">{{i}}</a>
-              {%endif%}
-            </li>
-            {%endif%}
-            {%endfor%}
-
-            {% if ques_set.has_next %}
-            <li class="page-item">
-                    <a class="page-link" id="{{ ques_set.next_page_number }}" onclick="page(this)">Next ></a>
-                  </li>
-            <li class="page-item">
-                    <a class="page-link" id="{{ ques_set.paginator.num_pages }}" onclick="page(this)">Last &raquo;</a>
-                  </li>
-            {% endif %}
-          </ul>
-        </nav>
-                        </div>
-				            </div>
-                 		</div>
-                 	</div>
-                 </div>
-                  
-                 {%endif%}
-                <!-- /.card-body -->
-            	</div>
-                <div class="card-footer">
-                  <input name="submit" type="submit" class="btn btn-primary">
-                  <!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
                 </div>
-              </form>
+                    <hr>
+
+
+                    {%endfor%}
+		                </div>
+		                
+		                <!-- /.card-body -->
+                    <div class="card-footer">
+                            <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-end">
+        {% if ques_set.has_previous %}
+        <li class="page-item {%if ques_set.number == 1%} hide{%endif%}">
+                <a class="page-link" id="1" onclick="page(this)">&laquo; First</a>
+              </li>
+        <li class="page-item {%if ques_set.number == 1%} hide{%endif%}">
+                <a class="page-link" id="{{ ques_set.previous_page_number }}" onclick="page(this)">< Previous</a>
+              </li>
+        {% endif %}
+        
+        {%for i in ques_set.paginator.num_pages|range%}
+        {%if forloop.counter < 5%}
+        <li class="page-item  {%if ques_set.number == i%}active{%endif%}">
+          {%if forloop.counter == 5%}
+          <a class="page-link" href="">...</a>
+          {%else%}
+          <a class="page-link" id="{{i}}" onclick="page(this)">{{i}}</a>
+          {%endif%}
+        </li>
+        {%endif%}
+        {%endfor%}
+
+        {% if ques_set.has_next %}
+        <li class="page-item">
+                <a class="page-link" id="{{ ques_set.next_page_number }}" onclick="page(this)">Next ></a>
+              </li>
+        <li class="page-item">
+                <a class="page-link" id="{{ ques_set.paginator.num_pages }}" onclick="page(this)">Last &raquo;</a>
+              </li>
+        {% endif %}
+      </ul>
+    </nav>
+                    </div>
+		            </div>
+             		</div>
+             	</div>
+             </div>
+              
+             {%endif%}
+            <!-- /.card-body -->
+        	</div>
+            <div class="card-footer">
+              <input name="submit" type="submit" class="btn btn-primary">
+              <!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
             </div>
+          </form>
         </div>
-      </div>
-
-    </section>
-    {%endblock%}
-    <!-- /.content -->
+    </div>
   </div>
-  <!-- /.content-wrapper -->
+</section>
+{%endblock%}
 
-    {%block script%}
-
+{%block script%}
 {%if crs%}
 <script type="text/javascript">
   function page(a){
@@ -254,8 +226,4 @@
  
 </script>
 {%endif%}
-
-
-
-
-    {%endblock%}
+{%endblock%}

@@ -110,7 +110,7 @@ def videopermissions(request,view='false'):
             videolist.append(v.split(".")[0])
 
         try:
-            notice1 = notice.objects.all().order_by('-generateddate')[0:5]
+            notice1 = notice.objects.all().order_by('-id')[0:5]
         except:
             notice1 = ""
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
@@ -135,4 +135,3 @@ def watched_video(request):
         status = videos_watched_status(user=request.user,course=course,watched=vid)
         status.save()
     return HttpResponse("")
-

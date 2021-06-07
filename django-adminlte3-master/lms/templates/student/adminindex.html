@@ -12,238 +12,219 @@
 </style>
 {%endblock%}
 {%load static%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Dashboard</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Dashboard</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    {%endblock%}
-    <!-- /.content-header -->
 
-    <!-- Main content -->
-    {%block content%}
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          {%if request.user.is_superuser%}
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
+{%block page_link%}
+{%block page_title%}
+Dashboard
+{%endblock%}
+{%endblock%}
 
-                <p>Add Students</p>
-              </div>
-              <div class="icon">
-                <a href="{% url 'addstudents' %}" class="icon"><i class="fas fa-user-graduate"></i></a>
-              </div>
-              <a href="{% url 'sheetdata' table='profile'%}" class="small-box-footer">
-                View Student <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
+{%block content%}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      {%if request.user.is_superuser%}
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-info">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Add Students</p>
           </div>
-          
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-danger">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>Groups Registrations</p>
-              </div>
-              <div class="icon">
-                <a href="{% url 'addgroups' %}" class="icon"><i class="icon-group"></i></a>
-              </div>
-              <a href="{% url 'viewgroups' view='true'%}" class="small-box-footer">
-                View Groups <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
+          <div class="icon">
+            <a href="{% url 'addstudents' %}" class="icon"><i class="fas fa-user-graduate"></i></a>
           </div>
-          {%endif%}
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>Add Members</p>
-              </div>
-              <div class="icon">
-                <a href="{% url 'addusers' %}" class="icon"><i class="fas fa-user-plus"></i></a>
-              </div>
-              <a href="{% url 'viewmembers'%}" class="small-box-footer">
-                View Members <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-success">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>Attendance</p>
-              </div>
-              <div class="icon">
-                <a href="{%url 'attendance'%}" class="icon"><i class="fas fa-check-square"></i></a>
-              </div>
-              <a href="{%url 'attendance'%}" class="small-box-footer">
-                Attendance <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-success">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>View Performance</p>
-              </div>
-              <div class="icon">
-                <a href="{% url 'sheetdata' table='peformacne'%}" class="icon"><i class="fas fa-percentage"></i></a>
-              </div>
-              <a href="{% url 'sheetdata' table='peformacne'%}" class="small-box-footer">
-                View Performance <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-warning" style="color: white!important;">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>Add Notice</p>
-              </div>
-              <div class="icon">
-                <a href="{%url 'addnotice'%}" class="icon"><i class="fas fa-bell"></i></a>
-              </div>
-              <a href="{%url 'addnotice'%}" class="small-box-footer"  style="color: white!important;">
-                View Notice <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-success">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>Certificate Requests</p>
-              </div>
-              <div class="icon">
-                <a href="{%url 'addcertificate'%}" class="icon"><i class="fas fa-file-alt"></i></a>
-              </div>
-              <a href="{%url 'addcertificate'%}" class="small-box-footer">
-                Certificate Issue <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-danger">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>Add Question</p>
-              </div>
-              <div class="icon">
-                <a href="{% url 'add_questions' %}" class="icon"><i class="fas fa-question"></i></a>
-              </div>
-              <a href="{% url 'view_questions' pageno=1%}" class="small-box-footer">
-                View Questions <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>Evaluate Practicles</p>
-              </div>
-              <div class="icon">
-                <a href="{% url 'practicle_validate' %}" class="icon"><i class="fa fa-code" aria-hidden="true"></i></a>
-              </div>
-              <a href="{% url 'practicle_validate'%}" class="small-box-footer">
-                View Marks <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-danger">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>Timeline Posts</p>
-              </div>
-              <div class="icon">
-                <a href="{% url 'timeline' %}" class="icon"><i class="fas fa-history"></i></i></a>
-              </div>
-              <a href="{% url 'timeline'%}" class="small-box-footer">
-                View Timeline <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-primary">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>Feedback</p>
-              </div>
-              <div class="icon">
-                <a href="{% url 'sheetdata' table='feedback'%}" class="icon"><i class="fa fa-edit" aria-hidden="true"></i></a>
-              </div>
-              <a href="{% url 'sheetdata' table='feedback'%}" class="small-box-footer">
-                View Feedbacks <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-          <div class="col-lg-3 col-6">
-            <!-- small card -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <!-- <h3>44</h3> -->
-
-                <p>Video Permissions</p>
-              </div>
-              <div class="icon">
-                <a href="{% url 'videopermissions' %}" class="icon"><i class="fa fa-video" aria-hidden="true"></i></a>
-              </div>
-              <a href="{% url 'videopermissions'%}" class="small-box-footer">
-                View Video Permissions <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
+          <a href="{% url 'sheetdata' table='profile'%}" class="small-box-footer">
+            View Student <i class="fas fa-arrow-circle-right"></i>
+          </a>
         </div>
-       
-      </div><!--/. container-fluid -->
+      </div>
+      
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-danger">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Groups Registrations</p>
+          </div>
+          <div class="icon">
+            <a href="{% url 'addgroups' %}" class="icon"><i class="icon-group"></i></a>
+          </div>
+          <a href="{% url 'viewgroups'%}" class="small-box-footer">
+            View Groups <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+      {%endif%}
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-info">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Add Members</p>
+          </div>
+          <div class="icon">
+            <a href="{% url 'addusers' %}" class="icon"><i class="fas fa-user-plus"></i></a>
+          </div>
+          <a href="{% url 'viewmembers'%}" class="small-box-footer">
+            View Members <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-success">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Attendance</p>
+          </div>
+          <div class="icon">
+            <a href="{%url 'attendance'%}" class="icon"><i class="fas fa-check-square"></i></a>
+          </div>
+          <a href="{%url 'attendance'%}" class="small-box-footer">
+            Attendance <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-success">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>View Performance</p>
+          </div>
+          <div class="icon">
+            <a href="{% url 'sheetdata' table='peformacne'%}" class="icon"><i class="fas fa-percentage"></i></a>
+          </div>
+          <a href="{% url 'sheetdata' table='peformacne'%}" class="small-box-footer">
+            View Performance <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-warning" style="color: white!important;">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Add Notice</p>
+          </div>
+          <div class="icon">
+            <a href="{%url 'addnotice'%}" class="icon"><i class="fas fa-bell"></i></a>
+          </div>
+          <a href="{%url 'addnotice'%}" class="small-box-footer"  style="color: white!important;">
+            View Notice <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-success">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Certificate Requests</p>
+          </div>
+          <div class="icon">
+            <a href="{%url 'addcertificate'%}" class="icon"><i class="fas fa-file-alt"></i></a>
+          </div>
+          <a href="{%url 'addcertificate'%}" class="small-box-footer">
+            Certificate Issue <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-danger">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Add Question</p>
+          </div>
+          <div class="icon">
+            <a href="{% url 'add_questions' %}" class="icon"><i class="fas fa-question"></i></a>
+          </div>
+          <a href="{% url 'view_questions' pageno=1%}" class="small-box-footer">
+            View Questions <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-info">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Evaluate Practicles</p>
+          </div>
+          <div class="icon">
+            <a href="{% url 'practicle_validate' %}" class="icon"><i class="fa fa-code" aria-hidden="true"></i></a>
+          </div>
+          <a href="{% url 'practicle_validate'%}" class="small-box-footer">
+            View Marks <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-danger">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Timeline Posts</p>
+          </div>
+          <div class="icon">
+            <a href="{% url 'timeline' %}" class="icon"><i class="fas fa-history"></i></i></a>
+          </div>
+          <a href="{% url 'timeline'%}" class="small-box-footer">
+            View Timeline <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-primary">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Feedback</p>
+          </div>
+          <div class="icon">
+            <a href="{% url 'sheetdata' table='feedback'%}" class="icon"><i class="fa fa-edit" aria-hidden="true"></i></a>
+          </div>
+          <a href="{% url 'sheetdata' table='feedback'%}" class="small-box-footer">
+            View Feedbacks <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <!-- small card -->
+        <div class="small-box bg-info">
+          <div class="inner">
+            <!-- <h3>44</h3> -->
+
+            <p>Video Permissions</p>
+          </div>
+          <div class="icon">
+            <a href="{% url 'videopermissions' %}" class="icon"><i class="fa fa-video" aria-hidden="true"></i></a>
+          </div>
+          <a href="{% url 'videopermissions'%}" class="small-box-footer">
+            View Video Permissions <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+   
+  </div><!--/. container-fluid -->
   </div>
   <div>
   </div>
-    </section>
-    {%endblock%}
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
+</section>
+{%endblock%}

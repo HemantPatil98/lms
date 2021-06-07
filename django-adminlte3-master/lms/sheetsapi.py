@@ -231,7 +231,7 @@ def updatesheet(SPREADSHEET_ID,SHEET_NAME,row,value,col=0,cell=False,dimension="
             ]
         }
         request = sheet.values().update(spreadsheetId=SPREADSHEET_ID,
-                                    range=SHEET_NAME+"!"+str(chr(col+64))+str(row)+":"+str(chr(col+64))+str(row),
+                                    range=SHEET_NAME+"!"+col+str(row)+":"+col+str(row),
                                     valueInputOption="USER_ENTERED", body=body)
     else:
         body = {

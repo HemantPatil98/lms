@@ -13,7 +13,7 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          {%if not request.user.is_staff%}<img src="/media/{{request.session.ab.photo}}" class="img-circle elevation-2" alt="User Image">{%endif%}
+          {%if not request.user.is_staff%}<img src="/media/{{request.session.profile_photo}}" class="img-circle elevation-2" alt="User Image">{%endif%}
         </div>
         <div class="info">
           <a href="{%url 'viewprofile'%}" class="d-block">{{request.user.username}}</a>
@@ -38,7 +38,7 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
           <li class="nav-item ">
-            <a href="{%url 'index'%}" class="nav-link active">
+            <a href="{%url 'index'%}" class="nav-link {%if request.resolver_match.url_name == 'index' %}active{%endif%}">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
                 Dashboard
@@ -48,7 +48,7 @@
           </li>
           {%if request.user.is_staff%}
           <li class="nav-item">
-            <a href="" class="nav-link">
+            <a href="" class="nav-link {%if request.resolver_match.url_name == 'addstudents' or request.resolver_match.url_name == 'addgroups' or request.resolver_match.url_name == 'addusers' %}active{%endif%}">
               <i class="nav-icon fas fa-plus-square"></i>
               <p>
                 Add Users
@@ -57,19 +57,19 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'addstudents' %}" class="nav-link">
+                <a href="{% url 'addstudents' %}" class="nav-link {%if request.resolver_match.url_name == 'addstudents' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Students</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'addgroups' %}" class="nav-link">
+                <a href="{% url 'addgroups' %}" class="nav-link {%if request.resolver_match.url_name == 'addgroups' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Groups</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'addusers' %}" class="nav-link">
+                <a href="{% url 'addusers' %}" class="nav-link {%if request.resolver_match.url_name == 'addusers' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Members</p>
                 </a>
@@ -77,7 +77,7 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link {%if request.resolver_match.url_name == 'sheetdata' and table == 'student_profile' or table == 'studendent_performance' %}active{%endif%}{%if request.resolver_match.url_name == 'viewgroups'%}active{%endif%}{%if request.resolver_match.url_name == 'viewmembers'%}active{%endif%}">
               <i class="nav-icon fas fa-eye"></i>
               <p>
                 View Users
@@ -86,25 +86,25 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'sheetdata' table='student_profile' %}" class="nav-link">
+                <a href="{% url 'sheetdata' table='student_profile' %}" class="nav-link {%if request.resolver_match.url_name == 'sheetdata' and table == 'student_profile' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Students Profile</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'sheetdata' table='student_performance' %}" class="nav-link">
+                <a href="{% url 'sheetdata' table='student_performance' %}" class="nav-link {%if request.resolver_match.url_name == 'sheetdata' and table == 'studendent_performance' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Students Performance</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'viewgroups' view='true' %}" class="nav-link">
+                <a href="{% url 'viewgroups' %}" class="nav-link {%if request.resolver_match.url_name == 'viewgroups' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Groups</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'viewmembers' %}" class="nav-link">
+                <a href="{% url 'viewmembers' %}" class="nav-link {%if request.resolver_match.url_name == 'viewmembers' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Members</p>
                 </a>
@@ -113,7 +113,7 @@
           </li>
           {%endif%}
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link {%if request.resolver_match.url_name == 'addnotice' or request.resolver_match.url_name == 'viewnotice'%}active{%endif%}">
               <i class="nav-icon fas fa-bell"></i>
               <p>
                 Notice
@@ -123,14 +123,14 @@
             <ul class="nav nav-treeview">
               {%if request.user.is_staff%}
               <li class="nav-item">
-                <a href="{%url 'addnotice'%}" class="nav-link">
+                <a href="{%url 'addnotice'%}" class="nav-link {%if request.resolver_match.url_name == 'addnotice' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Add notice</p>
                 </a>
               </li>
               {%endif%}
               <li class="nav-item">
-                <a href="{%url 'viewnotice'%}" class="nav-link">
+                <a href="{%url 'viewnotice'%}" class="nav-link {%if request.resolver_match.url_name == 'viewnotice' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>View notice</p>
                 </a>
@@ -138,7 +138,7 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a href="" class="nav-link">
+            <a href="" class="nav-link {%if request.resolver_match.url_name == 'video' %}active{%endif%}">
               <i class="fas fa-video"></i>
               <p>
                 Videos
@@ -148,38 +148,38 @@
             <ul class="nav nav-treeview">
               {%if request.user.is_superuser%}
               <li class="nav-item">
-                <a href="{%url 'videopermissions'%}" class="nav-link">
+                <a href="{%url 'videopermissions'%}" class="nav-link {%if request.resolver_match.url_name == 'videopermissions' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Video Permissions</p>
                 </a>
               </li>
               {%endif%}
               <li class="nav-item">
-                <a href="{%url 'video' course='C'%}" class="nav-link">
+                <a {%if 'video' in per.C%}href="/video/C/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%} class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'C' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>C Programing</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{%url 'video' course='SQL'%}" class="nav-link">
+                <a {%if 'video' in per.SQL%}href="/video/Sql/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'SQL' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>SQL</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{%url 'video' course='WD'%}" class="nav-link">
+                <a {%if 'video' in per.WD%}href="/video/WD/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'WD'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Web Designing</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{%url 'video' course='Core'%}" class="nav-link">
+                <a {%if 'video' in per.PYTHON%}href="/video/Python/"{%elif 'video' in per.JAVA%}href="/video/Java/"{%elif 'video' in per.TESTING%}href="/video/Testing/"{%elif 'video' in per.ANGULAR%}href="/video/Angular/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%} class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Core'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Core Domain</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{%url 'video' course='Adv'%}" class="nav-link">
+                <a {%if 'video' in per.PYTHON%}href="/video/Python/"{%elif 'video' in per.JAVA%}href="/video/Java/"{%elif 'video' in per.TESTING%}href="/video/Testing/"{%elif 'video' in per.ANGULAR%}href="/video/Angular/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%} class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Adv'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Adv Domain</p>
                 </a>
@@ -187,7 +187,7 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link {%if request.resolver_match.url_name == 'exam'%}active{%endif%}">
               <i class="fa fa-question"></i>
               <p>
                 Exam
@@ -196,20 +196,20 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{%url 'mcq_exam'%}" class="nav-link">
+                <a href="{%url 'mcq_exam'%}" class="nav-link {%if request.resolver_match.url_name == 'mcq_exam'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Exam</p>
                 </a>
               </li>
               {%if request.user.is_superuser%}
               <li class="nav-item">
-                <a href="{%url 'add_questions'%}" class="nav-link">
+                <a href="{%url 'add_questions'%}" class="nav-link {%if request.resolver_match.url_name == 'add_questions'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Add Questions</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{%url 'view_questions' pageno=1%}" class="nav-link">
+                <a href="{%url 'view_questions' pageno=1%}" class="nav-link {%if request.resolver_match.url_name == 'view_questions'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>View Questions</p>
                 </a>
@@ -220,7 +220,7 @@
 
           {%if request.user.is_superuser%}
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link {%if request.resolver_match.url_name == 'practicle_validate'%}active{%endif%}">
               <i class="fa fa-code"></i>
               <p>
                 Evaluate Exams
@@ -229,7 +229,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{%url 'practicle_validate'%}" class="nav-link">
+                <a href="{%url 'practicle_validate'%}" class="nav-link {%if request.resolver_match.url_name == 'practicle_validate'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Open</p>
                 </a>
@@ -238,7 +238,7 @@
           </li>
           {%endif%}
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link {%if request.resolver_match.url_name == 'timeline'%}active{%endif%}">
               <i class="fas fa-history"></i>
               <p>
                 Timeline
@@ -247,7 +247,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{%url 'timeline'%}" class="nav-link">
+                <a href="{%url 'timeline'%}" class="nav-link {%if request.resolver_match.url_name == 'timeline'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>{%if request.user.is_superuser%}Add / {%endif%}View Timeline</p>
                 </a>
@@ -256,7 +256,7 @@
           </li>
           {%if request.user.is_superuser%}
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link {%if request.resolver_match.url_name == 'feedback'%}active{%endif%}">
               <i class="fas fa-edit"></i>
               <p>
                 Feedback
@@ -265,7 +265,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{%url 'sheetdata' table='feedback'%}" class="nav-link">
+                <a href="{%url 'sheetdata' table='feedback'%}" class="nav-link {%if request.resolver_match.url_name == 'feedback'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>View Feedback</p>
                 </a>
@@ -274,7 +274,7 @@
           </li>
           {%endif%}
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link {%if request.resolver_match.url_name == 'attendance'%}active{%endif%}">
               <i class="fas fa-check-square"></i>
               <p>
                 Attendance
@@ -283,7 +283,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{%if request.user.is_staff%}{%url 'attendance'%}{%else%}{%url 'studentsattendance'%}{%endif%}" class="nav-link">
+                <a href="{%if request.user.is_staff%}{%url 'attendance'%}{%else%}{%url 'studentsattendance'%}{%endif%}" class="nav-link {%if request.resolver_match.url_name == 'attendance'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>{%if request.user.is_superuser%}Add /{%endif%} view Attendance</p>
                 </a>

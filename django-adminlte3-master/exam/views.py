@@ -7,21 +7,10 @@ from .models import *
 import random
 import os
 from lms import models,sheetsapi
-from lms.sheetfields import student_performance
+from lms.sheetfields import all_fields_index
 
 # from lms.models import gpinfo
 # Create your views here.
-
-# student_performance = {'id':"A",'name':"B",'contact':"C",'emailid':"D",'dateofadmission':"E",'trainingmode':"F",'coursestartdate':"G",'course':"H",
-#                        'coursestartfrom':"I",'currentmodule':"J",
-#                        'ctrainername':"K",'cmodulestart':"L",'cmoduleend':"M",'ctheory':14,'cpractical':15,'coral':16,'ctotal':17,
-#                        'sqltrainername':18,'sqlmodulestart':19,'sqlmoduleend':20,'sqltheory':21,'sqlpractical':22,'sqloral':23,'sqltotal':24,
-#                        'wdtrainername':25,'wdmodulestart':26,'wdmoduleend':27,'wdpractical':8,'wdoral':29,'wdtotal':30,'portfoliolink':31,
-#                        'mock1':32,'projectguid':33,'miniproject':34,
-#                        'coretrainername':35,'coremodulestart':36,'coremoduleend':37,'coretheory':38,'corepractical':39,'coreoral':40,'coretotal':41,'mock2':42,
-#                        'advtrainername':43,'advmodulestart':44,'advmoduleend':45,'advtheory':46,'advpractical':47,'advoral':48,'advtotal':49,
-#                        'fullcoursseend':"AX",'cravitaprojectstart':"AY",'mock3':"AZ",'softskill':"BA",'finalmock':"BB",'totalmarks':"BC",'eligiableforplacement':"BD",
-#                        'remark':"BE"}
 
 ###
 @login_required(login_url='')
@@ -114,7 +103,6 @@ def add_questions(request):
     ext1 = {}
     cr = course.objects.all()
     for c in cr:
-        print(c.type)
         ext1[c.type] = ext.get(name=c.type.lower()).value
     ext = ext1
 
@@ -162,7 +150,7 @@ def mcq_exam(request):
             return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
                                                            'prog_set': prog_set,'attempt':attempt})
 
-    print(request.user.groups.all())
+    # print(request.user.groups.all())
     courses = []
     for g in request.user.groups.all():
         gp = models.groupsinfo.objects.get(group=g.id)
@@ -216,13 +204,13 @@ def mcq_validate(request):
     row = int(row)
 
     if crs.name == 'C':
-        col = student_performance.index('C Theory (Out of 40)')
+        col = all_fields_index['student_performance']['C Theory (Out of 40)']
     elif crs.name == 'SQL':
-        col = student_performance.index('Sql Theory (Out of 40)')
+        col = all_fields_index['student_performance']['Sql Theory (Out of 40)']
     elif crs.name.find('Core')==0:
-        col = student_performance.index('Core Theory (Out of 40)')
+        col = all_fields_index['student_performance']['Core Theory (Out of 40)']
     elif crs.name.find('Adv')==0:
-        col = student_performance.index('Adv Theory (Out of 40)')
+        col = all_fields_index['student_performance']['Adv Theory (Out of 40)']
 
 
     y = request.user.date_joined.strftime('%Y')
@@ -319,23 +307,23 @@ def sync_questions(request):
 @login_required(login_url='')
 def savepracticle(request):
     crs = course.objects.get(name=request.POST['cname'],type=request.POST['type'])
+    result = exam_attempts.objects.filter(student=request.user, course=crs)
+    attempt = 1 if len(result) == 0 else 2 if len(result) < 2 else "Attempts Overed"
     for field in request.POST:
         if field.find('ans') == 0:
             pno = field.replace('ans', '')
             answer = request.POST[field]
             prog = program.objects.get(id=pno)
-
-            result = exam_attempts.objects.filter(student=request.user, course=crs)
-            if len(result) == 0:
-                attempt = 1
-                p = program_ans(student=request.user, course=crs, program=prog, answer=answer, attempt=attempt)
-                p.save()
-            elif len(result) < 2:
-                attempt = 2
-                p = program_ans(student=request.user, course=crs, program=prog, answer=answer, attempt=attempt)
-                p.save()
-            else:
-                attempt = "Attempts Overed"
+            # if len(result) == 0:
+            #     attempt = 1
+            p = program_ans(student=request.user, course=crs, program=prog, answer=answer, attempt=attempt)
+            p.save()
+            # elif len(result) < 2:
+            #     attempt = 2
+            #     p = program_ans(student=request.user, course=crs, program=prog, answer=answer, attempt=attempt)
+            #     p.save()
+            # else:
+            #     attempt = "Attempts Overed"
     if attempt != "Attempts Overed":
         result = exam_attempts(student=request.user, course=crs, attempt=attempt)
         result.save()
@@ -388,6 +376,7 @@ def view_practicle(request):
     ex = exam_attempts.objects.get(id=int(attempt))
     prog_ans = program_ans.objects.filter(student=ex.student_id,course=ex.course.id,attempt=ex.attempt)
     courses = course.objects.values_list('name', flat=True).distinct()
+
     crs = course.objects.get(id=ex.course.id)
     gname = prog_ans[0].student.groups.get(name__startswith=crs.name).name
 
@@ -398,6 +387,7 @@ def view_practicle(request):
 def marks_practicle(request):
     marks = 0
     for m in request.POST.getlist('marks'):
+        print(m,type(m))
         marks += int(m)
     attempt = request.POST['attempt']
     ex = exam_attempts.objects.get(id=int(attempt))
@@ -410,17 +400,17 @@ def marks_practicle(request):
     row = int(row)
 
     if crs.name == 'C':
-        col = student_performance['cpractical']
+        col = all_fields_index['student_performance']['C Practical (Out of 40)']
     elif crs.name == 'SQL':
-        col = student_performance['sqlpractical']
+        col = all_fields_index['student_performance']['Sql Practical (Out of 40)']
     elif crs.name.find('Core') == 0:
-        col = student_performance['corepractical']
+        col = all_fields_index['student_performance']['Core Practical (Out of 40)']
     elif crs.name.find('Adv') == 0:
-        col = student_performance['advpractical']
+        col = all_fields_index['student_performance']['Adv Practical (Out of 40)']
 
     sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=sheetname, row=row+1, value=[marks], col=col, cell=True)
 
-    return redirect('practical_validate')
+    return redirect('index')
 
 ###
 @login_required(login_url='')
@@ -454,7 +444,7 @@ def saveprogram(request):
         return redirect('index')
 
 
-    return HttpResponse("")
+    return redirect('index')
 
 ###
 @login_required(login_url='')
@@ -471,7 +461,11 @@ def setprogrammarks(request):
     row = int(row)
 
     if crs.name.find('Adv') == 0:
-        col = student_performance['advpractical']
+        col = all_fields_index['student_performance']['Adv Practical (Out of 40)']
+        sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=[value], col=col, cell=True)
+        messages.info(request,'Program marks saved')
+    if crs.name.find('WD') == 0:
+        col = all_fields_index['student_performance']['WD Practical (Out of 150)']
         sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=[value], col=col, cell=True)
         messages.info(request,'Program marks saved')
     return HttpResponse("")

@@ -1,8 +1,9 @@
-
 from django.urls import path
-from . import views,models,sheetsapi,pdfgenerator
-sheetsapi.startsheet()
-
+from . import views,models,pdfgenerator
+from django.conf import settings
+from django.conf.urls.static import static
+views.config()
+from .sheetfields import indexing_fields
 urlpatterns = [
     path('accounts/login/',views.login_form),
     path('',views.login_form,name='login_form'),
@@ -13,10 +14,9 @@ urlpatterns = [
 
     path('index/',views.index,name='index'),
     path('add/student/',views.addstudent,name='addstudents'),
-    # path('view_data/student/',views.viewstudent,name='viewstudents'),
-    # path('view_data/performance/', views.viewperformance, name='viewperformance'),
+
     path('add/groups/',views.addgroups,name='addgroups'),
-    path('view/groups/<slug:view>/',views.addgroups,name='viewgroups'),
+    path('view/groups/',views.addgroups,{'view': True},name='viewgroups'),
     path('add/users/',views.addusers,name='addusers'),
     path('user_permissions/',views.user_permissions,name='user_permissions'),
     path('view_data/members/', views.viewmembers, name='viewmembers'),
@@ -25,8 +25,8 @@ urlpatterns = [
     path('attendance_update/', views.attendance_update, name='attendance_update'),
     path('studentattendance/', views.studentattendance, name='studentsattendance'),
     path('attendance/', views.attendance, name='attendance'),
-    path('add/notice/',views.addnotice,name='addnotice'),
-    path('view/notice/',views.viewnotice,name='viewnotice'),
+    path('add/notice/',models.notice.addnotice,name='addnotice'),
+    path('view/notice/',models.notice.addnotice ,{'view': True},name='viewnotice'),
     path('add/certificate/', views.addcertificate, name='addcertificate'),
     path('get/certificate/', views.getcertificate, name='getcertificate'),
     path('set/certificate/', views.setcertificate, name='setcertificate'),
@@ -37,7 +37,6 @@ urlpatterns = [
     path('deletetimeline/', models.timeline.deletetimeline, name='deletetimeline'),
 
     path('addfeedback/', views.addfeedback, name='addfeedback'),
-    # path('viewfeedback/', views.viewfeedback, name='viewfeedback'),
 
     path('request_certificate/',views.request_certificate,name='request_certificate'),
 
@@ -55,6 +54,7 @@ urlpatterns = [
     path('pdftest/',views.pdftest,name='pdftest'),
     path('render/pdf/', pdfgenerator.Pdf.as_view(),name='pdf'),
 
-    path('sheetdata/<slug:table>/',views.sheetdata,name='sheetdata')
+    path('sheetdata/<slug:table>/',views.sheetdata,name='sheetdata'),
+    # path('test/', indexing_fields, name='test')
 
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -174,126 +174,107 @@
   }
 </style>
 {%endblock%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>Add Members</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Add Members</li>
-            </ol>
-          </div>
-        </div>
-      </div><!-- /.container-fluid -->
-    </section>
-    {%endblock%} 
 
-    <!-- Main content -->
-    {%block content%}
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-12">
-            <!-- general form elements -->
-            <div class="card card-primary">
-              <div class="card-header">
-                <h3 class="card-title">Members </h3>
+{%block page_link%}
+{%block page_title%}
+Add Members
+{%endblock%}
+{%endblock%}
+
+{%block content%}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Members </h3>
+          </div>
+          <!-- /.card-header -->
+          <!-- form start -->
+          <form action="{%url 'addusers'%}" method="POST" onsubmit="return save()">
+            {%csrf_token%}
+            <div class="card-body row">
+
+              <div class="form-group col-md-6">
+                <label for="nameInputEmail1">First Name</label>
+                <input name="fname" type="text" class="form-control" id="nameInputEmail1" placeholder="Enter Name" value="{{member.first_name}}" required="" {%if gname%}readonly{%endif%}>
               </div>
-              <!-- /.card-header -->
-              <!-- form start -->
-              <form action="{%url 'addusers'%}" method="POST" onsubmit="return save()">
-                {%csrf_token%}
-                <div class="card-body row">
 
-                  <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">First Name</label>
-                    <input name="fname" type="text" class="form-control" id="nameInputEmail1" placeholder="Enter Name" value="{{member.first_name}}" required="" {%if gname%}readonly{%endif%}>
-                  </div>
+              <div class="form-group col-md-6">
+                <label for="nameInputEmail1">Last Name</label>
+                <input name="lname" type="text" class="form-control" id="nameInputEmail1" placeholder="Enter Name" value="{{member.last_name}}" required="" {%if gname%}readonly{%endif%}>
+              </div>
 
-                  <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">Last Name</label>
-                    <input name="lname" type="text" class="form-control" id="nameInputEmail1" placeholder="Enter Name" value="{{member.last_name}}" required="" {%if gname%}readonly{%endif%}>
-                  </div>
+              <div class="form-group col-md-6">
+                <label for="nameInputEmail1">Email</label>
+                <input name="email" type="email" class="form-control" id="nameInputEmail1" placeholder="Enter Name" value="{{member.email}}" required="" {%if gname%}readonly{%endif%}>
+              </div>
 
-                  <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">Email</label>
-                    <input name="email" type="email" class="form-control" id="nameInputEmail1" placeholder="Enter Name" value="{{member.email}}" required="" {%if gname%}readonly{%endif%}>
-                  </div>
-
-                  <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">Group Name</label>
-                    <select class="form-control select2" name="gname" style="width: 100%;" {%if gname%}readonly{%endif%} required="">
-                      {%if gname%}
-                      <option selected="selected">{{gname}}</option>
-                      {%else%}
-                        {%for group in groups%}
-                        <option {%if gname == group.name%} selected="selected" {%endif%}>{{group}}</option>
-                        {%endfor%}
-                      {%endif%}
-                      </select>
-                  </div>
-
+              <div class="form-group col-md-6">
+                <label for="nameInputEmail1">Group Name</label>
+                <select class="form-control select2" name="gname" style="width: 100%;" {%if gname%}readonly{%endif%} required="">
                   {%if gname%}
-                    <div class="card card-default col-sm-12">
-                      <div class="card-header" style="background-color: #6f42c1cf;color: white">
-                        <h3 class="card-title">Select Modules</h3>
-
-                        <div class="card-tools">
-                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                          </button>
-                          
-                        </div>
-                      </div>
-                      <!-- /.card-header -->
-                      <div class="card-body">
-                        <div class="row">
-                          <div class="col-12">
-                            <div class="form-group">
-                              <label>Add Modules</label>
-                              <div class="transfer"></div>
-                              <input type="hidden" name="permissions">
-                            </div>
-                            <!-- /.form-group -->
-                          </div>
-                          <!-- /.col -->
-                        </div>
-                        <!-- /.row -->
-                      </div>
-                      <!-- /.card-body -->
-
-                      <div class="card-footer">
-
-                      </div>
-                    </div>
-                    <!-- /.card -->
+                  <option selected="selected">{{gname}}</option>
+                  {%else%}
+                    {%for group in groups%}
+                    <option {%if gname == group.name%} selected="selected" {%endif%}>{{group}}</option>
+                    {%endfor%}
                   {%endif%}
+                  </select>
+              </div>
 
-                </div>
-                <!-- /.card-body -->
+              {%if gname%}
+                <div class="card card-default col-sm-12">
+                  <div class="card-header" style="background-color: #6f42c1cf;color: white">
+                    <h3 class="card-title">Select Modules</h3>
 
-                <div class="card-footer">
-                  <button id="submit" type="submit" name="submit" value="submit" class="btn btn-primary">Submit</button>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                      </button>
+                      
+                    </div>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="form-group">
+                          <label>Add Modules</label>
+                          <div class="transfer"></div>
+                          <input type="hidden" name="permissions">
+                        </div>
+                        <!-- /.form-group -->
+                      </div>
+                      <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                  </div>
+                  <!-- /.card-body -->
+
+                  <div class="card-footer">
+
+                  </div>
                 </div>
-              </form>
+                <!-- /.card -->
+              {%endif%}
+
             </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+              <button id="submit" type="submit" name="submit" value="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
         </div>
-      </div>
-
-    </section>
-    {%endblock%}
-
-    <!-- /.content -->
+    </div>
   </div>
+</section>
+{%endblock%}
 
-    {%block script%}
+{%block script%}
 <script src="{%static 'js/jquery.transfer.js'%}"></script>
 <script type="text/javascript">
 

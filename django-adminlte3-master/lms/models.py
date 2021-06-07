@@ -4,6 +4,7 @@ from datetime import datetime
 from django.shortcuts import render,HttpResponse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 # Create your models here.
 def nothing():
@@ -12,7 +13,7 @@ def nothing():
 class notice(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
-    generateddate = models.DateTimeField(default=datetime.now)
+    generateddate = models.DateTimeField()
     file = models.FileField(upload_to="notice/")
     externallink = models.CharField(max_length=100)
     createdby = models.ForeignKey(User,on_delete=nothing)
@@ -21,30 +22,53 @@ class notice(models.Model):
     def __str__(self):
         return self.title
 
-    def addnoticein(request):
-        title = request.POST['subject']
-        description = request.POST['description']
-        externallink = request.POST['externallink']
-        type = request.POST['type']
-        now = datetime.now()
+    @login_required(login_url='')
+    def addnotice(request,view=False):
+        if request.method == 'POST':
+            title = request.POST['subject']
+            description = request.POST['description']
+            externallink = request.POST['externallink']
+            type = request.POST['type']
+            now = datetime.now()
+            try:
+                file = request.FILES['file']
+                file._name = title + now.strftime("%m-%d-%Y, %H:%M:%S") + "." + file._name.split('.')[1]
+            except:
+                file = ''
+            if 'id' in request.POST:
+                id = request.POST['id']
+                note = notice.objects.filter(id=id)
+                note.update(title=title, description=description, externallink=externallink,file=file,
+                            createdby=request.user, type=type)
+            else:
+                note = notice(title=title, description=description, file=file, externallink=externallink,
+                              createdby=request.user, type=type,generateddate=datetime.now())
+                note.save()
+        if request.user.is_staff:
+            if view:
+                data = notice.objects.all().order_by('-id').filter(createdby=request.user)
+            else:
+                data = notice.objects.all().order_by('-id')
+        else:
+            data = notice.objects.all().order_by('-id')
         try:
-            file = request.FILES['file']
-            file._name=title+now.strftime("%m-%d-%Y, %H:%M:%S")+"."+file._name.split('.')[1]
+            pageno = request.GET['page']
         except:
-            file = ''
+            pageno = 1
+
+        count = 11 if request.user.is_staff else 12
+        P = Paginator(data,count)
+
+        page = P.page(pageno)
+
+        up = user_profile.objects.all().filter(user_id=request.user.id)[0]
+
         try:
-            id = request.POST['id']
-            note = notice.objects.all().get(id=id)
-            note.title = title
-            note.description = description
-            note.type = type
-            note.file = file if file != '' else None
-            note.externallink = externallink
-            note.save()
+            notice1 = notice.objects.all().order_by('-id')[0:5]
         except:
-            note = notice(title=title,description=description,file=file,externallink=externallink,
-                          createdby=request.user,type=type)
-            note.save()
+            notice1 = ""
+        return render(request, 'student/add_notice.html', {'data': page, 'up': up, 'notice': notice1})
+
 
 
 

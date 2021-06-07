@@ -1,10 +1,14 @@
 {%extends 'student/base.html'%}
 {%load static%}
 {%load admin_menu%}
+
 {%block style%}
 <style type="text/css">
   .knob{
     font-size: 35px!important;
+  }
+  .card{
+    cursor: pointer;
   }
   .card.maximized-card{
     height: max-content%!important;
@@ -37,454 +41,417 @@
 </style>
 
 {%endblock%}
-{%load admin_menu%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Dashboard</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Dashboard</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    {%endblock%}
-    <!-- /.content-header -->
 
-    <!-- Main content -->
-    {%block content%}{{request.session.ab}}
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="card col-md-3">
-              <div class="card-body box-profile">
-                <div class="text-center">
-                  <img class="profile-user-img img-fluid img-circle"
-                       src="/media/{{request.session.ab.photo}}"
-                       alt="User profile picture">
-                </div>
-                <br>
-                <div class="text-center" id="popupReturn" on hover=>
-                    <input type="text" class="knob knob1"  data-thickness="0.1" data-width="90" data-height="90"
-                           data-fgColor="#00a65a" readonly="true" value="{{performance|key_with_space:'Total Marks (Out of 700)'|div:7}}">
+{%block dashboard%}active{%endblock%}
 
-                    <div class="knob-label">Average Performance</div>
-                    <div id="tableContent" style="display:none">
-                        <div>
-                            <div class="panel panel-default">
-                                <div class="panel-heading">Performance</div>
-                                <div class="panel-body form-inline dept1">
-                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'C Total Marks'}}"><br>C</div>
-                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Sql Total Marks'}}"><br>Sql</div>
-                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'WD Total Marks'}}"><br>WD</div>
-                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Core Total Marks'}}"><br>Core</div>
-                            <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Adv Total Marks'}}"><br>Adv</div>
-                                </div>
-                            </div>
+{%block page_link%}
+{%block page_title%}
+Dashboard
+{%endblock%}
+{%endblock%}
+
+{%block content%}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="card col-md-3">
+          <div class="card-body box-profile">
+            <div class="text-center">
+              <img class="profile-user-img img-fluid img-circle"
+                   src="/media/{{request.session.profile_photo}}"
+                   alt="User profile picture">
+            </div>
+            <br>
+            <div class="text-center" id="popupReturn" on hover=>
+                <input type="text" class="knob knob1"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true" value="{{performance|key_with_space:'Total Marks (Out of 700)'|div:7}}"  data-toggle="tooltip" data-placement="top" title="Click to see your score card">
+
+                <div class="knob-label">Average Performance</div>
+                <div id="tableContent" style="display:none">
+                    <div>
+                      <div class="panel panel-default">
+                        <div class="panel-heading">Performance</div>
+                        <div class="panel-body form-inline dept1">
+                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'C Total Marks (Out of 100)'}}"><br>C</div>
+                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Sql Total Marks (Out of 100)'}}"><br>Sql</div>
+                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'WD Total Marks (Out of 200)'}}"><br>WD</div>
+                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Core Total Marks (Out of 100)'}}"><br>Core</div>
+                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Adv Total Marks (Out of 100)'}}"><br>Adv</div>
+                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Soft Skills Marks (Out of 100)'}}"><br>Adv</div>
                         </div>
+                      </div>
                     </div>
-                  </div>
-                <h3 class="profile-username text-center">{{performance|key_with_space:'Name'}}</h3>
-
-                <p class="text-muted text-center">{{performance|key_with_space:'Course'}}</p>
-                <ul class="list-group list-group-unbordered mb-3">
-                  <li class="list-group-item">
-                    <b>Date of Admission</b> <a class="float-right">{{performance|key_with_space:'Admission Date'}}</a>
-                  </li>
-                  <li class="list-group-item">
-                    <b>Training Mode</b> <a class="float-right">{{performance|key_with_space:'Training Mode'}}</a>
-                  </li>
-                  <li class="list-group-item">
-                    <b>Current Module</b> <a class="float-right">{{performance|key_with_space:'Current Module'}}</a>
-                  </li>
-                </ul>
-
-                <a {%if performance|key_with_space:'Eligible For Placement(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block'{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="bottom" title="After 60% you can apply for certicicate" style='cursor:not-allowed'{%endif%}  ><b>Request for Certificate</b></a>
-                <a class="btn btn-info btn-block" href="{%url 'pdf'%}" style="margin-top:5px;" target="new"><b>Offer Letter</b></a>
+                </div>
               </div>
+            <h3 class="profile-username text-center">{{performance|key_with_space:'Name'}}</h3>
+
+            <p class="text-muted text-center">{{performance|key_with_space:'Course'}}</p>
+            <ul class="list-group list-group-unbordered mb-3">
+              <li class="list-group-item">
+                <b>Date of Admission</b> <a class="float-right">{{performance|key_with_space:'Admission Date'}}</a>
+              </li>
+              <li class="list-group-item">
+                <b>Training Mode</b> <a class="float-right">{{performance|key_with_space:'Training Mode'}}</a>
+              </li>
+              <li class="list-group-item">
+                <b>Current Module</b> <a class="float-right">{{performance|key_with_space:'Current Module'}}</a>
+              </li>
+            </ul>
+            <a {%if performance|key_with_space:'Eligible For Placement(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block'{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="top" title="You can apply for certificate after all test and mocks completed" style='cursor:not-allowed'{%endif%}><b>Request for Certificate</b></a>
+            <a class="btn btn-info btn-block" href="{%url 'pdf'%}" style="margin-top:5px;" target="new"><b>Offer Letter</b></a>
           </div>
-          <div class="col-md-9">
-            <div class="row">
-              <div class="col-md-3">
-              <div class="card card-danger shadow-lg">
-                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.c','#cbody')">
-                  <div class="row">
-                    <div class="col-sm-12 c">
-                      <img src="{%static 'courses/c.png'%}" width="150px"> 
-                    </div>
-                    <div class="col-sm-12 c">
-                      <h3 class="card-title">C Programinig</h3>   
-                    </div>
-                  </div>
-
-                  <div class="card-tools" id="#c">
-                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
-                    </button>
-                  </div>
-                  <!-- /.card-tools -->
+      </div>
+      <div class="col-md-9">
+        <div class="row">
+          <div class="col-md-3">
+          <div class="card card-danger shadow-lg">
+            <div class="card-header" data-card-widget="maximize" onclick="onexpand('.c','#cbody')" data-toggle="tooltip" data-placement="top" title="Expand Card For More Features">
+              <div class="row">
+                <div class="col-sm-12 c">
+                  <img src="{%static 'courses/c.png'%}" width="150px"> 
                 </div>
-                <!-- /.card-header -->
-                <div class="card-body expandbody">
-                  Expand Card For More Features
-                  <div id="cbody" class="collapse">
-                    <div class="row">
-                      <div class="col-sm-4">
-                        <a {%if 'video' in per.C%}href="/video/C/"{%endif%}>
-                        <img src="{%static 'courses/video.png'%}" width="150px">
-                        <h2>Videos</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'exam' in per.C%}href="{%url 'mcq_exam'%}"{%endif%}>
-                        <img src="{%static 'courses/exam2.png'%}" width="150px">
-                        <h2>Exam</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'notes' in per.C%}href=""{%endif%}>
-                        <img src="{%static 'courses/notes.png'%}" width="150px">
-                        <h2>Notes</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a href="">
-                        <img src="{%static 'courses/syllabus4.png'%}" width="150px">
-                        <h2>Syllabus</h2>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
+                <div class="col-sm-12 c">
+                  <h3 class="card-title" >C Programinig</h3>   
                 </div>
-                <!-- /.card-body -->
+              </div>
+
+              <div class="card-tools" id="#c">
+                <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                </button>
+              </div>
+              <!-- /.card-tools -->
             </div>
-            <!-- /.card -->
-            </div>
-            <div class="col-md-3">
-              <div class="card card-danger shadow-lg">
-                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.sql','#sqlbody')">
-                  <div class="row">
-                    <div class="col-sm-12 sql">
-                  <img src="{%static 'courses/sql.png'%}" width="150px">
-                      <!-- <i class="fas fa-database" style="width: 100%;font-size: 100px;"></i> -->
-                    </div>
-                    <div class="col-sm-12 sql">
-                  <h3 class="card-title">SQL</h3>
-                      
-                    </div>
+            <!-- /.card-header -->
+            <div class="card-body expandbody">
+              Expand Card For More Features
+              <div id="cbody" class="collapse">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <a {%if 'video' in per.C%}href="/video/C/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/video.png'%}" width="150px">
+                    <h2>Videos</h2>
+                    </a>
                   </div>
-
-                  <div class="card-tools" id="#sql">
-                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
-                    </button>
+                  <div class="col-sm-4">
+                    <a {%if 'exam' in per.C%}href="{%url 'mcq_exam'%}"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/exam2.png'%}" width="150px">
+                    <h2>Exam</h2>
+                    </a>
                   </div>
-                  <!-- /.card-tools -->
+                  <div class="col-sm-4">
+                    <a {%if 'notes' in per.C%}href=""{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/notes.png'%}" width="150px">
+                    <h2>Notes</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a href="">
+                    <img src="{%static 'courses/syllabus4.png'%}" width="150px">
+                    <h2>Syllabus</h2>
+                    </a>
+                  </div>
                 </div>
-                <!-- /.card-header -->
-                <div class="card-body expandbody">
-                  Expand Card For More Features
-                  <div id="sqlbody" class="collapse">
-                    <div class="row">
-                      <div class="col-sm-4">
-                        <a {%if 'video' in per.SQL%}href="/video/SQL/"{%endif%}>
-                        <img src="{%static 'courses/video.png'%}" width="150px">
-                        <h2>Videos</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'video' in per.SQL%}href="{%url 'mcq_exam'%}"{%endif%}>
-                        <img src="{%static 'courses/exam2.png'%}" width="150px">
-                        <h2>Exam</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'video' in per.SQL%}href=""{%endif%}>
-                        <img src="{%static 'courses/notes.png'%}" width="150px">
-                        <h2>Notes</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a href="">
-                        <img src="{%static 'courses/syllabus4.png'%}" width="150px">
-                        <h2>Syllabus</h2>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
+              </div>
 
-                </div>
-                <!-- /.card-body -->
             </div>
-            <!-- /.card -->
-            </div>
-              <div class="col-md-3">
-              <div class="card card-danger shadow-lg">
-                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.wd','#wdbody')">
-                  <div class="row">
-                    <div class="col-sm-12 wd">
-                  <img src="{%static 'courses/wd.png'%}" width="150px">
-                      
-                    </div>
-                    <div class="col-sm-12 wd">
-                  <h3 class="card-title">Web Designing</h3>
-                      
-                    </div>
-                  </div>
-
-                  <div class="card-tools" id="#wd">
-                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
-                    </button>
-                  </div>
-                  <!-- /.card-tools -->
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body expandbody">
-                  Expand Card For More Features
-                  <div id="wdbody" class="collapse">
-                    <div class="row">
-                      <div class="col-sm-4">
-                        <a {%if 'video' in per.WD%}href="/video/WD/"{%endif%}>
-                        <img src="{%static 'courses/video.png'%}" width="150px">
-                        <h2>Videos</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'exam' in per.WD%}href="{%url 'mcq_exam'%}"{%endif%}>
-                        <img src="{%static 'courses/exam2.png'%}" width="150px">
-                        <h2>Exam</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'notes' in per.WD%}href=""{%endif%}>
-                        <img src="{%static 'courses/notes.png'%}" width="150px">
-                        <h2>Notes</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a href="">
-                        <img src="{%static 'courses/syllabus4.png'%}" width="150px">
-                        <h2>Syllabus</h2>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-                <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-            </div>
-            <div class="col-md-3">
-              <div class="card card-danger shadow-lg">
-                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.core','#corebody')">
-                  <div class="row">
-                    <div class="col-sm-12 core">
-                  <img src="{%static 'courses/core.png'%}" width="150px">
-                      
-                    </div>
-                    <div class="col-sm-12 core">
-                  <h3 class="card-title">Core Domain</h3>
-                      
-                    </div>
-                  </div>
-
-                  <div class="card-tools" id="#core">
-                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
-                    </button>
-                  </div>
-                  <!-- /.card-tools -->
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body expandbody">
-                  Expand Card For More Features
-                  <div id="corebody" class="collapse">
-                    <div class="row">
-                      <div class="col-sm-4">
-                        <a {%if 'video' in per.PYTHON%}href="/video/Python/"{%elif 'video' in per.JAVA%}href="/video/Java/"{%elif 'video' in per.TESTING%}href="/video/Testing/"{%endif%}>
-                        <img src="{%static 'courses/video.png'%}" width="150px">
-                        <h2>Videos</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'exam' in per.PYTHON or 'exam' in per.JAVA or per.TESTING%}href="{%url 'mcq_exam'%}"{%endif%}>
-                        <img src="{%static 'courses/exam2.png'%}" width="150px">
-                        <h2>Exam</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'notes' in per.PYTHON or 'notes' in per.JAVA or 'notes' in per.TESTING%}href=""{%endif%}>
-                        <img src="{%static 'courses/notes.png'%}" width="150px">
-                        <h2>Notes</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a href="">
-                        <img src="{%static 'courses/syllabus4.png'%}" width="150px">
-                        <h2>Syllabus</h2>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-                <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-            </div>
-            <div class="col-md-3">
-              <div class="card card-danger shadow-lg">
-                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.adv','#advbody')">
-                  <div class="row">
-                    <div class="col-sm-12 adv">
-                  <img src="{%static 'courses/framework.jpg'%}" width="150px">
-                      
-                    </div>
-                    <div class="col-sm-12 adv">
-                  <h3 class="card-title">Advance Domain</h3>
-                      
-                    </div>
-                  </div>
-
-                  <div class="card-tools" id="#adv">
-                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
-                    </button>
-                  </div>
-                  <!-- /.card-tools -->
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body expandbody">
-                  Expand Card For More Features
-                  <div id="advbody" class="collapse">
-                    <div class="row">
-                      <div class="col-sm-4">
-                        <a {%if 'video' in per.PYTHON%}href="/video/Python/"{%elif 'video' in per.JAVA%}href="/video/Java/"{%elif 'video' in per.TESTING%}href="/video/Testing/"{%endif%}>
-                        <img src="{%static 'courses/video.png'%}" width="150px">
-                        <h2>Videos</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'exam' in per.PYTHON or 'exam' in per.JAVA or per.TESTING%}href="{%url 'mcq_exam'%}"{%endif%}>
-                        <img src="{%static 'courses/exam2.png'%}" width="150px">
-                        <h2>Exam</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'notes' in per.PYTHON or 'notes' in per.JAVA or 'notes' in per.TESTING%}href=""{%endif%}>
-                        <img src="{%static 'courses/notes.png'%}" width="150px">
-                        <h2>Notes</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a href="">
-                        <img src="{%static 'courses/syllabus4.png'%}" width="150px">
-                        <h2>Syllabus</h2>
-                        </a>
-                      </div>
-                  </div>
-
-                </div>
-                <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-            </div></div>
-
-            <div class="col-md-3">
-              <div class="card card-danger shadow-lg">
-                <div class="card-header" data-card-widget="maximize" onclick="onexpand('.softskills','#softskills')">
-                  <div class="row">
-                    <div class="col-sm-12 adv">
-                  <img src="{%static 'courses/softskills.jpg'%}" width="150px" height="180px;">
-                      
-                    </div>
-                    <div class="col-sm-12 adv">
-                  <h3 class="card-title">Soft Skills</h3>
-                      
-                    </div>
-                  </div>
-
-                  <div class="card-tools" id="#softskills">
-                    <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
-                    </button>
-                  </div>
-                  <!-- /.card-tools -->
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body expandbody">
-                  Expand Card For More Features
-                  <div id="softskills" class="collapse">
-                    <div class="row">
-                      <div class="col-sm-4">
-                        <a href="{%url 'timeline'%}">
-                        <img src="{%static 'courses/timeline.png'%}" width="150px">
-                        <h2>Timeline</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a {%if 'exam' in per.PYTHON or 'exam' in per.JAVA or per.SOFT_SKILL%}href="{%url 'mcq_exam'%}"{%endif%}>
-                        <img src="{%static 'courses/exam2.png'%}" width="150px">
-                        <h2>Exam</h2>
-                        </a>
-                      </div>
-                      <!-- <div class="col-sm-4">
-                        <a href="">
-                        <img src="{%static 'courses/notes.png'%}" width="150px">
-                        <h2>Notes</h2>
-                        </a>
-                      </div>
-                      <div class="col-sm-4">
-                        <a href="">
-                        <img src="{%static 'courses/syllabus4.png'%}" width="150px">
-                        <h2>Syllabus</h2>
-                        </a>
-                      </div> -->
-                    </div>
-                  </div>
-
-                </div>
-                <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-            </div>
-          </div>
+            <!-- /.card-body -->
         </div>
-
-
-          <!-- <div class="col-lg-3 col-6">
-            
-            <div class="small-box bg-info">
-              <div class="inner">
-                <h3>44</h3>
-
-                <p>Attendance</p>
-              </div>
-              <div class="icon">
-                <a href="{%url 'attendance'%}" class="icon"><i class="fas fa-check-square"></i></a>
-              </div>
-              <a href="{%url 'attendance'%}" class="small-box-footer">
-                Attendance <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-
-          <div class="col-1"></div> -->
+        <!-- /.card -->
         </div>
-       
-      </div><!--/. container-fluid -->
-    </section>
-    {%endblock%}
+        <div class="col-md-3">
+          <div class="card card-danger shadow-lg">
+            <div class="card-header" data-card-widget="maximize" onclick="onexpand('.sql','#sqlbody')" data-toggle="tooltip" data-placement="top" title="Expand Card For More Features">
+              <div class="row">
+                <div class="col-sm-12 sql">
+              <img src="{%static 'courses/sql.png'%}" width="150px">
+                  <!-- <i class="fas fa-database" style="width: 100%;font-size: 100px;"></i> -->
+                </div>
+                <div class="col-sm-12 sql">
+              <h3 class="card-title">SQL</h3>
+                  
+                </div>
+              </div>
+
+              <div class="card-tools" id="#sql">
+                <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                </button>
+              </div>
+              <!-- /.card-tools -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body expandbody">
+              Expand Card For More Features
+              <div id="sqlbody" class="collapse">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <a {%if 'video' in per.SQL%}href="/video/SQL/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/video.png'%}" width="150px">
+                    <h2>Videos</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a {%if 'video' in per.SQL%}href="{%url 'mcq_exam'%}"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/exam2.png'%}" width="150px">
+                    <h2>Exam</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a {%if 'video' in per.SQL%}href=""{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/notes.png'%}" width="150px">
+                    <h2>Notes</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a href="">
+                    <img src="{%static 'courses/syllabus4.png'%}" width="150px">
+                    <h2>Syllabus</h2>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+        </div>
+          <div class="col-md-3">
+          <div class="card card-danger shadow-lg">
+            <div class="card-header" data-card-widget="maximize" onclick="onexpand('.wd','#wdbody')" data-toggle="tooltip" data-placement="top" title="Expand Card For More Features">
+              <div class="row">
+                <div class="col-sm-12 wd">
+              <img src="{%static 'courses/wd.png'%}" width="150px">
+                  
+                </div>
+                <div class="col-sm-12 wd">
+              <h3 class="card-title">Web Designing</h3>
+                  
+                </div>
+              </div>
+
+              <div class="card-tools" id="#wd">
+                <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                </button>
+              </div>
+              <!-- /.card-tools -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body expandbody">
+              Expand Card For More Features
+              <div id="wdbody" class="collapse">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <a {%if 'video' in per|key_with_space:'Web Designing'%}href="/video/WD/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/video.png'%}" width="150px">
+                    <h2>Videos</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a {%if 'exam' in per|key_with_space:'Web Designing'%}href="{%url 'mcq_exam'%}"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/exam2.png'%}" width="150px">
+                    <h2>Exam</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a {%if 'notes' in per.WD%}href=""{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/notes.png'%}" width="150px">
+                    <h2>Notes</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a href="">
+                    <img src="{%static 'courses/syllabus4.png'%}" width="150px">
+                    <h2>Syllabus</h2>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+        </div>
+        <div class="col-md-3">
+          <div class="card card-danger shadow-lg">
+            <div class="card-header" data-card-widget="maximize" onclick="onexpand('.core','#corebody')" data-toggle="tooltip" data-placement="top" title="Expand Card For More Features">
+              <div class="row">
+                <div class="col-sm-12 core">
+              <img src="{%static 'courses/core.png'%}" width="150px">
+                  
+                </div>
+                <div class="col-sm-12 core">
+              <h3 class="card-title">Core Domain</h3>
+                  
+                </div>
+              </div>
+
+              <div class="card-tools" id="#core">
+                <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                </button>
+              </div>
+              <!-- /.card-tools -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body expandbody">
+              Expand Card For More Features
+              <div id="corebody" class="collapse">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <a {%if 'video' in per|key_with_space:"Core Python"%}href="/video/Core_Python/"{%elif 'video' in per|key_with_space:"Core Java"%}href="/video/Core_Java/"{%elif 'video' in per|key_with_space:"Core Testing"%}href="/video/Core_Testing/"{%elif 'video' in per|key_with_space:"Core Angular"%}href="/video/Core_Angular/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/video.png'%}" width="150px">
+                    <h2>Videos</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a {%if 'exam' in per|key_with_space:"Core Python" or 'exam' in per|key_with_space:"Core Java" or per|key_with_space:"Core Testing" or per|key_with_space:"Core Angular"%}href="{%url 'mcq_exam'%}"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/exam2.png'%}" width="150px">
+                    <h2>Exam</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a {%if 'exam' in per|key_with_space:"Core Python" or 'exam' in per|key_with_space:"Core Java" or per|key_with_space:"Core Testing" or per|key_with_space:"Core Angular"%}href=""{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/notes.png'%}" width="150px">
+                    <h2>Notes</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a href="">
+                    <img src="{%static 'courses/syllabus4.png'%}" width="150px">
+                    <h2>Syllabus</h2>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+        </div>
+        <div class="col-md-3">
+          <div class="card card-danger shadow-lg">
+            <div class="card-header" data-card-widget="maximize" onclick="onexpand('.adv','#advbody')" data-toggle="tooltip" data-placement="top" title="Expand Card For More Features">
+              <div class="row">
+                <div class="col-sm-12 adv">
+              <img src="{%static 'courses/framework.jpg'%}" width="150px">
+                  
+                </div>
+                <div class="col-sm-12 adv">
+              <h3 class="card-title">Advance Domain</h3>
+                  
+                </div>
+              </div>
+
+              <div class="card-tools" id="#adv">
+                <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                </button>
+              </div>
+              <!-- /.card-tools -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body expandbody">
+              Expand Card For More Features
+              <div id="advbody" class="collapse">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <a {%if 'video' in per|key_with_space:"Adv Python"%}href="/video/Adv_Python/"{%elif 'video' in per|key_with_space:"Adv Java"%}href="/video/Adv_Java/"{%elif 'video' in per|key_with_space:"Adv Testing"%}href="/video/Adv_Testing/"{%elif 'video' in per|key_with_space:"Adv Angular"%}href="/video/Adv_Angular/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/video.png'%}" width="150px">
+                    <h2>Videos</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a {%if 'exam' in per|key_with_space:"Adv Python" or 'exam' in per|key_with_space:"Adv Java" or per.|key_with_space:"Adv Testing" or per|key_with_space:"Adv Angular"%}href="{%url 'mcq_exam'%}"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/exam2.png'%}" width="150px">
+                    <h2>Exam</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a {%if 'notes' in per|key_with_space:"Adv Python" or 'exam' in per|key_with_space:"Adv Java" or per.|key_with_space:"Adv Testing" or per|key_with_space:"Adv Angular"%}href=""{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}>
+                    <img src="{%static 'courses/notes.png'%}" width="150px">
+                    <h2>Notes</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a href="">
+                    <img src="{%static 'courses/syllabus4.png'%}" width="150px">
+                    <h2>Syllabus</h2>
+                    </a>
+                  </div>
+              </div>
+
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+        </div></div>
+
+        <div class="col-md-3">
+          <div class="card card-danger shadow-lg">
+            <div class="card-header" data-card-widget="maximize" onclick="onexpand('.softskills','#softskills')" data-toggle="tooltip" data-placement="top" title="Expand Card For More Features">
+              <div class="row">
+                <div class="col-sm-12 softskills">
+              <img src="{%static 'courses/softskills.jpg'%}" width="150px" height="180px;">
+                  
+                </div>
+                <div class="col-sm-12 softskills">
+              <h3 class="card-title">Soft Skills</h3>
+                  
+                </div>
+              </div>
+
+              <div class="card-tools" id="#softskills">
+                <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
+                </button>
+              </div>
+              <!-- /.card-tools -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body expandbody">
+              Expand Card For More Features
+              <div id="softskills" class="collapse">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <a href="{%url 'timeline'%}">
+                    <img src="{%static 'courses/timeline.png'%}" width="150px">
+                    <h2>Timeline</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a href="{%url 'mcq_exam'%}">
+                    <img src="{%static 'courses/exam2.png'%}" width="150px">
+                    <h2>Exam</h2>
+                    </a>
+                  </div>
+                  <!-- <div class="col-sm-4">
+                    <a href="">
+                    <img src="{%static 'courses/notes.png'%}" width="150px">
+                    <h2>Notes</h2>
+                    </a>
+                  </div>
+                  <div class="col-sm-4">
+                    <a href="">
+                    <img src="{%static 'courses/syllabus4.png'%}" width="150px">
+                    <h2>Syllabus</h2>
+                    </a>
+                  </div> -->
+                </div>
+              </div>
+
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+        </div>
+      </div>
+    </div>
+
+    </div>
+   
+  </div><!--/. container-fluid -->
+</section>
+{%endblock%}
     
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
+
 {%block script%}
 <script>
   $(function () {
@@ -493,9 +460,6 @@
     $('.knob').knob({
 
       draw: function () {
-
-        // "tron" case
-        // console.log(this);
         if (this.$.data('skin') == 'tron') {
 
           var a   = this.angle(this.cv)  // Angle
@@ -576,22 +540,25 @@
     $(x).toggleClass('collapse');
     }
 </script>
-<!-- <script type="text/javascript" src=""></script> -->
-        <script>
-            $().ready(function(e) {
 
-                var popupEvent = function() {
-                  
-                }
+<script>
+    $().ready(function(e) {
 
-                $('#popupReturn').hunterPopup({
-                    width: '500px',
-                    height: 'auto',
-                    title: "Performance",
-                    content: $('#tableContent'),
-                    event: popupEvent
-                });
+        var popupEvent = function() {
+          
+        }
 
-            });
-        </script>
+        $('#popupReturn').hunterPopup({
+            width: '500px',
+            height: 'auto',
+            title: "Performance",
+            content: $('#tableContent'),
+            event: popupEvent
+        });
+
+    });
+    $(document).ready(function(){
+$('[data-toggle="tooltip"]').tooltip();   
+});
+</script>
 {%endblock%}

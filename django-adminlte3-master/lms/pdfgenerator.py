@@ -46,7 +46,7 @@ class Pdf(View):
         SHEET_NAME = "Apr - Mar " +datetime.now().strftime("%Y")
         up = user_profile.objects.get(user_id=request.user.id)
         range = "!"+str(up.student_performance_row)+':'+str(up.student_performance_row)
-        values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname=SHEET_NAME, range=range)
+        values = sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname=SHEET_NAME, range=range)
 
         # print(values)
         today = timezone.now()

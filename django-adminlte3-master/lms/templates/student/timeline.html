@@ -1,5 +1,7 @@
 {%extends 'student/base.html'%}
 {%load static%}
+{%load admin_menu%}
+
 {%block style%}
 <style type="text/css">
     select {
@@ -7,98 +9,73 @@
 };
 </style>
 <link rel="stylesheet" href="{%static 'student/plugins/summernote/summernote-bs4.min.css'%}">
-<!-- <link rel="stylesheet" href="{%static 'student/plugins/src/bootstrap3-wysihtml5.css'%}"> -->
-
-  <!-- SimpleMDE -->
-  <link rel="stylesheet" href="{%static 'student/plugins/simplemde.min.css'%}">
+<link rel="stylesheet" href="{%static 'student/plugins/simplemde.min.css'%}">
 {%endblock%}
-{%load admin_menu%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Timeline</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Timeline</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    {%endblock%}
-    <!-- /.content-header -->
 
-    <!-- Main content -->
-    {%block content%}
-    <section class="content" onscroll="track(this)">
-<form action="{%url 'addtimeline'%}" method="POST">
+{%block page_link%}
+{%block page_title%}
+Timeline
+{%endblock%}
+{%endblock%}
 
-      <div class="container-fluid">
-        <!-- Timelime example  -->
-        <div class="row">
-          <div class="col-md-12">
-            <!-- The time line -->
-            <div class="timeline">
-              <!-- timeline time label -->
-              <div class="time-label">
-                <span class="bg-red" id="today"></span>
+{%block content%}
+<section class="content" onscroll="track(this)">
+  <form action="{%url 'addtimeline'%}" method="POST">
+
+  <div class="container-fluid">
+    <!-- Timelime example  -->
+    <div class="row">
+      <div class="col-md-12">
+        <!-- The time line -->
+        <div class="timeline">
+          <!-- timeline time label -->
+          <div class="time-label">
+            <span class="bg-red" id="today"></span>
+          </div>
+          <!-- /.timeline-label -->
+          <!-- timeline item -->
+          {%if request.user.is_staff%}
+          <div>
+            {%csrf_token%}
+              <select name="type">
+                <option value="video">Video &#xf03d;</option>
+                <option value="image">Image &#xf030;</option>
+                <option value="comment">Comment &#xf086;</option>
+                <!-- <option>Quote &#xf1dd;</option> -->
+              </select>
+            <div class="timeline-item">
+              <span class="time"><!-- <i class="fas fa-clock"></i> 12:05 --></span>
+              <h3 class="timeline-header"><a ></a>
+                <input type="text" name="title" class="form-control" placeholder="Title"></h3>
+
+              <div class="timeline-body">
+                  <div id="new">Add New Post</div>
+                  <textarea name="body" style="display: none;"></textarea>
               </div>
-              <!-- /.timeline-label -->
-              <!-- timeline item -->
-              {%if request.user.is_staff%}
-              <div>
-                {%csrf_token%}
-                  <select name="type">
-                    <option value="video">Video &#xf03d;</option>
-                    <option value="image">Image &#xf030;</option>
-                    <option value="comment">Comment &#xf086;</option>
-                    <!-- <option>Quote &#xf1dd;</option> -->
-                  </select>
-                <div class="timeline-item">
-                  <span class="time"><!-- <i class="fas fa-clock"></i> 12:05 --></span>
-                  <h3 class="timeline-header"><a ></a>
-                    <input type="text" name="title" class="form-control" placeholder="Title"></h3>
-
-                  <div class="timeline-body">
-                      <div id="new">Add New Post</div>
-                      <textarea name="body" style="display: none;"></textarea>
-                  </div>
-                  <div class="timeline-footer">
-                    <a class="btn btn-primary btn-sm preview" onclick="preview('#new')">Preview</a>
-                    <a class="btn btn-success btn-sm edit" onclick="edit('#new')">Edit</a>
-                    <a class="btn btn-success btn-sm publish" onclick="save()">Publish</a>
-                    <input type="submit" name="submit" style="display: none;">
-                  </div>
-                </div>
+              <div class="timeline-footer">
+                <a class="btn btn-primary btn-sm preview" onclick="preview('#new')">Preview</a>
+                <a class="btn btn-success btn-sm edit" onclick="edit('#new')">Edit</a>
+                <a class="btn btn-success btn-sm publish" onclick="save()">Publish</a>
+                <input type="submit" name="submit" style="display: none;">
               </div>
-              <!-- END timeline item -->
-              {%endif%}
-<!--               <div>
-                <i class="fas fa-clock bg-gray"></i>
-              </div> -->
             </div>
           </div>
-          <!-- /.col -->
+          <!-- END timeline item -->
+          {%endif%}
+
         </div>
       </div>
-      <!-- /.timeline -->
-</form>
-    </section>
-  {%endblock%}
-    
-    <!-- /.content -->
+      <!-- /.col -->
+    </div>
   </div>
-  <!-- /.content-wrapper -->
+  <!-- /.timeline -->
+  </form>
+</section>
+{%endblock%}
+    
+
 {%block script%}
 <script src="{%static 'student/plugins/summernote/summernote-bs4.min.js'%}"></script>
-<!-- <script src="{%static 'student/plugins/src/bootstrap3-wysihtml5.js'%}"></script> -->
 <script type="text/javascript">
   window.pre = 0;
   window.endtimeline = true;
@@ -106,13 +83,12 @@
 
     var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     var d = new Date();
-   day =  d.getDay();
+   day =  d.getDate();
    month = months[d.getMonth()];
    year = d.getFullYear();
-    // console.log(day);
-
 
    $('#today').text(day+" "+month+" "+year);
+
     // Summernote
     $('#new').summernote();
     load();
@@ -130,6 +106,7 @@
                 </div>`;
     $(".timeline").append(item);
       window.endtimeline = false;
+      toastr.success('Timeline Ended');
 
       }
     }
@@ -140,7 +117,6 @@
   url = "{%url 'timelinedata'%}";
   $.get( url, { pre:pre }).done(function( data ) {
     window.data = data;
-    // console.log(data,data[431]);
     data = JSON.parse(data);
     $.each(data,function(){
       icon = '';
@@ -178,9 +154,9 @@
     // console.log(item);
     $(".timeline").append(item);
     });
-    // console.log(data);
+
     window.pre = window.pre + 20;
-    // alert( "Data Loaded: " + data );
+    toastr.success('New Content Loaded');
   });
 }
 
@@ -213,7 +189,6 @@ var deleteitem = function(id){
   url = "{%url 'deletetimeline'%}";
   $.get( url, { id: id })
   .done(function( data ) {
-    // alert( "Data Loaded: " + data );
     window.location.replace(window.location.href);
   });
 }

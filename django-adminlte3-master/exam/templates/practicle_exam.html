@@ -7,14 +7,6 @@
 		padding: 10px;
 		margin-top: 7px;
 	}
-/*	#add_questions_form .col-md-5{
-		position: fixed;
-		top: 50%;
-	    left: 50%;
-	    transform: translate(-50%, -50%);
-	}
-	.hide{
-		display: none;
 	}*/
   body{
     -webkit-touch-callout: none;
@@ -39,183 +31,156 @@
 </style>
 {%endblock%}
 {%load static%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>MCQ Test</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">MCQ Test</li>
-            </ol>
-          </div>
-        </div>
-      </div><!-- /.container-fluid -->
-    </section>
-    {%endblock%}
 
-    <!-- Main content -->
-    {%block content%}
-    <span id="timer"><i class="fas fa-stopwatch" aria-hidden="true"></i> <span></span></span>
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-12">
-            <!-- general form elements -->
-            <div class="card card-primary">
-              <div id="header" class="card-header bg-info">
-                <div class="form-group">
-                  <i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
-                  {{crs.instructions}}
+{%block page_link%}
+{%block page_title%}
+Exam
+{%endblock%}
+{%endblock%}
+
+{%block content%}
+<span id="timer"><i class="fas fa-stopwatch" aria-hidden="true"></i> <span></span></span>
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="card card-primary">
+          <div id="header" class="card-header bg-info">
+            <div class="form-group">
+              <i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
+              {%if crs%}{{crs.instructions}}{%else%}For Advance Domain Practical And Portfolio Select Prgorgam{%endif%}
+            </div>
+          </div>
+          <!-- /.card-header -->
+          <!-- form start -->
+          <form action="{%if crs.type == 'PRACTICAL'%}{%url 'save_practical'%}{%elif crs.type == 'PROGRAM'%}{%url 'save_program'%}{%endif%}" method="POST" onsubmit="return check()" enctype="multipart/form-data">
+            {%csrf_token%}
+            <div class="card-body" style="border: 2px solid #17a2b8;">
+            	<div class="row">
+
+              <div class="form-group col-md-4">
+              <label>Course</label>
+                {%if not crs%}
+
+              <select class="form-control select2" style="width: 100%;" name="cname" {%if crs%}disabled{%endif%}>
+                {%for course in courses%}
+                <option {%if crs ==  course%}selected{%endif%}>{{course}}</option>
+                {%endfor%}}
+              </select>
+                {%else%}
+                <input type="text" value="{{crs}}" class="form-control" disabled="">
+
+                {%endif%}
+
+              {%if crs%}
+              <input type="hidden" name="cname" value="{{crs}}">
+              {%endif%}
+            	</div>
+            	<div class="form-group col-md-4">
+            		<div class="row">
+            			<div class="col-md-6">
+            				<label>Section</label>
+                		<select class="form-control select2" name="type" {%if crs%}disabled{%endif%}>
+                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>MCQ</option>
+                      <option {%if crs.type == 'PRACTICAL' %}selected{%endif%}>PRACTICAL</option>
+                			<option {%if crs.type == 'PROGRAM' %}selected{%endif%}>PROGRAM</option>
+                		</select>
+                		{%if crs%}
+		                  <input type="hidden" name="type" value="{{crs.type}}">
+		                  {%endif%}
+                	</div>
+                	<div class="col-md-6">
+                    {%if crs%}
+            				<label>Duration</label><br>
+                		<span id="time" style="font-size: xx-large;"><input type="number" class="form-control center" name="time" placeholder="Duration in minutes" value="{{crs.time}}"  {%if crs%}disabled{%endif%}></span>
+                		{%endif%}
+                	</div>
+            		</div>
+            		
+            	</div>
+            	<div class="form-group col-md-4">
+                <div class="row">
+                  <div class="col-md-6">
+                    <label id='marks'>Marks Scored: </label><br>
+                    <label>Out Off: 40</label>
+                  </div>
                 </div>
-              </div>
-              <!-- /.card-header -->
-              <!-- form start -->
-              <form action="{%if crs.type == 'PRACTICAL'%}{%url 'save_practical'%}{%elif crs.type == 'PROGRAM'%}{%url 'save_program'%}{%endif%}" method="POST" onsubmit="return check()" enctype="multipart/form-data">
-                {%csrf_token%}
-                <div class="card-body" style="border: 2px solid #17a2b8;">
-                	<div class="row">
+            	</div>
+            	</div>
+             {%if crs%}
+             <div>
+             	<hr>
+             	<div id="add_questions_form" class="row hide">
+             		<div class="col-md-12">
+             			<div class="card ">
+		              <!-- /.card-header -->
+		              <!-- form start -->
+		                <div class="card-body" id="body" style="height: 800px;overflow: auto;">
+                      <i>Click on Question to open IDE</i>
+		                {%for pro in prog_set%}
+                    <div class='question' id='{{pro.id}}'>
+                     <div>
+                        <div class="form-group">
+                            <label for="question">Program #{{forloop.counter}}</label>
+                            <div class="form-control program" id="que{{pro.id}}" onclick="(function(){$('#program{{pro.id}}').toggleClass('collapse');disa('{{pro.id}}');})()">{{pro}}</div> 
+                        </div>
+                        <div id="program{{pro.id}}" class="row collapse">
+                          {%if crs.type == 'PRACTICAL'%}
+                         <div class="col-md-8"><iframe src="https://techiedelight.com/compiler/" width="100%" height="500px;"></iframe>
+                         </div>
 
-                  <!-- <div class="form-group col-md-6">
-                    <label for="nameInputEmail1">Group Name</label>
-                    <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
-                  </div> -->
-                  <div class="form-group col-md-4">
-                  <label>Course</label>
-                  <select class="form-control select2" style="width: 100%;" name="cname" {%if crs%}disabled{%endif%}>
-                    {%for course in courses%}
-                    <option {%if crs ==  course%}selected{%endif%}>{{course}}</option>
-                    {%endfor%}}
-                  </select>
-                  {%if crs%}
-                  <input type="hidden" name="cname" value="{{crs}}">
-                  {%endif%}
-                	</div>
-                	<div class="form-group col-md-4">
-                		<div class="row">
-                			<div class="col-md-6">
-                				<label>Section</label>
-		                		<select class="form-control select2" name="type" {%if crs%}disabled{%endif%}>
-		                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>MCQ</option>
-                          <option {%if crs.type == 'PRACTICAL' %}selected{%endif%}>PRACTICAL</option>
-		                			<option {%if crs.type == 'PROGRAM' %}selected{%endif%}>PROGRAM</option>
-		                		</select>
-		                		{%if crs%}
-				                  <input type="hidden" name="type" value="{{crs.type}}">
-				                  {%endif%}
-		                	</div>
-		                	<div class="col-md-6">
-                        {%if crs%}
-                				<label>Duration</label><br>
-		                		<span id="time" style="font-size: xx-large;"><input type="number" class="form-control center" name="time" placeholder="Duration in minutes" value="{{crs.time}}"  {%if crs%}disabled{%endif%}></span>
-		                		{%endif%}
-		                	</div>
-                		</div>
-                		
-                	</div>
-                	<div class="form-group col-md-4">
-                		<!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
-                    <div class="row">
-                      <div class="col-md-6">
-                        <label id='marks'>Marks Scored: </label><br>
-                        <label>Out Off: 40</label>
+                         <div class="col-md-4">
+                           <textarea class="form-control ans" style="width: 100%;height: 90%" name="ans{{pro.id}}" placeholder="Paste your code here"></textarea>
+                    <a class="btn btn-primary" style="margin-top: 10px;" pno={{pro.id}} onclick="save()">SAVE</a>
+
+                         </div>
+                         
+                         {%elif crs.type == 'PROGRAM'%}
+                         <div class="col-md-5">
+                           <div class="input-group">
+                              <div class="custom-file">
+                                <input type="file" name=file{{pro.id}} class="custom-file-input" id="file{{pro.id}}">
+                                <label class="custom-file-label" for="file{{pro.id}}">Choose zip file</label>
+                              </div>
+                              <div class="input-group-append">
+                                <span class="input-group-text btn" onclick="sub()">Upload</span>
+                              </div>
+                            </div>
+                                <span>* Mandatory only zip file allowed</span>
+
+                         </div>
+                         {%endif%}
+                         <br>
                       </div>
                     </div>
-                	</div>
-                	</div>
-                 {%if crs%}
-                 <div>
-                 	<hr>
-                 	<div id="add_questions_form" class="row hide">
-                 		<div class="col-md-12">
-                 			<div class="card ">
-				              <!-- <div class="card-header bg-info">
-				                <div class="form-group">
-				                	<i class="fas fa-info text-warning" style="font-size: x-large;"> Instructions</i><br>
-                          {{crs.instructions}}
-				                </div>
-				              </div> -->
-				              <!-- /.card-header -->
-				              <!-- form start -->
-				                <div class="card-body" id="body" style="height: 800px;overflow: auto;">
-                          <i>Click on Question to open IDE</i>
-				                {%for pro in prog_set%}
-                        <div class='question' id='{{pro.id}}'>
-                         <div>
-                            <div class="form-group">
-                                <label for="question">Program #{{forloop.counter}}</label>
-                                <!-- <textarea name="question" class="form-control" id="question" col=4 placeholder="Enter Question"></textarea> -->
-                                <div class="form-control program" id="que{{pro.id}}" onclick="(function(){$('#program{{pro.id}}').toggleClass('collapse');disa('{{pro.id}}');})()">{{pro}}</div> <!-- data-toggle="collapse" data-target='#program{{pro.id}}' -->
-                            </div>
-                            <div id="program{{pro.id}}" class="row collapse">
-                              {%if crs.type == 'PRACTICAL'%}
-                             <div class="col-md-8"><iframe src="https://techiedelight.com/compiler/" width="100%" height="500px;"></iframe>
-                             </div>
-
-                             <div class="col-md-4">
-                               <textarea class="form-control ans" style="width: 100%;height: 90%" name="ans{{pro.id}}" placeholder="Paste your code here"></textarea>
-                        <a class="btn btn-primary" style="margin-top: 10px;" pno={{pro.id}} onclick="save()">SAVE</a>
-
-                             </div>
-                             
-                        
-
-                             {%elif crs.type == 'PROGRAM'%}
-                             <div class="col-md-5">
-                               <div class="input-group">
-                                  <div class="custom-file">
-                                    <input type="file" name=file{{pro.id}} class="custom-file-input" id="file{{pro.id}}">
-                                    <label class="custom-file-label" for="file{{pro.id}}">Choose zip file</label>
-                                  </div>
-                                  <div class="input-group-append">
-                                    <span class="input-group-text btn" onclick="sub()">Upload</span>
-                                  </div>
-                                </div>
-                                    <span>* Mandatory only zip file allowed</span>
-
-                             </div>
-                             {%endif%}
-                             <br>
-                          </div>
-                        </div>
-                    </div>
-                        <hr>
-
-                        {%endfor%}
-				                </div>
-				                
-				                <!-- /.card-body -->
-				            </div>
-                 		</div>
-                 	</div>
-                 </div>
-                  
-                 {%endif%}
-                <!-- /.card-body -->
-            	</div>
-                <div class="card-footer">
-                  <input name="submit" type="submit" class="btn btn-primary">
-                  <!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
                 </div>
-              </form>
+                    <hr>
+
+                    {%endfor%}
+		                </div>
+		                
+		                <!-- /.card-body -->
+		            </div>
+             		</div>
+             	</div>
+             </div>
+              
+             {%endif%}
+            <!-- /.card-body -->
+        	</div>
+            <div class="card-footer">
+              <input name="submit" type="submit" class="btn btn-primary">
+              <!-- {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion()><i class="fas fa-plus"></i> Add Questions</button>{%endif%} -->
             </div>
+          </form>
         </div>
-      </div>
-
-    </section>
-    {%endblock%}
-    <!-- /.content -->
+    </div>
   </div>
-  <!-- /.content-wrapper -->
+</section>
+{%endblock%}
 
-    {%block script%}
-
+{%block script%}
 {%if crs%}
 {%if crs.type == 'PRACTICAL'%}
 <script type="text/javascript">
@@ -239,14 +204,10 @@
         }
 
         if (--timer < 0) {
-            // exit();
-            // stopTimer(fiveMinutes);
             $('#time').addClass('text-danger');
             $('#timer').addClass('text-danger');
             $("input[name='submit']").trigger('click');
-            // $("input[name='submit']").trigger('click');
             clearInterval(window.a);
-            // exit();
         }
     }, 1000);
   }
@@ -254,26 +215,37 @@
 function check(){
   document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
       document.cookie = "que_ans=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+      document.cookie = "que_id=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
 }
-  window.onload = function () {
+abc();
+ function abc() {
   if(getCookie('que_ans') != ""){
     que_ans = JSON.parse(getCookie('que_ans'));
+    que_id = JSON.parse(getCookie('que_id'));
     keys = Object.keys(que_ans);
-    // console.log(que_ans);
-    // console.log(keys);
    for (i=0;i<que_ans.length;i++){
     a = que_ans[i];
-    // console.log(a.pno);
+    b = que_id[i];
     program = $('.program')[i];
-    $(program).attr('id','que'+a.pno);
-    $(program).text(a.pro);
-    // console.log($('.program')[i]);
-    ans = $('.ans')[i];
-    $(ans).val(a.ans);
-    $(ans).attr('name','ans'+a.pno);
+    $(program).attr('id',b);
+    $(program).text(a);
+    // ans = $('.ans')[i];
+    // $(ans).val(a.ans);
+    // $(ans).attr('name','ans'+a.pno);
    }
 
+   }else{
+    que_ans = [];
+    que_id = [];
+    $.each($('.program'),function () {
+      console.log(this);
+      que_ans.push($(this).text());
+      que_id.push($(this).attr('id'));
+    });
+      setCookie('que_ans',Json.stringfy(que_ans),1);
+
   }
+}
   if(getCookie('timer')==""){
     duration = $("input[name='time']").val();
     console.log(duration);
@@ -282,13 +254,10 @@ function check(){
     startTimer(fiveMinutes, display);
   }
   else{
-    // duration = $("input[name='time']").val();
     var fiveMinutes = parseInt(getCookie('timer'),10),
         display = document.querySelector("#time");
     startTimer(fiveMinutes, display);
   }
-    
-  };
 
   function disa(a){};
   
@@ -297,22 +266,13 @@ function check(){
     // pi = 0;
     $('textarea').each(function(){
       pno = $(this).attr('name');
-      console.log(pno);
-
       program = $("#que"+pno).text();
-      console.log(program)
       ans = $("textarea[name="+pno+"]").val();
-      console.log(ans);
       que = {'pno':pno,'pro':program,'ans':ans};
       question_answer.push(que);
-      // pi += 1;
+
     })
 
-    // url = "window.location.origin/savepracticle/";
-    // $.post(url,"&"+pno+"="+program ).done(function(data){
-    //   console.log(data);
-    // })
-    // return false;
     setCookie('que_ans',JSON.stringify(question_answer),1);
   }
   function setCookie(cname, cvalue, exdays) {
@@ -339,143 +299,123 @@ function check(){
   }
   </script>
   {%elif crs.type == 'PROGRAM'%}
-  <script type="text/javascript">
+<script type="text/javascript">
     
-function startTimer(duration, display) {
-    var timer = duration, hr, minutes, seconds;
-    window.a=setInterval(function () {
-      setCookie('timer',timer,1);
-        hr = parseInt(timer/3600,10);
-        minutes = !(timer % 360) ? parseInt( timer/3600, 10) : parseInt((timer/60)%60,10);
-        seconds = parseInt(timer % 60, 10);
+  function startTimer(duration, display) {
+      var timer = duration, hr, minutes, seconds;
+      window.a=setInterval(function () {
+        setCookie('timer',timer,1);
+          hr = parseInt(timer/3600,10);
+          minutes = !(timer % 360) ? parseInt( timer/3600, 10) : parseInt((timer/60)%60,10);
+          seconds = parseInt(timer % 60, 10);
 
-        hr = hr < 10 ? "0" + hr : hr;
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
+          hr = hr < 10 ? "0" + hr : hr;
+          minutes = minutes < 10 ? "0" + minutes : minutes;
+          seconds = seconds < 10 ? "0" + seconds : seconds;
 
-        display.textContent = hr + ":" + minutes + ":" + seconds;
-        $("#timer span").text( hr + ":" + minutes + ":" + seconds);
-        if (timer == 60*5){
-          $('#time').addClass('text-warning');
-          $('#timer').addClass('text-warning');
+          display.textContent = hr + ":" + minutes + ":" + seconds;
+          $("#timer span").text( hr + ":" + minutes + ":" + seconds);
+          if (timer == 60*5){
+            $('#time').addClass('text-warning');
+            $('#timer').addClass('text-warning');
+          }
+
+          if (--timer < 0) {
+              $('#time').addClass('text-danger');
+              $('#timer').addClass('text-danger');
+              $("input[name='submit']").trigger('click');
+              clearInterval(window.a);
+
+          }
+      }, 1000);
+    }
+
+
+      window.onload = function () {
+      if(getCookie('que_ans') != ""){
+        que_ans = getCookie('que_ans');
+        que_id = getCookie('que_id');
+
+        $('.program').text(que_ans);
+        $('.program').attr('id',que_id);
+        // $('')
+        duration = $("input[name='time']").val();
+            var fiveMinutes = parseInt(getCookie('timer'),10),
+          display = document.querySelector("#time");
+      startTimer(fiveMinutes, display);
+        
+       }
+
+    else{
+      setCookie("que_ans",$('.program').text(),1);
+      setCookie("que_id",$('.program').attr('id'),1);
+      duration = $("input[name='time']").val();
+  var fiveMinutes = 60 * duration,
+            display = document.querySelector("#time");
+        startTimer(fiveMinutes, display);
+    }
+  }
+    function setCookie(cname, cvalue, exdays) {
+      var d = new Date();
+      d.setTime(d.getTime() + (exdays*24*60*60*1000));
+      var expires = "expires="+ d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+    function getCookie(cname) {
+      var name = cname + "=";
+      var decodedCookie = decodeURIComponent(document.cookie);
+      var ca = decodedCookie.split(';');
+      for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
         }
-
-        if (--timer < 0) {
-            // exit();
-            // stopTimer(fiveMinutes);
-            $('#time').addClass('text-danger');
-            $('#timer').addClass('text-danger');
-            $("input[name='submit']").trigger('click');
-            // $("input[name='submit']").trigger('click');
-            clearInterval(window.a);
-            // exit();
+        
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
         }
-    }, 1000);
-  }
-
-
-    window.onload = function () {
-  if(getCookie('que_ans') != ""){
-    que_ans = JSON.parse(getCookie('que_ans'));
-    keys = Object.keys(que_ans);
-    // console.log(que_ans);
-    // console.log(keys);
-   for (i=0;i<que_ans.length;i++){
-    a = que_ans[i];
-    // console.log(a.pno);
-    program = $('.program')[i];
-    $(program).attr('id','que'+a.pno);
-    $(program).text(a.pro);
-    // console.log($('.program')[i]);
-    // ans = $('.ans')[i];
-    // $(ans).val(a.ans);
-    // $(ans).attr('name','ans'+a.pno);
-   }
-
-  }
-  if(getCookie('timer')==""){
-    duration = $("input[name='time']").val();
-    var fiveMinutes = 60 * duration,
-        display = document.querySelector("#time");
-    startTimer(fiveMinutes, display);
-  }
-  else{
-    // duration = $("input[name='time']").val();
-    var fiveMinutes = parseInt(getCookie('timer'),10),
-        display = document.querySelector("#time");
-    startTimer(fiveMinutes, display);
-  }
-    
-  };
-  function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+ d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-  }
-  function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i <ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
       }
+      return "";
+    }
+
+    function sub(){
+      $("input[name='submit']").trigger('click');
+    }
+    function check(){
+      var fileInput =  "";
+      $("input[type='file']").each(function(){
+        if(!$(this).attr('disabled')){
+          fileInput =  $(this);
+        }
+      })
+      var filePath = $(fileInput).val(); 
+
       
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
+      if (filePath.indexOf('.zip')<0) { 
+          alert('Invalid file type'); 
+          fileInput.value = ''; 
+          return false;       
+      } 
+      else if (confirm(filePath)){
+        document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+        clearInterval(window.a)
+        document.cookie = "que_ans=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+          return true;
+          
+        }
+  }
+    function disa(a){
+        name = "file"+a;
+      $("input[type='file']").each(function(){
+        if($(this).attr('name') != name){
+        $(this).attr('disabled',true);
       }
-    }
-    return "";
-  }
-
-  function sub(){
-    $("input[name='submit']").trigger('click');
-  }
-  // window.name = "";
-  function check(){
-    var fileInput =  "";
-    $("input[type='file']").each(function(){
-      if(!$(this).attr('disabled')){
-        fileInput =  $(this);
+      else{
+        $(this).attr('disabled',false);
       }
-    })
-console.log(fileInput);
-    var filePath = $(fileInput).val(); 
-
-    // var allowedExtensions =  /(\.zip)$/i; 
-    alert(filePath);
-    if (filePath.indexOf('.zip')<0) { 
-        alert('Invalid file type'); 
-        fileInput.value = ''; 
-        return false; 
-    } 
-    else{
-      document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
-      document.cookie = "que_ans=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
-      // document.cookie = "asd=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
-      return true;
-    }
-  }
-  function disa(a){
-    console.log(a);
-      name = "file"+a;
-      console.log(name);
-    $("input[type='file']").each(function(){
-      // console.log(name);
-      if($(this).attr('name') != name){
-      $(this).attr('disabled',true);
+      })
 
     }
-    else{
-      $(this).attr('disabled',false);
-    }
-    })
-      // $(a).attr('disabled',false);
-      // console.log($(a));
-
-  }
   </script>
   {%endif%}
 {%endif%}
@@ -483,136 +423,14 @@ console.log(fileInput);
 
 <script>
   $(function () {
-    //Initialize Select2 Elements
     $('.select2').select2({
     	tags:true
     })
 
-    //Initialize Select2 Elements
     $('.select2bs4').select2({
       theme: 'bootstrap4',
       tags:true
     })
-
-    //Datemask dd/mm/yyyy
-
-    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
-    //Datemask2 mm/dd/yyyy
-    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
-    //Money Euro
-    $('[data-mask]').inputmask()
-
-    //Date range picker
-    $('#reservationdate').datetimepicker({
-        format: 'L'
-    });
-    //Date range picker
-    $('#reservation').daterangepicker()
-    //Date range picker with time picker
-    $('#reservationtime').daterangepicker({
-      timePicker: true,
-      timePickerIncrement: 30,
-      locale: {
-        format: 'MM/DD/YYYY hh:mm A'
-      }
-    })
-    //Date range as a button
-    $('#daterange-btn').daterangepicker(
-      {
-        ranges   : {
-          'Today'       : [moment(), moment()],
-          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        },
-        startDate: moment().subtract(29, 'days'),
-        endDate  : moment()
-      },
-      function (start, end) {
-        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-      }
-    )
-
-    //Timepicker
-    $('#timepicker').datetimepicker({
-      format: 'LT'
-    })
-
-    //Bootstrap Duallistbox
-    $('.duallistbox').bootstrapDualListbox()
-
-    //Colorpicker
-    $('.my-colorpicker1').colorpicker()
-    //color picker with addon
-    $('.my-colorpicker2').colorpicker()
-
-    $('.my-colorpicker2').on('colorpickerChange', function(event) {
-      $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
-    })
-
-    $("input[data-bootstrap-switch]").each(function(){
-      $(this).bootstrapSwitch('state', $(this).prop('checked'));
-    })
-
-  })
-  // BS-Stepper Init
-  document.addEventListener('DOMContentLoaded', function () {
-    window.stepper = new Stepper(document.querySelector('.bs-stepper'))
-  })
-
-  // DropzoneJS Demo Code Start
-  Dropzone.autoDiscover = false
-
-  // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-  var previewNode = document.querySelector("#template")
-  previewNode.id = ""
-  var previewTemplate = previewNode.parentNode.innerHTML
-  previewNode.parentNode.removeChild(previewNode)
-
-  var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
-    url: "/target-url", // Set the url
-    thumbnailWidth: 80,
-    thumbnailHeight: 80,
-    parallelUploads: 20,
-    previewTemplate: previewTemplate,
-    autoQueue: false, // Make sure the files aren't queued until manually added
-    previewsContainer: "#previews", // Define the container to display the previews
-    clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
-  })
-
-  myDropzone.on("addedfile", function(file) {
-    // Hookup the start button
-    file.previewElement.querySelector(".start").onclick = function() { myDropzone.enqueueFile(file) }
-  })
-
-  // Update the total progress bar
-  myDropzone.on("totaluploadprogress", function(progress) {
-    document.querySelector("#total-progress .progress-bar").style.width = progress + "%"
-  })
-
-  myDropzone.on("sending", function(file) {
-    // Show the total progress bar when upload starts
-    document.querySelector("#total-progress").style.opacity = "1"
-    // And disable the start button
-    file.previewElement.querySelector(".start").setAttribute("disabled", "disabled")
-  })
-
-  // Hide the total progress bar when nothing's uploading anymore
-  myDropzone.on("queuecomplete", function(progress) {
-    document.querySelector("#total-progress").style.opacity = "0"
-  })
-
-  // Setup the buttons for all transfers
-  // The "add files" button doesn't need to be setup because the config
-  // `clickable` has already been specified.
-  document.querySelector("#actions .start").onclick = function() {
-    myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED))
-  }
-  document.querySelector("#actions .cancel").onclick = function() {
-    myDropzone.removeAllFiles(true)
-  }
-  // DropzoneJS Demo Code End
+})
 </script>
     {%endblock%}

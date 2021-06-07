@@ -46,57 +46,36 @@ iframe{
   <!-- <link rel="stylesheet" type="text/css" href="{%static 'dashboard.css'%}"> -->
  <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
 {%endblock%}
+
 {%load admin_menu%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Videos</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Videos</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    {%endblock%}
 
-    <!-- /.content-header -->
+{%block page_link%}
+{%block page_title%}
+Videos
+{%endblock%}
+{%endblock%}
 
-    <!-- Main content -->
-    {%block content%}
+{%block content%}
 
-        <!-- Script for the picture-in-picture plugin -->
-        <script src="https://players.brightcove.net/videojs-pip/1/videojs-pip.min.js"></script>
-    <section class="content">
+<section class="content">
   <div class="col-sm-12 col-md-12" style="margin-top: 0px;">
     <div class="row up_title">
       <div id="title" class="col-sm-12 col-md-6">{{videos.0}}</div>
       <div class="col-md-6">
         <div class="progress-outer">
-                <div class="progress">
-                    <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width:{{per}}%; box-shadow:-1px 10px 10px rgba(240, 173, 78,0.7);"></div>
-                    <div class="progress-value">{{per}}%</div>
-                </div>
-            </div>
+              <div class="progress">
+                  <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width:{{per}}%; box-shadow:-1px 10px 10px rgba(240, 173, 78,0.7);"></div>
+                  <div class="progress-value">{{per}}%</div>
+              </div>
+        </div>
       </div>
-
-      </div>
+    </div>
     
     <div class="row container">
-
       <div class="col-sm-12 col-md-8">
         <div id="video"  style="background-color: #9193955e;" style="height: 100%;width: 100%;"><!-- #545190b8; -->
             <iframe src="{%url 'videoframe' course=course video=videos.0%}" height="100%" width="100%" style="overflow: hidden;"></iframe>
         </div>
-
       </div>
 
       <main class="col-sm-12 col-md-4">
@@ -109,14 +88,11 @@ iframe{
         </article>
         {%endfor%}
       </main>
-      
     </div>  
   </div>
-  </section>
-    {%endblock%}
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
+</section>
+{%endblock%}
+
 {%block script%}
   <script type="text/javascript" src="{%static 'video.js'%}"> </script>
  <script src="https://vjs.zencdn.net/7.11.4/video.min.js"></script>

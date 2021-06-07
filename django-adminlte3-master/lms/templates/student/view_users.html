@@ -22,55 +22,37 @@
   }
 </style>
 {%endblock%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Student Data</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Student Data</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    {%endblock%}
-    <!-- /.content-header -->
 
-    <!-- Main content -->
-    {%block content%}
-    <section class="content">
-      <div class="card card-primary">
-        <div class="card-header">
-          <h3 class="card-title">Student Profile</h3>
-          <div class="" style="width: max-content;float: right;">
-            <!-- <label>Custom Select</label> -->
-            <select name="sheetname" class="custom-select" onchange="load()">
-              {%for sheetname in sheetnames%}
-              <option value="{{sheetname}}">{{sheetname}}</option>
-              {%endfor%}
-            </select>
-          </div>
-        </div>
-        <!-- /.card-header -->
-        <div class="card-body">
-          <div id="grid"></div>
-        </div>
-        <!-- /.card-body -->
+{%block page_link%}
+{%block page_title%}
+View Members
+{%endblock%}
+{%endblock%}
+
+{%block content%}
+<section class="content">
+  <div class="card card-primary">
+    <div class="card-header">
+      <h3 class="card-title">Student Profile</h3>
+      <div class="" style="width: max-content;float: right;">
+        <!-- <label>Custom Select</label> -->
+        <select name="sheetname" class="custom-select" onchange="load()">
+          {%for sheetname in sheetnames%}
+          <option value="{{sheetname}}">{{sheetname}}</option>
+          {%endfor%}
+        </select>
       </div>
-      <!-- /.card -->
-    </section>
-    {%endblock%}
-    <!-- /.content -->
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+      <div id="grid"></div>
+    </div>
+    <!-- /.card-body -->
   </div>
-  <!-- /.content-wrapper -->
+  <!-- /.card -->
+</section>
+{%endblock%}
+
 {%block script%}
 <style type="text/css">
   .hide{

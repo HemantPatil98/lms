@@ -1,5 +1,5 @@
   {%load static%}
-
+{%load admin_menu%}
   <nav class="main-header navbar navbar-expand navbar-white">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
@@ -21,16 +21,14 @@
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#id1">
           <i class="far fa-bell"></i>
-          <!-- <span class="badge badge-warning navbar-badge">15</span> -->
+          <span class="badge badge-warning navbar-badge"> *</span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="id1">
           {%for note in notice%}
-          <a href="#" class="dropdown-item {%if note.type == 'Placement'%}{%endif%}">
+          <a onclick="noteopen('{{note.generateddate}}','{{note.title}}','{{note.description}}','{{note.externallink}}','{{note.file}}')" class="dropdown-item {%if request.session.last_notice_id <= note.id%}bg-warning{%endif%}{%if note.type == 'Placement'%}{%endif%}">
             <!-- Message Start -->
-            <div class="media">
-              <!-- <img src="{%static 'student/dist/img/user1-128x128.jpg'%}" alt="User Avatar" class="img-size-50 mr-3 img-circle"> -->
-              <!-- <i class="fas fa-file "></i> -->
-              <span class="img-size-50 mr-3" style="font-size: x-large; text-align-last: center;align-self: center;"><i class="fas fa-link" onclick="window.location.href='{{note.externalink}}'"></i></span>
+            <div class="media" >
+              <span class="img-size-50 mr-3" style="font-size: x-large; text-align-last: center;align-self: center;"><i class="fas fa-link" onclick="window.location.href='{{note.externalink}}'" ></i></span>
               <div class="media-body">
                 <h3 class="dropdown-item-title">
                   {{note.title}}

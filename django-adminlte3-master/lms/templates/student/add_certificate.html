@@ -22,58 +22,40 @@
   }
 </style>
 {%endblock%}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    {%block content_header%}
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Student Data</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Student Data</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    {%endblock%}
-    <!-- /.content-header -->
 
-    <!-- Main content -->
-    {%block content%}
-    <section class="content">
-      <div class="card card-primary">
-        <div class="card-header">
-          <h3 class="card-title">Student Profile</h3>
-          <div class="" style="width: max-content;float: right;">
-            <!-- <label>Custom Select</label> -->
-            <select name="status" class="custom-select" onchange="load()">
-              <option value="In Process">In Process</option>
-              <option value="Issued">Issued</option>
-              <option value="Rejected">Rejected</option>
-            </select>
-          </div>
-        </div>
-        <!-- /.card-header -->
-        <div class="card-body">
-          <form action="{%url 'setcertificate'%}" enctype="multipart/form-data" method="POST">
-          <div id="grid"></div>
-          <input type="submit" name="submit" class="hide">
-        </form>
-        </div>
-        <!-- /.card-body -->
+{%block content%}
+<section class="content">
+  <div class="card card-primary">
+    <div class="card-header">
+      <h3 class="card-title">Student Profile</h3>
+      <div class="" style="width: max-content;float: right;">
+        <!-- <label>Custom Select</label> -->
+        <select name="status" class="custom-select" onchange="load()">
+          <option value="In Process">In Process</option>
+          <option value="Issued">Issued</option>
+          <option value="Rejected">Rejected</option>
+        </select>
       </div>
-      <!-- /.card -->
-    </section>
-    {%endblock%}
-    <!-- /.content -->
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+      <form action="{%url 'setcertificate'%}" enctype="multipart/form-data" method="POST">
+      <div id="grid"></div>
+      <input type="submit" name="submit" class="hide">
+    </form>
+    </div>
+    <!-- /.card-body -->
   </div>
-  <!-- /.content-wrapper -->
+  <!-- /.card -->
+</section>
+{%endblock%}
+
+{%block page_link%}
+{%block page_title%}
+Add Certificates
+{%endblock%}
+{%endblock%}
+
 {%block script%}
 <style type="text/css">
   .hide{
