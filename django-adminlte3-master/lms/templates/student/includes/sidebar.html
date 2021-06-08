@@ -56,12 +56,14 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+              {%if request.user.is_superuser%}
               <li class="nav-item">
                 <a href="{% url 'addstudents' %}" class="nav-link {%if request.resolver_match.url_name == 'addstudents' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Students</p>
                 </a>
               </li>
+              {%endif%}
               <li class="nav-item">
                 <a href="{% url 'addgroups' %}" class="nav-link {%if request.resolver_match.url_name == 'addgroups' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>

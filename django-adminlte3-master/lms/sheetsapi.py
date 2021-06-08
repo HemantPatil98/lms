@@ -247,4 +247,5 @@ def updatesheet(SPREADSHEET_ID,SHEET_NAME,row,value,col=0,cell=False,dimension="
                                             valueInputOption="USER_ENTERED", body=body)
         # print(request)
     response = request.execute()
+    print(response)
 

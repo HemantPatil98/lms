@@ -32,31 +32,35 @@ def add_questions(request):
             crs = course(name=cname,type=type,time=request.POST['time'])
             if not os.path.exists('media/videos/courses/'+cname):
                 os.mkdir('media/videos/courses/'+cname)
+            if not os.path.exists('media/videos/thumb/'+cname):
+                os.mkdir('media/videos/thumb/'+cname)
 
             try:
                 SPREADSHEET_ID = models.extra_data.objects.get(name=type).value
             except:
-                if type == 'MCQ':
-                    fields = ["Question","Option1","Option2","Option3","Option4","Answer",'Explanation']
-                elif type == 'PRACTICAL':
-                    fields = ["Program"]
-                elif type == 'PROGRAM':
-                    fields = ["Program"]
-                SPREADSHEET_ID = sheetsapi.createsheet(name=type,columns=fields,sheetname=cname)
-                ext = models.extra_data(name=type, value=SPREADSHEET_ID)
-                ext.save()
-                ext = models.extra_data(name=cname+"_"+type,value=1)
-                ext.save()
+                if type != 'ORAL':
+                    if type == 'MCQ':
+                        fields = ["Question","Option1","Option2","Option3","Option4","Answer",'Explanation']
+                    elif type == 'PRACTICAL':
+                        fields = ["Program"]
+                    elif type == 'PROGRAM':
+                        fields = ["Program"]
+                    SPREADSHEET_ID = sheetsapi.createsheet(name=type,columns=fields,sheetname=cname)
+                    ext = models.extra_data(name=type, value=SPREADSHEET_ID)
+                    ext.save()
+                    ext = models.extra_data(name=cname+"_"+type,value=1)
+                    ext.save()
             else:
-                if type == 'MCQ':
-                    fields = ["Question", "Option1", "Option2", "Option3", "Option4", "Answer",'Explanation']
-                elif type == 'PRACTICAL':
-                    fields = ["Program"]
-                elif type == 'PROGRAM':
-                    fields = ["Program"]
-                sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=cname,columns=fields)
-                ext = models.extra_data(name=(cname+"_"+type),value=1)
-                ext.save()
+                if type != 'ORAL':
+                    if type == 'MCQ':
+                        fields = ["Question", "Option1", "Option2", "Option3", "Option4", "Answer",'Explanation']
+                    elif type == 'PRACTICAL':
+                        fields = ["Program"]
+                    elif type == 'PROGRAM':
+                        fields = ["Program"]
+                    sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=cname,columns=fields)
+                    ext = models.extra_data(name=(cname+"_"+type),value=1)
+                    ext.save()
 
             crs.save()
         courses = course.objects.all()
@@ -103,7 +107,8 @@ def add_questions(request):
     ext1 = {}
     cr = course.objects.all()
     for c in cr:
-        ext1[c.type] = ext.get(name=c.type.lower()).value
+        if c.type != 'ORAL':
+            ext1[c.type] = ext.get(name=c.type.lower()).value
     ext = ext1
 
     courses = course.objects.values_list('name', flat=True).distinct()
@@ -314,16 +319,8 @@ def savepracticle(request):
             pno = field.replace('ans', '')
             answer = request.POST[field]
             prog = program.objects.get(id=pno)
-            # if len(result) == 0:
-            #     attempt = 1
             p = program_ans(student=request.user, course=crs, program=prog, answer=answer, attempt=attempt)
             p.save()
-            # elif len(result) < 2:
-            #     attempt = 2
-            #     p = program_ans(student=request.user, course=crs, program=prog, answer=answer, attempt=attempt)
-            #     p.save()
-            # else:
-            #     attempt = "Attempts Overed"
     if attempt != "Attempts Overed":
         result = exam_attempts(student=request.user, course=crs, attempt=attempt)
         result.save()
@@ -368,6 +365,14 @@ def getdata_practicle(request):
 
     return HttpResponse(str(data).replace('None',"'none'").replace("'",'"'))
 
+def getdata_oral(request):
+    cname = request.GET['cname']
+    gp = models.groupsinfo.objects.filter(course=cname)
+    print(gp)
+    for g in gp:
+        us = User.objects.filter(groups__name=g.group.name)
+        print(us)
+    return HttpResponse("")
 
 ###
 @login_required(login_url='')
@@ -396,8 +401,9 @@ def marks_practicle(request):
     crs = ex.course
     SPREADSHEET_ID = models.extra_data.objects.get(name='student_performance').value
     sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
-    row = models.user_profile.objects.get(user_id=request.user).student_performance_row
+    row = models.user_profile.objects.get(user_id=ex.student).student_performance_row
     row = int(row)
+
 
     if crs.name == 'C':
         col = all_fields_index['student_performance']['C Practical (Out of 40)']
@@ -410,7 +416,7 @@ def marks_practicle(request):
 
     sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=sheetname, row=row+1, value=[marks], col=col, cell=True)
 
-    return redirect('index')
+    return HttpResponse("<script type=text/javascript>window.close()</script>")
 
 ###
 @login_required(login_url='')

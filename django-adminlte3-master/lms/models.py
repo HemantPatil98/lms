@@ -7,8 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
 # Create your models here.
-def nothing():
-    pass
+
 
 class notice(models.Model):
     title = models.CharField(max_length=50)
@@ -16,7 +15,7 @@ class notice(models.Model):
     generateddate = models.DateTimeField()
     file = models.FileField(upload_to="notice/")
     externallink = models.CharField(max_length=100)
-    createdby = models.ForeignKey(User,on_delete=nothing)
+    createdby = models.ForeignKey(User,on_delete=models.CASCADE)
     type = models.CharField(max_length=12,choices=(('Notice','Notice'),('Placement','placement')),default='Notice')
 
     def __str__(self):
@@ -73,7 +72,7 @@ class notice(models.Model):
 
 
 class certificate_request(models.Model):
-    student_id = models.ForeignKey(User,on_delete=nothing)
+    student_id = models.ForeignKey(User,on_delete=models.CASCADE)
     certificate_number = models.CharField(max_length=10)
     certificate = models.FileField(upload_to='certificate/')
     certificate_status = models.CharField(max_length=10,default="In Process")
@@ -82,12 +81,12 @@ class certificate_request(models.Model):
         return self.student_id.first_name
 
 class user_profile(models.Model):
-    user_id = models.OneToOneField(User,on_delete=nothing)
+    user_id = models.OneToOneField(User,on_delete=models.CASCADE)
     student_performance_row = models.IntegerField(blank=True,null=True)
     student_profile_row = models.IntegerField(blank=True,null=True)
     otp = models.CharField(max_length=6)
     photo = models.FileField(upload_to='profile_photo/')
-    certificate = models.ForeignKey(certificate_request,on_delete=nothing,blank=True,null=True)
+    certificate = models.ForeignKey(certificate_request,on_delete=models.CASCADE,blank=True,null=True)
 
     def __str__(self):
         return self.user_id.username
@@ -100,7 +99,7 @@ class extra_data(models.Model):
         return self.name
 
 class timeline(models.Model):
-    generator = models.ForeignKey(User,on_delete=nothing)
+    generator = models.ForeignKey(User,on_delete=models.CASCADE)
     generatedtime = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100)
     type = models.CharField(max_length=100)

@@ -49,7 +49,7 @@ program = ['Program']
 all_fields = [student_performance,student_profile,attendance,feedback,mcq,program]
 all_fields_index = {'student_performance':{},'student_profile':{},'attendance':{},'feedback':{},'mcq':{},'program':{}}
 
-marks = {'C Total Marks':'','Sql Total Marks':'','WD Total Marks':'','Core Total Marks':'','Adv Total Marks':'','Total Marks (Out of 700)':''}
+marks = {'C Total Marks (Out of 100)':'','Sql Total Marks (Out of 100)':'','WD Total Marks (Out of 200)':'','Core Total Marks (Out of 100)':'','Adv Total Marks (Out of 100)':'','Total Marks (Out of 700)':''}
 
 from django.shortcuts import HttpResponse
 def indexing_fields():
@@ -62,7 +62,8 @@ def indexing_fields():
                 ch = chr(ord(ch) + 1)
             else:
                 if i == '':
-                    i='A'
+                    i = 'A'
+                    ch = 'A'
                 else:
                     i = chr(ord(i)+1)
                     ch = 'A'
@@ -92,12 +93,11 @@ def indexing_fields():
                                         ',INDIRECT("' + all_fields_index['student_performance']['Core Total Marks (Out of 100)'] + '"&ROW())' + \
                                         ',INDIRECT("' + all_fields_index['student_performance']['Adv Total Marks (Out of 100)'] + '"&ROW())' + \
                                         ',INDIRECT("' + all_fields_index['student_performance']['Soft Skills Marks (Out of 100)'] + '"&ROW()))'
-
-
+    # print(all_fields_index['student_performance'])
 
 import os
 def make_media_directory():
-    media_structure = ['media','media/profile_photos','media/notice','media/certificate','media/programs','media/videos',
+    media_structure = ['media','media/profile_photo','media/notice','media/certificate','media/programs','media/videos',
                        'media/videos/courses','media/videos/courses','media/videos/thumb']
     for path in media_structure:
         if not os.path.exists(path):

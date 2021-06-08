@@ -108,30 +108,34 @@ $(function () {
             // sheetname = $("select[name='sheetname']").val();
             // console.log(sheetname);
             // $("input[name='submit']").trigger('click');
+            if (confirm(item.CERTIFICATE)) {
+                          var formData = new FormData();
+  formData.append('file', $('#file')[0].files[0]);
+  formData.append('id',item.ID);
+  formData.append('certificate_number',item['CERTIFICATE NUMBER']);
+  formData.append('certificate_status',item['CERTIFICATE STATUS']);
+  $.ajax({
+         url : "{%url 'setcertificate'%}",
+         type : 'POST',
+         data : formData,
+         processData: false,  // tell jQuery not to process the data
+         contentType: false,  // tell jQuery not to set contentType
+         success : function(data) {
+             console.log(data);
+             // alert(data);
+         }
+  });
+      load();
+            }
 
-            var formData = new FormData();
-formData.append('file', $('#file')[0].files[0]);
-formData.append('id',item.ID);
-formData.append('certificate_number',item['CERTIFICATE NUMBER']);
-formData.append('certificate_status',item['CERTIFICATE STATUS']);
-$.ajax({
-       url : "{%url 'setcertificate'%}",
-       type : 'POST',
-       data : formData,
-       processData: false,  // tell jQuery not to process the data
-       contentType: false,  // tell jQuery not to set contentType
-       success : function(data) {
-           console.log(data);
-           alert(data);
-       }
-});
+
             },
           deleteItem: $.noop
         },
 
         fields: [
-            { name: "ID", type: "number", width: 70,editing:true, css:"hide"},
-            { name: "NAME", type: "text", width: 70,editing:true, css:""},
+            { name: "ID", type: "number", width: 70,editing:true, css:"hide",validate:"required"},
+            { name: "NAME", type: "text", width: 70,editing:false, css:""},
             { name: "CERTIFICATE STATUS", type: "select", width: 70, css:"", items:[
                                  { Name: "In Process", Id: "In Process"},
                                  { Name: "Issued", Id: "Issued" },
@@ -139,33 +143,29 @@ $.ajax({
             { name: "CERTIFICATE NUMBER", type: "text",width:100,css:''},
             { name: "CERTIFICATE", type: "text",width:100,css:'',editTemplate: function(value) {
         return this._editPicker = $("<input type='file' name='file' id='file'>");},editValue: function() {
-        return this._editPicker.val();},itemTemplate: function(value, item) { if (value) {return this._editPicker = $("<a href=/media/"+value+">Open</a>")};}},
+        return this._editPicker.val();},itemTemplate: function(value, item) { if (value) {return this._editPicker = $("<a href=/media/"+value+" class='btn btn-danger' target='new'>Open</a>")};}},
         { name: "control", type:"control"}
         ]
     });
   });
-    $('#grid').jsGrid({data:db.data});
+    // $('#grid').jsGrid({data:db.data});
 
 </script>
 <script type="text/javascript">
-  // window.db = db;
+
   var db = {};
   load();
  function load(){
     var status=$("select[name='status']").val();
-// console.log(status);
+
   var url = "{%url 'getcertificate'%}";
 $.get(url,{status:status},function(data,status){
-    // console.log(data);
-    // console.log(JSON.parse(data.replaceAll("'",'"')));
-    // db = {};
+
     data = data.replaceAll("'",'"');
     db.data=JSON.parse(data);
     // console.log(db.data);
     $('#grid').jsGrid({data:db.data});
-// wndow.db=db;
-    // db.loadData;
-    // addaction();
+
     $(".jsgrid-grid-body").keypress(function(){var keycode = (event.keyCode ? event.keyCode : event.which);
           if(keycode == '13'){window.edit_row=this;$('#grid').jsGrid('updateItem')}});
 });

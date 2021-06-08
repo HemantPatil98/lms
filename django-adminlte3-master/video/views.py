@@ -81,7 +81,7 @@ def videopermissions(request,view='false'):
         gp = Group.objects.get(name=gname)
         gpinfo = groupsinfo.objects.get(group_id=gp.id)
 
-        cname = request.POST['cname']
+        # cname = request.POST['cname']
 
         if request.POST.getlist('videopermission'):
             for p in gp.permissions.all():
@@ -103,11 +103,11 @@ def videopermissions(request,view='false'):
         gp_permissions = gp.permissions.all()
 
         videolist = []
-
-        videos = "media/videos/courses/" + cname
-
-        for v in os.listdir(videos):
-            videolist.append(v.split(".")[0])
+        # print(gpinfo.course)
+        videos = "media/videos/courses/" + gpinfo.course
+        if os.path.exists(videos):
+            for v in os.listdir(videos):
+                videolist.append(v.split(".")[0])
 
         try:
             notice1 = notice.objects.all().order_by('-id')[0:5]

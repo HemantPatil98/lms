@@ -76,7 +76,7 @@ Dashboard
                         <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'WD Total Marks (Out of 200)'}}"><br>WD</div>
                         <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Core Total Marks (Out of 100)'}}"><br>Core</div>
                         <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Adv Total Marks (Out of 100)'}}"><br>Adv</div>
-                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Soft Skills Marks (Out of 100)'}}"><br>Adv</div>
+                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Soft Skills Marks (Out of 100)'}}"><br>Soft Skill</div>
                         </div>
                       </div>
                     </div>
@@ -96,7 +96,12 @@ Dashboard
                 <b>Current Module</b> <a class="float-right">{{performance|key_with_space:'Current Module'}}</a>
               </li>
             </ul>
-            <a {%if performance|key_with_space:'Eligible For Placement(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block'{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="top" title="You can apply for certificate after all test and mocks completed" style='cursor:not-allowed'{%endif%}><b>Request for Certificate</b></a>
+            {%if certificate%}
+              <a {%if certificate.certificate%}href="/media/{{certificate.certificate}}" class='btn btn-success btn-block' target='new' title="Download certificate" {%else%}title="Certificate Not issued yet" class='btn btn-warning btn-block'{%endif%}  data-toggle="tooltip" data-placement="top"  style='cursor:not-allowed'><b><i class="fa fa-download"></i>Download Certificate</b> </a>
+
+            {%else%}
+            <a {%if performance|key_with_space:'Eligible For Certificate(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block' data-toggle="tooltip" data-placement="top" title="Click to Apply for certificate"{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="top" title="You can apply for certificate after all test and mocks completed" style='cursor:not-allowed'{%endif%}><b>Request for Certificate</b></a>
+            {%endif%}
             <a class="btn btn-info btn-block" href="{%url 'pdf'%}" style="margin-top:5px;" target="new"><b>Offer Letter</b></a>
           </div>
       </div>

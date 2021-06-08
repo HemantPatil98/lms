@@ -32,13 +32,12 @@ def log_in(request):
         us = authenticate(request, username=username, password=password)
 
         if us is not None:
+            login(request, us)
             messages.info(request, "Successfully Log In")
+            request.session['profile_photo'] = str(user_profile.objects.get(user_id=request.user.id).photo)
             if us.last_login !=None:
-                login(request, us)
-                request.session['profile_photo'] = str(user_profile.objects.get(user_id=request.user.id).photo)
                 return redirect(index)
             else:
-                request.session['profile_photo'] = str(user_profile.objects.get(user_id=request.user.id).photo)
                 return redirect(reset_password)
         else:
             messages.error(request, "Username and password not match")
@@ -63,40 +62,40 @@ def login_form(request):
 def reset_password(request):
 
     if request.method=='POST':
-        try:
-            if request.user.is_authenticated:
-                us = authenticate(username=request.user.username,password=request.POST['oldpassword'])
-                if us is not None:
-                    us.set_password(request.POST['password'])
-                    us.save()
-                    login(request, us)
-                    messages.success(request, 'Password reset succesful')
-                    return redirect('index')
-                else:
-                    return redirect('reset_password')
-
+        # try:
+        if request.user.is_authenticated:
+            us = authenticate(username=request.user.username,password=request.POST['oldpassword'])
+            if us is not None:
+                us.set_password(request.POST['password'])
+                us.save()
+                login(request, us)
+                messages.success(request, 'Password reset succesful')
+                return redirect('index')
             else:
-                us = User.objects.filter(username=request.POST['username'])
-                if len(us)==1:
-                    us =us[0]
-                    password = randomstring(request)
-                    us.set_password(password)
-                    us.save()
-                    header = 'To:' + us.username + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
+                return redirect(reset_password)
 
-                    message = header + '\n Username: ' + us.username + '\n New Password: ' + password + ' \n\n'
-                    mail(us.email, message)
+        else:
+            us = User.objects.filter(username=request.POST['username'])
+            if len(us)==1:
+                us =us[0]
+                password = randomstring(request)
+                us.set_password(password)
+                us.save()
+                header = 'To:' + us.username + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
 
-                    print(message)
-                    messages.success(request,'Password reset successfully')
-                    messages.success(request,'Check email for new password')
-                    return redirect(login_form)
-                else:
-                    messages.error(request,'Username Not Found')
-                    return redirect(reset_password)
-        except:
-            messages.error(request,'Error')
-            return redirect(reset_password)
+                message = header + '\n Username: ' + us.username + '\n New Password: ' + password + ' \n\n'
+                mail(us.email, message)
+
+                print(message)
+                messages.success(request,'Password reset successfully')
+                messages.success(request,'Check email for new password')
+                return redirect(login_form)
+            else:
+                messages.error(request,'Username Not Found')
+                return redirect(reset_password)
+        # except:
+        #     messages.error(request,'Error')
+        #     return redirect(reset_password)
 
     return render(request,'student/reset_password.html')
 
@@ -164,8 +163,12 @@ def index(request):
             notice1 = ""
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
 
-        print(performance,values)
-        return render(request, 'student/index.html', {'performance': performance,'notice':notice1,'up':up,'per':per,'profile':""})
+        # print(performance,values)
+        try:
+            certificate = certificate_request.objects.get(student_id=request.user)
+        except:
+            certificate = ""
+        return render(request, 'student/index.html', {'performance': performance,'notice':notice1,'up':up,'per':per,'profile':"",'certificate':certificate})
 
 ###
 @login_required(login_url='')
@@ -174,7 +177,7 @@ def addstudent(request):
         y = request.user.date_joined.strftime('%Y')
         SHEET_NAME = "Apr - Mar " + y
         from .models import user_profile
-        profile = [['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-4)+1)', ""], ["", ""], ["", ""], ["", ""]]
+        profile = [['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-4)+1)',"",""], ["", ""], ["", ""], ["", ""]]
         for field in itertools.islice(request.POST, 2, None):
             val = request.POST.getlist(field)
             for i in range(0, 4):
@@ -183,21 +186,21 @@ def addstudent(request):
                 except:
                     profile[i].append("")
         if request.user.is_staff:
-            performance = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)', profile[0][8],
+            performance = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)',"", profile[0][8],
                            profile[0][11] + "/" + profile[0][12]
                 , profile[0][13], profile[0][3], profile[0][7], profile[0][5], profile[0][4], profile[0][6]]
             # print(performance)
 
             SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
             performance = performance + [""]*(len(student_performance)-len(performance)) if len(performance)<len(student_performance) else performance
-            performance[all_fields_index['student_performance']['C Total Marks (Out of 100)']] = marks['C Total Marks (Out of 100)']
-            performance[all_fields_index['student_performance']['Sql Total Marks (Out of 100)']] = marks['Sql Total Marks (Out of 100)']
-            performance[all_fields_index['student_performance']['WD Total Marks (Out of 200)']] = marks['WD Total Marks (Out of 200)']
-            performance[all_fields_index['student_performance']['Core Total Marks (Out of 100)']] = marks['Core Total Marks (Out of 100)']
-            performance[all_fields_index['student_performance']['Adv Total Marks (Out of 100)']] = marks['Adv Total Marks (Out of 100)']
-            performance[all_fields_index['student_performance']['Total Marks (Out of 700)']] = marks['Total Marks (Out of 700)']
-            performance[all_fields_index['student_performance'][('Eligible For Certificate(Y/N)')]] = '''=IF(AND(INDIRECT("N"&ROW())>27,INDIRECT("O"&ROW())>27,INDIRECT("P"&ROW())>13,INDIRECT("U"&ROW())>27,INDIRECT("V"&ROW())>27,INDIRECT("W"&ROW())>27,INDIRECT("AB"&ROW())>105,INDIRECT("AC"&ROW())>17,NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),INDIRECT("AJ"&ROW())>27,INDIRECT("AK"&ROW())>27,INDIRECT("AL"&ROW())>13,NOT(ISBLANK(INDIRECT("AN"&ROW()))),INDIRECT("AR"&ROW())>27,INDIRECT("AS"&ROW())>27,INDIRECT("AT"&ROW())>13,NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),INDIRECT("BA"&ROW())>70,NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
-            performance[all_fields_index['student_performance'][('Eligible For Placement(Y/N)')]] = '''=IF(AND(,NOT(ISBLANK(INDIRECT("N"&ROW()))),NOT(ISBLANK(INDIRECT("O"&ROW()))),NOT(ISBLANK(INDIRECT("P"&ROW()))),NOT(ISBLANK(INDIRECT("U"&ROW()))),NOT(ISBLANK(INDIRECT("V"&ROW()))),NOT(ISBLANK(INDIRECT("W"&ROW()))),NOT(ISBLANK(INDIRECT("AB"&ROW()))),NOT(ISBLANK(INDIRECT("AC"&ROW()))),NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),NOT(ISBLANK(INDIRECT("AJ"&ROW()))),NOT(ISBLANK(INDIRECT("AK"&ROW()))),NOT(ISBLANK(INDIRECT("AL"&ROW()))),NOT(ISBLANK(INDIRECT("AN"&ROW()))),NOT(ISBLANK(INDIRECT("AR"&ROW()))),NOT(ISBLANK(INDIRECT("AS"&ROW()))),NOT(ISBLANK(INDIRECT("AT"&ROW()))),NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),NOT(ISBLANK(INDIRECT("BA"&ROW()))),NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
+            performance[student_performance.index('C Total Marks (Out of 100)')] = marks['C Total Marks (Out of 100)']
+            performance[student_performance.index('Sql Total Marks (Out of 100)')] = marks['Sql Total Marks (Out of 100)']
+            performance[student_performance.index('WD Total Marks (Out of 200)')] = marks['WD Total Marks (Out of 200)']
+            performance[student_performance.index('Core Total Marks (Out of 100)')] = marks['Core Total Marks (Out of 100)']
+            performance[student_performance.index('Adv Total Marks (Out of 100)')] = marks['Adv Total Marks (Out of 100)']
+            performance[student_performance.index('Total Marks (Out of 700)')] = marks['Total Marks (Out of 700)']
+            performance[student_performance.index('Eligible For Certificate(Y/N)')] = '''=IF(AND(INDIRECT("N"&ROW())>27,INDIRECT("O"&ROW())>27,INDIRECT("P"&ROW())>13,INDIRECT("U"&ROW())>27,INDIRECT("V"&ROW())>27,INDIRECT("W"&ROW())>27,INDIRECT("AB"&ROW())>105,INDIRECT("AC"&ROW())>17,NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),INDIRECT("AJ"&ROW())>27,INDIRECT("AK"&ROW())>27,INDIRECT("AL"&ROW())>13,NOT(ISBLANK(INDIRECT("AN"&ROW()))),INDIRECT("AR"&ROW())>27,INDIRECT("AS"&ROW())>27,INDIRECT("AT"&ROW())>13,NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),INDIRECT("BA"&ROW())>70,NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
+            performance[student_performance.index('Eligible For Placement(Y/N)')] = '''=IF(AND(,NOT(ISBLANK(INDIRECT("N"&ROW()))),NOT(ISBLANK(INDIRECT("O"&ROW()))),NOT(ISBLANK(INDIRECT("P"&ROW()))),NOT(ISBLANK(INDIRECT("U"&ROW()))),NOT(ISBLANK(INDIRECT("V"&ROW()))),NOT(ISBLANK(INDIRECT("W"&ROW()))),NOT(ISBLANK(INDIRECT("AB"&ROW()))),NOT(ISBLANK(INDIRECT("AC"&ROW()))),NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),NOT(ISBLANK(INDIRECT("AJ"&ROW()))),NOT(ISBLANK(INDIRECT("AK"&ROW()))),NOT(ISBLANK(INDIRECT("AL"&ROW()))),NOT(ISBLANK(INDIRECT("AN"&ROW()))),NOT(ISBLANK(INDIRECT("AR"&ROW()))),NOT(ISBLANK(INDIRECT("AS"&ROW()))),NOT(ISBLANK(INDIRECT("AT"&ROW()))),NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),NOT(ISBLANK(INDIRECT("BA"&ROW()))),NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
             if request.user.is_staff:
                 performance_row = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=[performance])
             else:
@@ -217,9 +220,9 @@ def addstudent(request):
             username = request.POST['emailid']
             password = randomstring(request)
 
+            print(password,request.POST)
             us = User.objects.create_user(username=username,first_name=request.POST['name'],
                       password=password,email=request.POST['emailid'],last_name=request.POST['contact'])
-            us.save()
             try:
                 file = request.FILES['photo']
                 file._name = str(request.user.username) +"."+ file._name.split('.')[1]
@@ -237,22 +240,25 @@ def addstudent(request):
                 us_profile = user_profile.objects.get(user_id=request.user.id)
                 us_profile.photo = file
                 us_profile.save()
+
             # message to be sent
 
             params = {
+                'id' : us.id,
                 'addate': datetime.now(),
-                'name': request.user.first_name,
+                'name': us.first_name,
                 'contact': request.POST['contact']
             }
             Render.render_to_file('student/pdf.html', params)
 
-            header = 'To:' + us.username + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
+            header = 'To:' + us.username + '\n' + 'From: aniket.pawar@cravitaindia.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
 
             message = header + '\n Username: ' + username + '\n Password: ' + password + ' \n\n'
             print(message)
 
             mailletter(us.email,message)
-            request.session['profile_photo'] = us_profile.photo
+            us.save()
+            request.session['profile_photo'] = str(us_profile.photo)
             messages.info(request,'Student added successfully')
         else:
             from .models import user_profile
@@ -267,7 +273,7 @@ def addstudent(request):
             # vars(us_profile)['_state'] = None
             # request.session['ab']=vars(us_profile)
             messages.info(request,'Profile updated successfully')
-        request.session['profile_photo'] = us_profile.photo
+        request.session['profile_photo'] = str(us_profile.photo)
         return redirect('index')
 
     try:
@@ -284,32 +290,34 @@ def addgroups(request,view=False):
     if request.method == 'POST':
         gname = request.POST['gname']
         gp = Group.objects.filter(name=gname)
+        gpinfo = ""
+        print(request.POST,request.POST['enddate'] != "")
         if len(gp) == 0:
             cname = request.POST['cname']
             startdate = request.POST['startdate']
             enddate = request.POST['enddate']
             gp=Group(name=gname)
             videos = "media/videos/courses/" + cname
-            os.mkdir(videos)
+            if not os.path.exists(videos):
+                os.mkdir(videos)
             gp.save()
             gpinfo = groupsinfo(group=gp,course=cname,startdate=startdate,enddate=enddate)
             gpinfo.save()
             messages.info(request,'Group created')
             SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
 
-            print(sheetfields.attendance)
+            # print(sheetfields.attendance)
             sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,columns=sheetfields.attendance)
             messages.info(request, gname + " is added in sheet")
         else:
             gp=gp[0]
             gpinfo = groupsinfo.objects.get(group_id=gp.id)
-            try:
+
+            if request.POST['enddate'] != "":
                 gpinfo.enddate = request.POST['enddate']
                 gpinfo.save()
-            except:
-                pass
+            print(gpinfo.enddate)
             cname = request.POST['cname']
-
         if 'videopermission' in request.POST:
             for p in gp.permissions.all():
                 if p.name not in request.POST.getlist('videopermission'):
@@ -373,6 +381,8 @@ def addgroups(request,view=False):
             notice1 = ""
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
         courses = course.objects.values_list('name', flat=True).distinct()
+        print(gpinfo.startdate)
+
         return render(request,'student/add_groups.html',{'gname':gp,'permissions':Permission.objects.all()[68::],'pre':pre,
                                                         'members':members,'memb_pre':memb_pre,'up':up,'groups':groups,
                                                          'notice':notice1,'vpermissions':videolist,'courses':courses,
@@ -381,6 +391,20 @@ def addgroups(request,view=False):
     courses = course.objects.values_list('name', flat=True).distinct()
 
     return render(request,'student/add_groups.html',{'groups':groups,'courses':courses,'view':view})
+
+###
+@login_required(login_url='')
+def deletegroups(request,gname):
+    gp = Group.objects.filter(name=gname)
+    for u in User.objects.all():
+        # print(u.groups.filter(name=gname))
+        if u.groups.filter(name=gname):
+            print(u)
+            up = user_profile.objects.filter(user_id=u.id)
+            up.delete()
+            u.delete()
+    gp.delete()
+    return redirect(index)
 
 ###
 @login_required(login_url='')
@@ -563,12 +587,15 @@ def studentattendance(request):
 ###
 @login_required(login_url='')
 def request_certificate(request):
-    cr = certificate_request(student_id=request.user)
-    cr.save()
-    us = user_profile.objects.get(user_id=request.user.id)
-    us.certificate=cr
-    us.save()
-    messages.info(request,'certificate saved Successfully')
+    if not len(certificate_request.objects.filter(student_id=request.user)):
+        cr = certificate_request(student_id=request.user)
+        cr.save()
+        us = user_profile.objects.get(user_id=request.user.id)
+        us.certificate=cr
+        us.save()
+        messages.info(request,'Certificate Request saved Successfully')
+    else:
+        messages.info(request,'Certificate Request Saved Already')
     return redirect('index')
 
 ###
@@ -706,40 +733,42 @@ def set_data(request,table):
                 SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
             if table == 'student_performance':
                 SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
-                rowv[all_fields_index['student_performance']['C Total Marks (Out of 100)']] = marks['C Total Marks (Out of 100)']
-                rowv[all_fields_index['student_performance']['Sql Total Marks (Out of 100)']] = marks['Sql Total Marks (Out of 100)']
-                rowv[all_fields_index['student_performance']['WD Total Marks (Out of 200)']] = marks['WD Total Marks (Out of 200)']
-                rowv[all_fields_index['student_performance']['Core Total Marks (Out of 100)']] = marks['Core Total Marks (Out of 100)']
-                rowv[all_fields_index['student_performance']['Adv Total Marks (Out of 100)']] = marks['Adv Total Marks (Out of 100)']
-                rowv[all_fields_index['student_performance']['Total Marks (Out of 700)']] = marks['Total Marks (Out of 700)']
+                rowv[student_performance.index('C Total Marks (Out of 100)')] = marks['C Total Marks (Out of 100)']
+                rowv[student_performance.index('Sql Total Marks (Out of 100)')] = marks['Sql Total Marks (Out of 100)']
+                rowv[student_performance.index('WD Total Marks (Out of 200)')] = marks['WD Total Marks (Out of 200)']
+                rowv[student_performance.index('Core Total Marks (Out of 100)')] = marks['Core Total Marks (Out of 100)']
+                rowv[student_performance.index('Adv Total Marks (Out of 100)')] = marks['Adv Total Marks (Out of 100)']
+                rowv[student_performance.index('Total Marks (Out of 700)')] = marks['Total Marks (Out of 700)']
                 rowv[student_performance.index('Eligible For Certificate(Y/N)')] = '''=IF(AND(INDIRECT("N"&ROW())>27,INDIRECT("O"&ROW())>27,INDIRECT("P"&ROW())>13,INDIRECT("U"&ROW())>27,INDIRECT("V"&ROW())>27,INDIRECT("W"&ROW())>27,INDIRECT("AB"&ROW())>105,INDIRECT("AC"&ROW())>17,NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),INDIRECT("AJ"&ROW())>27,INDIRECT("AK"&ROW())>27,INDIRECT("AL"&ROW())>13,NOT(ISBLANK(INDIRECT("AN"&ROW()))),INDIRECT("AR"&ROW())>27,INDIRECT("AS"&ROW())>27,INDIRECT("AT"&ROW())>13,NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),INDIRECT("BA"&ROW())>70,NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
                 rowv[student_performance.index('Eligible For Placement(Y/N)')] = '''=IF(AND(,NOT(ISBLANK(INDIRECT("N"&ROW()))),NOT(ISBLANK(INDIRECT("O"&ROW()))),NOT(ISBLANK(INDIRECT("P"&ROW()))),NOT(ISBLANK(INDIRECT("U"&ROW()))),NOT(ISBLANK(INDIRECT("V"&ROW()))),NOT(ISBLANK(INDIRECT("W"&ROW()))),NOT(ISBLANK(INDIRECT("AB"&ROW()))),NOT(ISBLANK(INDIRECT("AC"&ROW()))),NOT(ISBLANK(INDIRECT("AE"&ROW()))),NOT(ISBLANK(INDIRECT("AF"&ROW()))),NOT(ISBLANK(INDIRECT("AJ"&ROW()))),NOT(ISBLANK(INDIRECT("AK"&ROW()))),NOT(ISBLANK(INDIRECT("AL"&ROW()))),NOT(ISBLANK(INDIRECT("AN"&ROW()))),NOT(ISBLANK(INDIRECT("AR"&ROW()))),NOT(ISBLANK(INDIRECT("AS"&ROW()))),NOT(ISBLANK(INDIRECT("AT"&ROW()))),NOT(ISBLANK(INDIRECT("AY"&ROW()))),NOT(ISBLANK(INDIRECT("AZ"&ROW()))),NOT(ISBLANK(INDIRECT("BA"&ROW()))),NOT(ISBLANK(INDIRECT("BB"&ROW())))),"Y","N")'''
             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME, row=int(row)+1, value=[rowv])
+            return HttpResponse('Success')
+
         elif table == 'attendance':
             SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
             rowv = request.GET.getlist('rowv[]')
             row = request.GET['row']
             SHEET_NAME = request.GET['sheetname']
-
-            if (type(rowv[0])==int):
-                rowv = [x for x in rowv]
-            else:
-                rowv = [int(x) for x in rowv]
-
             date = datetime.now()
             day = date.strftime("%d")
             month = date.strftime("%m")
             year = date.strftime("%Y")
-
-            currentdate=day+"/"+month+"/"+year
+            currentdate = day + "/" + month + "/" + year
             present = [currentdate]
+            print(len(rowv))
+            if len(rowv):
+                rowv = [int(x) for x in rowv]
+                for i in range(0, max(rowv) + 1):
+                    if i in rowv:
+                        present.append("p")
+                    else:
+                        present.append("")
+            else:
+                rowv = [""]*50
+                present += rowv
 
-            for i in range(0,max(rowv)+1):
-                if i in rowv:
-                    present.append("p")
-                else:
-                    present.append("")
-            print(rowv,max(rowv),present)
+
+            print(present)
             row = int(row) if request.GET['update']=='true' else int(row)+1
 
             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,value=[present],SHEET_NAME=SHEET_NAME,col=row,row=0,dimension="COLUMNS")
@@ -841,33 +870,39 @@ def getcertificate(request):
                 else:
                     data1[v.upper()]=vars(c)[v]
             data.append(data1)
-    # print(us)
-    # for u in us:
-    #     st = user_profile.objects.get(user_id=u).student_performance_row
-    #     print(st)
-    #     v = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname='Apr - Mar 2021',range='!'+str(st)+':'+str(st))
-    #     print(v[0][13:17]+v[0][20:24]+v[0][27:30]+v[0][38:41]+v[0][46:49])
+
     return HttpResponse(str(data).replace('False','false').replace('True','true').replace('_',' '))
 
 ###
 @csrf_exempt
 @login_required(login_url='')
 def setcertificate(request):
+    cn = request.POST['certificate_number']
 
     try:
         file = request.FILES['file']
-        file._name = str(request.user.username.split(':')[0]) + "." + file._name.split('.')[1]
+        file._name = cn + "." + file._name.split('.')[1]
     except:
         file = ""
     id = request.POST['id']
-    cn = request.POST['certificate_number']
     cr = certificate_request.objects.get(id=id)
     cr.certificate_number = cn
-    cr.certificate = file
+    if file != "":
+        cr.certificate = file
     cr.certificate_status = request.POST['certificate_status']
     cr.save()
 
-    return HttpResponse(str(cr.certificate))
+    SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
+
+    row = user_profile.objects.get(user_id=cr.student_id).student_performance_row
+    print(row)
+
+    y = request.user.date_joined.strftime('%Y')
+    SHEET_NAME = "Apr - Mar " + y
+
+    values = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=row,
+                                   col=all_fields_index['student_performance']['Certificate No'],value=[cr.certificate_number],cell=True)
+    return HttpResponse("success")
 
 
 ###

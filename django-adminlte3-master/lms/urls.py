@@ -17,19 +17,25 @@ urlpatterns = [
 
     path('add/groups/',views.addgroups,name='addgroups'),
     path('view/groups/',views.addgroups,{'view': True},name='viewgroups'),
+    path('delete/groups/<slug:gname>',views.deletegroups,name='deletegroups'),
+
     path('add/users/',views.addusers,name='addusers'),
     path('user_permissions/',views.user_permissions,name='user_permissions'),
     path('view_data/members/', views.viewmembers, name='viewmembers'),
     path('profile/', views.viewprofile, name='viewprofile'),
+
     path('attendance/', views.attendance, name='attendance'),
     path('attendance_update/', views.attendance_update, name='attendance_update'),
     path('studentattendance/', views.studentattendance, name='studentsattendance'),
     path('attendance/', views.attendance, name='attendance'),
+
     path('add/notice/',models.notice.addnotice,name='addnotice'),
     path('view/notice/',models.notice.addnotice ,{'view': True},name='viewnotice'),
+
     path('add/certificate/', views.addcertificate, name='addcertificate'),
     path('get/certificate/', views.getcertificate, name='getcertificate'),
     path('set/certificate/', views.setcertificate, name='setcertificate'),
+    path('request_certificate/', views.request_certificate, name='request_certificate'),
 
     path('timeline/', models.timeline.viewtimeline, name='timeline'),
     path('timelinedata/', models.timeline.timelinedata, name='timelinedata'),
@@ -37,8 +43,6 @@ urlpatterns = [
     path('deletetimeline/', models.timeline.deletetimeline, name='deletetimeline'),
 
     path('addfeedback/', views.addfeedback, name='addfeedback'),
-
-    path('request_certificate/',views.request_certificate,name='request_certificate'),
 
     path('getdata/<slug:table>/',views.get_data,name='getdata'),
     path('setdata/<slug:table>/',views.set_data,name='setdata'),
@@ -55,6 +59,6 @@ urlpatterns = [
     path('render/pdf/', pdfgenerator.Pdf.as_view(),name='pdf'),
 
     path('sheetdata/<slug:table>/',views.sheetdata,name='sheetdata'),
-    # path('test/', indexing_fields, name='test')
+    path('test/', views.config, name='test')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

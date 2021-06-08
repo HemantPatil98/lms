@@ -80,7 +80,7 @@ Videos
 
       <main class="col-sm-12 col-md-4">
         {%for v in videos%}
-        <article class="item {%if v in watched%} watched {%endif%}" {%if not requst.user.username%} data-key="{{v}}"{%endif%} >
+        <article class="item {%if v in watched%} watched {%endif%} "  {%if request.user|has_per_name:v%} data-key="{{v}}"{%else%}class="bg-danger" data-toggle="tooltip" data-placement="top" title="This Video is currently locked for you"{%endif%} >
             <img src="/media/videos/thumb/{{course}}/{{v}}.jpg" alt="" class="thumb">
             <div class="details">
                 <span class='title'>{{v}}</span>  
@@ -99,13 +99,21 @@ Videos
 <script type="text/javascript">
   $("article").click(function(){
     var datakey=$(this).attr('data-key');
-    var src = window.location.origin+"/videoframe/{{course}}/"+datakey;
-    $('iframe').attr('src',src);
-    $("#title").text(datakey);
-    url = window.location.origin+"/watched_video/?course={{course}}&video="+datakey;
-    console.log(url);
-    $.get(url,{},function(data){});
+    if (datakey){
+      var src = window.location.origin+"/videoframe/{{course}}/"+datakey;
+      $('iframe').attr('src',src);
+      $("#title").text(datakey);
+      url = window.location.origin+"/watched_video/?course={{course}}&video="+datakey;
+      console.log(url);
+      $.get(url,{},function(data){});
+    }
+    else{
+      alert('This video is locked');
+    }
   })
+      $(document).ready(function(){
+$('[data-toggle="tooltip"]').tooltip();   
+});
 </script>
 </style>
 

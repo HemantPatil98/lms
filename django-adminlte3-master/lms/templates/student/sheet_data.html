@@ -79,7 +79,7 @@ $.get(url,{sheetname:sheetname},function(data,status){
     fields = []
     window.col = Object.keys(db.data[0]);
 
-readonly = ['ID','NAME','CONTACT NO','EMAIL ID','ADMISSION DATE','TRAINING MODE','C TOTAL MARKS','SQL TOTAL MARKS','WD TOTAL MARKS','PORTFOLIO LINK','CORE TOTAL MARKS','ADV TOTAL MARKS','TOTAL MARKS (OUT OF 700)'];
+readonly = ['ID','CERTIFICATE NO','NAME','CONTACT NO','EMAIL ID','ADMISSION DATE','TRAINING MODE','C TOTAL MARKS','SQL TOTAL MARKS','WD TOTAL MARKS','PORTFOLIO LINK','CORE TOTAL MARKS','ADV TOTAL MARKS','TOTAL MARKS (OUT OF 700)'];
 
     for(i=0;i<col.length;i++){
       console.log(col[i]=='CONTACT NO');

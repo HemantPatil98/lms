@@ -250,6 +250,18 @@ def sub(num):
 def has_per(obj,per):
     return len(obj.filter(name=per))
 
+@register.filter(name='has_per_name')
+def has_per_name(obj,per):
+    for g in obj.groups.all():
+        for p in g.permissions.all():
+            if p.name == per:
+                return True
+    else:
+        return False
+
+  # except:
+        # return False
+
 @register.filter(name='key_with_space')
 def key_with_space(obj,key):
     try:

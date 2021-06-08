@@ -198,10 +198,6 @@ Video Permissions
           <form action="{%url 'videopermissions'%}" method="POST" onsubmit="return save()">
             {%csrf_token%}
             <div class="card-body row">
-              <!-- <div class="form-group col-md-6">
-                <label for="nameInputEmail1">Group Name</label>
-                <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
-              </div> -->
               <div class="form-group col-md-6">
                 <label>Groups</label>
                 <select class="form-control select2" style="width: 100%;" name="gname" {%if gname%}readonly{%endif%}>
@@ -209,7 +205,7 @@ Video Permissions
                   <option selected>{{gname}}</option>
                   {%else%}
                   {%for group in groups%}
-                  <option {%if gname == group%}selected{%endif%}>{{group}}</option>
+                  <option {%if gname == group%}selected readonly{%endif%}>{{group}}</option>
                   {%endfor%}}
                   {%endif%}
                 </select>
@@ -221,7 +217,7 @@ Video Permissions
                   <option selected>{{gpinfo.course}}</option>
                   {%else%}
                   {%for cname in courses%}
-                  <option {%if cname == group%}selected{%endif%} class="a">{{cname}}</option>
+                  <option {%if cname == group%}selected readonly{%endif%} class="a">{{cname}}</option>
                   {%endfor%}}
                   {%endif%}
                 </select>
@@ -232,7 +228,7 @@ Video Permissions
               </div>
               <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
                 <label>End Date</label>
-                <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}">
+                <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}" readonly="">
               </div>
 
               {%if gname%}
@@ -318,11 +314,7 @@ Video Permissions
 <script>
   $(function () {
     //Initialize Select2 Elements
-    $('.select2').select2({
-      {%if view != 'true'%}
-          tags:true
-          {%endif%}
-          })
+    $('.select2').select2()
 
     //Initialize Select2 Elements
     $('.select2bs4').select2({

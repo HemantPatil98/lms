@@ -9,6 +9,7 @@ from .models import *
 import os
 from datetime import datetime
 from .sheetsapi import sheetvalues
+from .sheetfields import student_performance
 
 ###
 class Render:
@@ -50,11 +51,13 @@ class Pdf(View):
 
         # print(values)
         today = timezone.now()
+        print(values[0])
         params = {
-            'addate': datetime.strptime(values[0][4],"%Y-%m-%d"),
+            'id':request.user.id,
+            'addate': datetime.strptime(values[0][student_performance.index('Admission Date')],"%Y-%m-%d"),
             'name': request.user.first_name,
             'contact': values[0][2]
         }
-        Render.render_to_file('student/pdf.html',params)
+        # Render.render_to_file('student/pdf.html',params)
         return Render.render('student/pdf.html', params)
 

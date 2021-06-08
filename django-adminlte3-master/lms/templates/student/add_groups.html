@@ -361,6 +361,9 @@ Add Groups
 
             <div class="card-footer">
               <button type="submit" class="btn btn-primary">Submit</button>
+              {%if gname%}
+              <a class="btn btn-danger" type="submit" onclick="(function(){if(confirm('Are you sure wnat to delete these this group !')){window.location.replace('{%url 'deletegroups' gname=gname%}')}})()">Delete Group</a>
+              {%endif%}
             </div>
           </form>
         </div>

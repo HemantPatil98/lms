@@ -37,12 +37,13 @@ Validate Practical
 
       <div class="col-md-4 col-sm-5">
         <!-- <label>Custom Select</label> -->
-        <select name="cname" class="custom-select col-6" onchange="load()">
+        <select name="cname" class="custom-select select2 col-6" onchange="load()">
           {%for course in courses%}
           <option value="{{course}}">{{course}}</option>
           {%endfor%}
         </select>
         <select name="type" class="custom-select col-5" onchange="load()">
+          <!-- <option value="ORAL">ORAL</option> -->
           <option value="MCQ">MCQ</option>
           <option value="PRACTICAL">PRACTICAL</option>
           <option value="PROGRAM">PROGRAM</option>
@@ -77,7 +78,10 @@ Validate Practical
 console.log(cname);
     var type=$("select[name='type']").val();
 console.log(type);
-  var url = "{%url 'getdata_practicle'%}"
+  var url = "{%url 'getdata_practicle'%}";
+  // if (type == 'ORAL'){
+  //   var url = "{%url 'getdata_oral'%}";
+  // }
   if (type=='MCQ') {
    var field= [
             { name: "ID", type: "number", width: 70,editing:false},
@@ -127,6 +131,16 @@ $.get(url,{cname:cname,type:type},function(data,status){
     $(".jsgrid-grid-body").keypress(function(){var keycode = (event.keyCode ? event.keyCode : event.which);
           if(keycode == '13'){window.edit_row=this;$('#grid').jsGrid('updateItem')}});
 });
+var has_focus = true;
+
+window.onblur = function(){  
+    has_focus=false;  
+}
+window.onfocus = function(){  
+    has_focus=true;  
+    load();
+}
+
  }
 
 </script>

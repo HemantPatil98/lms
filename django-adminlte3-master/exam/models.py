@@ -53,7 +53,7 @@ class questions(models.Model):
 #         return self.option
 
 class program(models.Model):
-    course = models.ForeignKey(course,on_delete=nothing)
+    course = models.ForeignKey(course,on_delete=models.CASCADE)
     programe = models.CharField(max_length=250)
     file = models.FileField(upload_to='programs/')
 
@@ -79,3 +79,11 @@ class program_file(models.Model):
 
     class Meta:
         unique_together = (('student', 'course','attempt'),)
+
+class exam_orals(models.Model):
+    student = models.ForeignKey(User,on_delete=models.CASCADE)
+    course = models.ForeignKey(course,on_delete=models.CASCADE)
+    marks = models.IntegerField()
+
+    class Meta:
+        unique_together = (('student','course'))

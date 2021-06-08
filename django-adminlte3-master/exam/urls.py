@@ -16,6 +16,7 @@ urlpatterns = [
     path('setprogrammarks/',views.setprogrammarks,name='setprogrammarks'),
     # path('view/practicle//',views.view_practicle_validate,name='view_practicle'),
     path('get/answers/',views.get_answers,name='get_answers'),
+    path('getdata_oral/',views.getdata_oral,name='getdata_oral'),
     path('getdata_practicle/',views.getdata_practicle,name='getdata_practicle'),
     path('sync/questions/',views.sync_questions,name='sync_questions'),
 ]
