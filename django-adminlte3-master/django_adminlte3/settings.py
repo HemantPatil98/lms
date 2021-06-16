@@ -104,7 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+SESSION_SAVE_EVERY_REQUEST = True
 # Internationalization
 # https://docs.djangoproject.com/en/dev/topics/i18n/
 
@@ -129,3 +129,5 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = '/media/'
 LOGIN = ''
+
+

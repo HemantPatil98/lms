@@ -1,11 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User,Group
 from datetime import datetime
-from django.shortcuts import render,HttpResponse
+from django.shortcuts import render,HttpResponse,redirect
 from django.utils import timezone
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-
+from django.core import serializers
 # Create your models here.
 
 
@@ -62,11 +63,51 @@ class notice(models.Model):
 
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
 
+
+        return render(request, 'student/add_notice.html', {'data': page, 'up': up})
+
+    def getnotice(request):
+        notices = notice.objects.all().order_by('-id')
+        pageno = request.GET['pageno']
         try:
-            notice1 = notice.objects.all().order_by('-id')[0:5]
+            pageno = request.GET['pageno']
         except:
-            notice1 = ""
-        return render(request, 'student/add_notice.html', {'data': page, 'up': up, 'notice': notice1})
+            pageno = 1
+
+        P = Paginator(notices,10)
+
+        page = P.page(pageno)
+
+        if 'last_notice' not in request.session:
+            request.session['last_notice'] = notices[0].id
+            new_notices = []
+            for i in notices:
+                new_notices.append(i.id)
+            request.session['unread_notices'] = new_notices
+        else:
+            if request.session['last_notice'] < notices[0].id:
+                new_notices = []
+                for i in notices.filter(id__gt=request.session['last_notice']):
+                    new_notices.append(i.id)
+                request.session['unread_notices'] += new_notices
+        notices = serializers.serialize('json',list(page),fields=('title', 'description','generateddate','file','externallink'))
+
+        return HttpResponse(notices+";"+str(request.session['unread_notices']))
+
+    def markreadnotice(request):
+        unread_notices = request.session['unread_notices']
+        id = int(request.GET['id'])
+        if id in unread_notices:
+            unread_notices.remove(id)
+        request.session['unread_notices'] = unread_notices
+        print(request.session['unread_notices'])
+
+        return redirect('index')
+
+    def readallnotice(request):
+        request.session['unread_notices'] = []
+        messages.info(request,"All Notices Read")
+        return render('index')
 
 
 

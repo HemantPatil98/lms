@@ -1,16 +1,82 @@
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.contrib.auth.models import Group
 from django.contrib import messages
 from datetime import datetime
+from django.core import serializers
 from .models import *
 import random
 import os
+import json
+
 from lms import models,sheetsapi
 from lms.sheetfields import all_fields_index
 
 # from lms.models import gpinfo
 # Create your views here.
+
+###
+@login_required(login_url='')
+def add_course(request):
+    if request.method == 'POST':
+        cname = request.POST['cname']
+        count = 0
+        type = request.POST['type']
+        SPREADSHEET_ID = ""
+        crs = course.objects.filter(name=cname, type=type)
+
+        if(len(crs)==1):
+            crs=crs[0]
+            crs.instructions=request.POST['instructions']
+            crs.time = request.POST['time']
+            crs.save()
+        else:
+            crs = course(name=cname,type=type,time=request.POST['time'],questions_count=request.POST['count'])
+            if not os.path.exists('media/videos/courses/'+cname):
+                os.mkdir('media/videos/courses/'+cname)
+            if not os.path.exists('media/videos/thumb/'+cname):
+                os.mkdir('media/videos/thumb/'+cname)
+
+            try:
+                SPREADSHEET_ID = models.extra_data.objects.get(name=type).value
+            except:
+                if type != 'ORAL':
+                    if type == 'MCQ':
+                        fields = ["Question","Option1","Option2","Option3","Option4","Answer",'Explanation']
+                    elif type == 'PRACTICAL':
+                        fields = ["Program"]
+                    elif type == 'PROGRAM':
+                        fields = ["Program"]
+                    SPREADSHEET_ID = sheetsapi.createsheet(name=type,columns=fields,sheetname=cname)
+                    ext = models.extra_data(name=type, value=SPREADSHEET_ID)
+                    ext.save()
+                    ext = models.extra_data(name=cname+"_"+type,value=1)
+                    ext.save()
+            else:
+                if type != 'ORAL':
+                    if type == 'MCQ':
+                        fields = ["Question", "Option1", "Option2", "Option3", "Option4", "Answer",'Explanation']
+                    elif type == 'PRACTICAL':
+                        fields = ["Program"]
+                    elif type == 'PROGRAM':
+                        fields = ["Program"]
+                    sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=cname,columns=fields)
+                    ext = models.extra_data(name=(cname+"_"+type),value=1)
+                    ext.save()
+
+            crs.save()
+            return redirect(add_course)
+    ext = models.extra_data.objects.all()
+    ext1 = {}
+    cr = course.objects.all()
+    for c in cr:
+        if c.type != 'ORAL':
+            ext1[c.type] = ext.get(name=c.type).value
+    ext = ext1
+
+    courses = course.objects.values_list('name', flat=True).distinct()
+    return render(request,'add_course.html',{'courses':courses,'ext':ext})
 
 ###
 @login_required(login_url='')
@@ -101,14 +167,14 @@ def add_questions(request):
             count = program.objects.all().filter(course=crs)
 
         messages.info(request,'Question Added')
-        return render(request,'add_question.html',{'crs':crs,'courses':courses,'count':count})
+        return redirect('index')
 
     ext = models.extra_data.objects.all()
     ext1 = {}
     cr = course.objects.all()
     for c in cr:
         if c.type != 'ORAL':
-            ext1[c.type] = ext.get(name=c.type.lower()).value
+            ext1[c.type] = ext.get(name=c.type).value
     ext = ext1
 
     courses = course.objects.values_list('name', flat=True).distinct()
@@ -122,46 +188,74 @@ def mcq_exam(request):
         cname = request.POST['cname']
         type = request.POST['type']
         crs = course.objects.get(name=cname, type=type)
+        courses = course.objects.values_list('name', flat=True).distinct()
+        attempt = exam_attempts.objects.filter(student=request.user, course=crs)
+        attempt = len(attempt)
 
         if crs.type == 'MCQ':
             ques = questions.objects.all().filter(course=crs)
             ques = list(ques)
             random.shuffle(ques)
-            ques_set = random.sample(set(ques),2)
-            courses = course.objects.values_list('name', flat=True).distinct()
-            attempt = exam_attempts.objects.filter(student=request.user,course=crs)
-            attempt = len(attempt)
+            ques_set = random.sample(set(ques),crs.questions_count)
+
 
             return render(request, 'mcq_exam.html',
                           {'crs': crs, 'count': count, 'courses': courses, 'ques_set': ques_set, 'attempt':attempt})
         elif crs.type == 'PRACTICAL':
 
-            prog = program.objects.all().filter(course=crs.id)
-            prog_set = random.sample(set(prog),2)
-            courses = course.objects.values_list('name', flat=True).distinct()
-            attempt = exam_attempts.objects.filter(student=request.user,course=crs)
-            attempt = len(attempt)
+            if 'prog_set' in request.COOKIES:
+                prog_set = json.loads(request.COOKIES['prog_set'].replace("'",'"'))
 
-            return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
+            else:
+                prog = program.objects.all().filter(course=crs.id)
+                prog_set = random.sample(set(prog), crs.questions_count)
+
+                abc = str(serializers.serialize('json', list(prog_set), fields=('programe')))
+                print(abc)
+                prog_set = json.loads(abc)
+
+            # courses = course.objects.values_list('name', flat=True).distinct()
+            # attempt = exam_attempts.objects.filter(student=request.user, course=crs)
+            # attempt = len(attempt)
+            response =  render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
                                                            'prog_set': prog_set,'attempt':attempt})
+
+            response.set_cookie(key='prog_set',value=prog_set,max_age=4*60*1000)
+
+            return response
 
         elif crs.type == 'PROGRAM':
             prog = program.objects.all().filter(course=crs.id)
-            prog_set = random.sample(set(prog), 1)
-            courses = course.objects.values_list('name', flat=True).distinct()
-            attempt = exam_attempts.objects.filter(student=request.user,course=crs)
-            attempt = len(attempt)
+            prog_set = random.sample(set(prog), crs.questions_count)
+            # courses = course.objects.values_list('name', flat=True).distinct()
+            # attempt = exam_attempts.objects.filter(student=request.user,course=crs)
+            # attempt = len(attempt)
 
-            return render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
-                                                           'prog_set': prog_set,'attempt':attempt})
+            if 'prog_set' in request.COOKIES:
+                prog_set = json.loads(request.COOKIES['prog_set'].replace("'",'"'))
+
+            else:
+                prog = program.objects.all().filter(course=crs.id)
+                prog_set = random.sample(set(prog), crs.questions_count)
+
+                abc = str(serializers.serialize('json', list(prog_set), fields=('programe')))
+                print(abc)
+                prog_set = json.loads(abc)
+
+            response = render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
+                                                       'prog_set': prog_set,'attempt':attempt})
+
+            response.set_cookie(key='prog_set', value=prog_set, max_age=4 * 60 * 1000)
+
+            return response
 
     # print(request.user.groups.all())
     courses = []
     for g in request.user.groups.all():
         gp = models.groupsinfo.objects.get(group=g.id)
-        print(gp.course)
+        # print(gp.course)
         courses.append(gp.course)
-    # courses = course.objects.values_list('name', flat=True).distinct()
+    courses = course.objects.values_list('name', flat=True).distinct()
     return render(request,'mcq_exam.html',{'courses':courses})
 
 ###
@@ -270,23 +364,25 @@ def sync_questions(request):
     ext = models.extra_data.objects.all()
     for c in courses:
         if c.type == "MCQ":
-            SPREADSHEET_ID = models.extra_data.objects.get(name='mcq').value
+            SPREADSHEET_ID = models.extra_data.objects.get(name='MCQ').value
             ext_row = ext.get(name=c.name+"_MCQ")
             last_update = ext_row.value
             fetch_from = str(int(last_update)+1)
-            ques = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=c.name,range="!A"+fetch_from+":G")
+            ques = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=c.name,range="!A"+fetch_from+":G1000")
             if ques:
                 for q in ques:
+                    if len(q)<8:
+                        q = q+([""]*(7-len(q)))
                     q = questions(course=c,question=q[0],option1=q[1],option2=q[2],option3=q[3],option4=q[4],answer=q[5],explanation=q[6])
                     q.save()
                 ext_row.value = int(last_update) + len(ques)
                 ext_row.save()
         elif c.type == "PRACTICAL":
-            SPREADSHEET_ID = models.extra_data.objects.get(name='practical').value
+            SPREADSHEET_ID = models.extra_data.objects.get(name='PRACTICAL').value
             ext_row = ext.get(name=c.name+"_PRACTICAL")
             last_update = ext_row.value
             fetch_from = str(int(last_update)+1)
-            programs = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=c.name,range="!A"+fetch_from+":F")
+            programs = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=c.name,range="!A"+fetch_from+":F1000")
             if programs:
                 for p in programs:
                     p = program(course=c,programe=p[0])
@@ -294,11 +390,11 @@ def sync_questions(request):
                 ext_row.value = int(last_update) + len(programs)
                 ext_row.save()
         elif c.type == "PROGRAM":
-            SPREADSHEET_ID = models.extra_data.objects.get(name='program').value
+            SPREADSHEET_ID = models.extra_data.objects.get(name='PROGRAM').value
             ext_row = ext.get(name=c.name+"_PROGRAM")
             last_update = ext_row.value
             fetch_from = str(int(last_update)+1)
-            programs = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=c.name,range="!A"+fetch_from+":F")
+            programs = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=c.name,range="!A"+fetch_from+":F1000")
             if programs:
                 for p in programs:
                     p = program(course=c,programe=p[0])
@@ -314,24 +410,33 @@ def savepracticle(request):
     crs = course.objects.get(name=request.POST['cname'],type=request.POST['type'])
     result = exam_attempts.objects.filter(student=request.user, course=crs)
     attempt = 1 if len(result) == 0 else 2 if len(result) < 2 else "Attempts Overed"
-    for field in request.POST:
-        if field.find('ans') == 0:
-            pno = field.replace('ans', '')
-            answer = request.POST[field]
-            prog = program.objects.get(id=pno)
-            p = program_ans(student=request.user, course=crs, program=prog, answer=answer, attempt=attempt)
-            p.save()
+
     if attempt != "Attempts Overed":
+        for field in request.POST:
+            if field.find('ans') == 0:
+                pno = field.replace('ans', '')
+                answer = request.POST[field]
+                prog = program.objects.get(id=pno)
+                p = program_ans(student=request.user, course=crs, program=prog, answer=answer, attempt=attempt)
+                p.save()
+
         result = exam_attempts(student=request.user, course=crs, attempt=attempt)
         result.save()
-    messages.info(request,'Practical saved successfully')
+        messages.info(request, 'Practical saved successfully')
+    else:
+    # if attempt != "Attempts Overed":
+    #     result = exam_attempts(student=request.user, course=crs, attempt=attempt)
+    #     result.save()
+        messages.error(request,'Attempts Overed')
+
     return redirect('index')
 
 ###
 @login_required(login_url='')
 def practicle_validate(request):
     courses = course.objects.values_list('name', flat=True).distinct()
-    return render(request,'validate_practicle.html',{"courses":courses})
+    groups = Group.objects.all()
+    return render(request,'validate_practicle.html',{"courses":courses,"groups":groups})
 
 ###
 @login_required(login_url='')
@@ -362,17 +467,18 @@ def getdata_practicle(request):
             a['QUATION'] = p.program.programe
 
         data.append(a)
-
+        # print(a)
     return HttpResponse(str(data).replace('None',"'none'").replace("'",'"'))
 
 def getdata_oral(request):
-    cname = request.GET['cname']
-    gp = models.groupsinfo.objects.filter(course=cname)
-    print(gp)
-    for g in gp:
-        us = User.objects.filter(groups__name=g.group.name)
-        print(us)
-    return HttpResponse("")
+    gname = request.GET['gname']
+    if gname != 'all groups':
+        us = User.objects.filter(groups__name=gname)
+    else:
+        us = User.objects.all()
+    us = serializers.serialize('json',list(us),fields=('first_name')).replace('pk','ID').replace('first_name','NAME')
+
+    return HttpResponse(us)
 
 ###
 @login_required(login_url='')
@@ -385,7 +491,7 @@ def view_practicle(request):
     crs = course.objects.get(id=ex.course.id)
     gname = prog_ans[0].student.groups.get(name__startswith=crs.name).name
 
-    return render(request,'view_practicle.html',{'crs':crs,'courses':courses,'prog_set':prog_ans,'ex':ex,'gname':gname})
+    return render(request,'view_practical1.html',{'crs':crs,'courses':courses,'prog_set':prog_ans,'ex':ex,'gname':gname})
 
 ###
 @login_required(login_url='')
@@ -474,4 +580,18 @@ def setprogrammarks(request):
         col = all_fields_index['student_performance']['WD Practical (Out of 150)']
         sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=[value], col=col, cell=True)
         messages.info(request,'Program marks saved')
+    return HttpResponse("")
+
+def setoralmarks(request):
+    id = request.GET['id']
+    marks = request.GET['marks']
+    gname = request.GET['gname']
+    gp = Group.objects.filter(name=gname)
+    gpinfo = models.groupsinfo.filter(group=gp)
+    us = User.objects.get(id=id)
+    up = models.user_profile.objects.filter(user_id=us)
+    row = up.student_performance_row
+    SPREADSHEET_ID = models.extra_data.objects.get(name='student_performance').value
+
+    # sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=[marks], col=col, cell=True)
     return HttpResponse("")

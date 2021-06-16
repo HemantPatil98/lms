@@ -82,49 +82,45 @@ $(function () {
 
         controller: {
           loadData: function(filter) {
-           // return $.grep(db.data, function(client) {
-           //      var flag=false;
-           //      $.each(Object.keys(client),function(key,val){
-           //          val=val.toString();
-           //          val1=client[val].toString();
-           //          val2=filter[val];
-           //          if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
+           return $.grep(db.data, function(client) {
+                var flag=false;
+                $.each(Object.keys(client),function(key,val){
+                    val=val.toString();
+                    val1=client[val].toString();
+                    val2=filter[val];
+                    if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
 
-           //          flag=true;
-           //          }else{
-           //              flag=false;
-           //              return false;
-           //          };
-           //      })
-           //       if (flag) {
-           //          return client;
-           //      }
-           //  });
+                    flag=true;
+                    }else{
+                        flag=false;
+                        return false;
+                    };
+                })
+                 if (flag) {
+                    return client;
+                }
+            });
         },
           insertItem: $.noop,
           updateItem: function(item) {
-            // console.log(Object.values(item));
-            // console.log(item);
-            // sheetname = $("select[name='sheetname']").val();
-            // console.log(sheetname);
-            // $("input[name='submit']").trigger('click');
+
             if (confirm(item.CERTIFICATE)) {
-                          var formData = new FormData();
-  formData.append('file', $('#file')[0].files[0]);
-  formData.append('id',item.ID);
-  formData.append('certificate_number',item['CERTIFICATE NUMBER']);
-  formData.append('certificate_status',item['CERTIFICATE STATUS']);
-  $.ajax({
-         url : "{%url 'setcertificate'%}",
-         type : 'POST',
-         data : formData,
-         processData: false,  // tell jQuery not to process the data
-         contentType: false,  // tell jQuery not to set contentType
-         success : function(data) {
-             console.log(data);
-             // alert(data);
-         }
-  });
+              var formData = new FormData();
+              formData.append('file', $('#file')[0].files[0]);
+              formData.append('id',item.ID);
+              formData.append('certificate_number',item['CERTIFICATE NUMBER']);
+              formData.append('certificate_status',item['CERTIFICATE STATUS']);
+              $.ajax({
+                     url : "{%url 'setcertificate'%}",
+                     type : 'POST',
+                     data : formData,
+                     processData: false,  // tell jQuery not to process the data
+                     contentType: false,  // tell jQuery not to set contentType
+                     success : function(data) {
+                         console.log(data);
+                         // alert(data);
+                     }
+              });
       load();
             }
 
@@ -148,7 +144,6 @@ $(function () {
         ]
     });
   });
-    // $('#grid').jsGrid({data:db.data});
 
 </script>
 <script type="text/javascript">

@@ -123,16 +123,16 @@ Exam
                      <div>
                         <div class="form-group">
                             <label for="question">Program #{{forloop.counter}}</label>
-                            <div class="form-control program" id="que{{pro.id}}" onclick="(function(){$('#program{{pro.id}}').toggleClass('collapse');disa('{{pro.id}}');})()">{{pro}}</div> 
+                            <div class="form-control program" id="que{{pro.pk}}" onclick="(function(){$('#program{{pro.pk}}').toggleClass('collapse');disa('{{pro.pk}}');})()">{{pro.fields.programe}}</div> 
                         </div>
-                        <div id="program{{pro.id}}" class="row collapse">
+                        <div id="program{{pro.pk}}" class="row collapse">
                           {%if crs.type == 'PRACTICAL'%}
                          <div class="col-md-8"><iframe src="https://techiedelight.com/compiler/" width="100%" height="500px;"></iframe>
                          </div>
 
                          <div class="col-md-4">
-                           <textarea class="form-control ans" style="width: 100%;height: 90%" name="ans{{pro.id}}" placeholder="Paste your code here"></textarea>
-                    <a class="btn btn-primary" style="margin-top: 10px;" pno={{pro.id}} onclick="save()">SAVE</a>
+                           <textarea class="form-control ans" style="width: 100%;height: 90%" pno="{{pro.pk}}" name="ans{{pro.pk}}" placeholder="Paste your code here"></textarea>
+                    <a class="btn btn-primary" style="margin-top: 10px;" pno={{pro.pk}} onclick="save()">SAVE</a>
 
                          </div>
                          
@@ -140,8 +140,8 @@ Exam
                          <div class="col-md-5">
                            <div class="input-group">
                               <div class="custom-file">
-                                <input type="file" name=file{{pro.id}} class="custom-file-input" id="file{{pro.id}}">
-                                <label class="custom-file-label" for="file{{pro.id}}">Choose zip file</label>
+                                <input type="file" name=file{{pro.pk}} class="custom-file-input" id="file{{pro.pk}}">
+                                <label class="custom-file-label" for="file{{pro.pk}}">Choose zip file</label>
                               </div>
                               <div class="input-group-append">
                                 <span class="input-group-text btn" onclick="sub()">Upload</span>
@@ -178,11 +178,12 @@ Exam
     </div>
   </div>
 </section>
+  <input type="text" id="clear" value="Copy Blocked" readonly="">
+
 {%endblock%}
 
 {%block script%}
 {%if crs%}
-{%if crs.type == 'PRACTICAL'%}
 <script type="text/javascript">
   function startTimer(duration, display) {
     var timer = duration, hr, minutes, seconds;
@@ -211,44 +212,9 @@ Exam
         }
     }, 1000);
   }
-
-function check(){
-  document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
-      document.cookie = "que_ans=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
-      document.cookie = "que_id=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
-}
-abc();
- function abc() {
-  if(getCookie('que_ans') != ""){
-    que_ans = JSON.parse(getCookie('que_ans'));
-    que_id = JSON.parse(getCookie('que_id'));
-    keys = Object.keys(que_ans);
-   for (i=0;i<que_ans.length;i++){
-    a = que_ans[i];
-    b = que_id[i];
-    program = $('.program')[i];
-    $(program).attr('id',b);
-    $(program).text(a);
-    // ans = $('.ans')[i];
-    // $(ans).val(a.ans);
-    // $(ans).attr('name','ans'+a.pno);
-   }
-
-   }else{
-    que_ans = [];
-    que_id = [];
-    $.each($('.program'),function () {
-      console.log(this);
-      que_ans.push($(this).text());
-      que_id.push($(this).attr('id'));
-    });
-      setCookie('que_ans',Json.stringfy(que_ans),1);
-
-  }
-}
   if(getCookie('timer')==""){
     duration = $("input[name='time']").val();
-    console.log(duration);
+    // console.log(duration);
     var fiveMinutes = 60 * duration,
         display = document.querySelector("#time");
     startTimer(fiveMinutes, display);
@@ -258,125 +224,64 @@ abc();
         display = document.querySelector("#time");
     startTimer(fiveMinutes, display);
   }
+</script>
+{%if crs.type == 'PRACTICAL'%}
+<script type="text/javascript">
 
+
+function check(){
+  document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+      document.cookie = "que_ans=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+      document.cookie = "prog_set=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+}
+
+  if(getCookie('que_ans')!=''){
+    question_answer = JSON.parse(getCookie('que_ans'));
+    $('.programe').each(function(index) {
+      $(this).val(question_answer[index])
+    })
+    // console.log(question_answer);
+  }
+  
   function disa(a){};
   
   function save(){
     question_answer=[];
-    // pi = 0;
-    $('textarea').each(function(){
-      pno = $(this).attr('name');
-      program = $("#que"+pno).text();
-      ans = $("textarea[name="+pno+"]").val();
-      que = {'pno':pno,'pro':program,'ans':ans};
-      question_answer.push(que);
-
-    })
 
     setCookie('que_ans',JSON.stringify(question_answer),1);
   }
-  function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+ d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-  }
-  function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i <ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
-      }
-      
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
+  window.alertf = 0;
+  var result =false;
+
+
+  $('html').mouseenter(function(){
+    // alert();
+    if (result){
+      $("#clear").select();
+    document.execCommand("copy");
+    result = false;
+    // alert(result);
     }
-    return "";
-  }
+  });
+
+  $('html').mouseleave(function(){
+    // alert(result);
+    result=true;
+  });
+
   </script>
   {%elif crs.type == 'PROGRAM'%}
 <script type="text/javascript">
     
-  function startTimer(duration, display) {
-      var timer = duration, hr, minutes, seconds;
-      window.a=setInterval(function () {
-        setCookie('timer',timer,1);
-          hr = parseInt(timer/3600,10);
-          minutes = !(timer % 360) ? parseInt( timer/3600, 10) : parseInt((timer/60)%60,10);
-          seconds = parseInt(timer % 60, 10);
-
-          hr = hr < 10 ? "0" + hr : hr;
-          minutes = minutes < 10 ? "0" + minutes : minutes;
-          seconds = seconds < 10 ? "0" + seconds : seconds;
-
-          display.textContent = hr + ":" + minutes + ":" + seconds;
-          $("#timer span").text( hr + ":" + minutes + ":" + seconds);
-          if (timer == 60*5){
-            $('#time').addClass('text-warning');
-            $('#timer').addClass('text-warning');
-          }
-
-          if (--timer < 0) {
-              $('#time').addClass('text-danger');
-              $('#timer').addClass('text-danger');
-              $("input[name='submit']").trigger('click');
-              clearInterval(window.a);
-
-          }
-      }, 1000);
-    }
 
 
-      window.onload = function () {
-      if(getCookie('que_ans') != ""){
-        que_ans = getCookie('que_ans');
-        que_id = getCookie('que_id');
-
-        $('.program').text(que_ans);
-        $('.program').attr('id',que_id);
-        // $('')
-        duration = $("input[name='time']").val();
-            var fiveMinutes = parseInt(getCookie('timer'),10),
-          display = document.querySelector("#time");
-      startTimer(fiveMinutes, display);
-        
-       }
-
-    else{
-      setCookie("que_ans",$('.program').text(),1);
-      setCookie("que_id",$('.program').attr('id'),1);
-      duration = $("input[name='time']").val();
-  var fiveMinutes = 60 * duration,
-            display = document.querySelector("#time");
-        startTimer(fiveMinutes, display);
-    }
+  if(getCookie('que_ans')!=''){
+    question_answer = JSON.parse(getCookie('que_ans'));
+    $('textarea').each(function(index) {
+      $(this).val(question_answer[index])
+    })
+    // console.log(question_answer);
   }
-    function setCookie(cname, cvalue, exdays) {
-      var d = new Date();
-      d.setTime(d.getTime() + (exdays*24*60*60*1000));
-      var expires = "expires="+ d.toUTCString();
-      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-    }
-    function getCookie(cname) {
-      var name = cname + "=";
-      var decodedCookie = decodeURIComponent(document.cookie);
-      var ca = decodedCookie.split(';');
-      for(var i = 0; i <ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-          c = c.substring(1);
-        }
-        
-        if (c.indexOf(name) == 0) {
-          return c.substring(name.length, c.length);
-        }
-      }
-      return "";
-    }
 
     function sub(){
       $("input[name='submit']").trigger('click');
@@ -391,21 +296,22 @@ abc();
       var filePath = $(fileInput).val(); 
 
       
-      if (filePath.indexOf('.zip')<0) { 
+      if (filePath.indexOf('.zip')<0 || !filePath) { 
           alert('Invalid file type'); 
           fileInput.value = ''; 
           return false;       
       } 
       else if (confirm(filePath)){
-        document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+         document.cookie = "timer=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+      document.cookie = "prog_set=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
         clearInterval(window.a)
-        document.cookie = "que_ans=abcd; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
           return true;
           
         }
   }
     function disa(a){
         name = "file"+a;
+        console.log(name);
       $("input[type='file']").each(function(){
         if($(this).attr('name') != name){
         $(this).attr('disabled',true);

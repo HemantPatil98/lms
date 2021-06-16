@@ -86,25 +86,25 @@ def startsheet():
         ex = extra_data(name='batch_schedule', value=SPREADSHEET_ID)
         ex.save()
 
-    if not extra_data.objects.filter(name='mcq'):
+    if not extra_data.objects.filter(name='MCQ'):
         sheetname = "Sheet 1"
-        SPREADSHEET_ID = createsheet(name='Mcq',columns=mcq,sheetname=sheetname)
+        SPREADSHEET_ID = createsheet(name='MCQ',columns=mcq,sheetname=sheetname)
 
-        ex = extra_data(name='mcq', value=SPREADSHEET_ID)
+        ex = extra_data(name='MCQ', value=SPREADSHEET_ID)
         ex.save()
 
-    if not extra_data.objects.filter(name='practical'):
+    if not extra_data.objects.filter(name='PRACTICAL'):
         sheetname = "Sheet 1"
-        SPREADSHEET_ID = createsheet(name='Practical', columns=program, sheetname=sheetname)
+        SPREADSHEET_ID = createsheet(name='PRACTICAL', columns=program, sheetname=sheetname)
 
-        ex = extra_data(name='practical', value=SPREADSHEET_ID)
+        ex = extra_data(name='PRACTICAL', value=SPREADSHEET_ID)
         ex.save()
 
-    if not extra_data.objects.filter(name='program'):
+    if not extra_data.objects.filter(name='PROGRAM'):
         sheetname = "Sheet 1"
-        SPREADSHEET_ID = createsheet(name='Program', columns=program, sheetname=sheetname)
+        SPREADSHEET_ID = createsheet(name='PROGRAM', columns=program, sheetname=sheetname)
 
-        ex = extra_data(name='program', value=SPREADSHEET_ID)
+        ex = extra_data(name='PROGRAM', value=SPREADSHEET_ID)
         ex.save()
 
 
@@ -188,7 +188,7 @@ def appendsheet(SPREADSHEET_ID,values,range='!A:A',dimension='ROWS',sheetname="A
     properties = sheet.get(spreadsheetId=SPREADSHEET_ID).execute()
     sheets = []
     flag = 1
-    print(sheetname+range)
+    # print(sheetname+range)
     for item in properties['sheets']:
         sheets.append(item.get("properties").get('title'))
 
@@ -197,8 +197,19 @@ def appendsheet(SPREADSHEET_ID,values,range='!A:A',dimension='ROWS',sheetname="A
             flag = 0
             break
 
+    column = []
+    if 'student_performance' == extra_data.objects.filter(value=SPREADSHEET_ID)[0].name:
+        column = student_performance
+    elif 'student_profile' == extra_data.objects.filter(value=SPREADSHEET_ID)[0].name:
+        column = student_profile
+    elif 'attendance' == extra_data.objects.filter(value=SPREADSHEET_ID)[0].name:
+        column = attendance
+    elif 'attendance' == extra_data.objects.filter(value=SPREADSHEET_ID)[0].name:
+        column = attendance
+
+
     if flag:
-        addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=sheetname)
+        addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=sheetname,columns=column)
 
     value_range_body = {
         'majorDimension': dimension,

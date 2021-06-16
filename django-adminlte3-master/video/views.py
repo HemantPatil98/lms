@@ -11,7 +11,16 @@ import math
 from lms.models import *
 from lms import sheetsapi
 from exam.models import *
+video_key = []
 
+def randomstring():
+    import secrets
+    import string
+
+    N = 7
+    res = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for i in range(N))
+
+    return str(res)
 ###
 @login_required(login_url='')
 def video(request,course):
@@ -27,22 +36,38 @@ def video(request,course):
         per = math.floor((len(watch)/len(videolist))*100)
     else:
         per = 0
+
     return render(request,'video.html',{'course':course,'videos':videolist,'watched':watch,'per':per})
 
 ###
 @xframe_options_sameorigin
 @login_required(login_url='')
 def videoframe(request,course,video):
+    # key = randomstring()
+    # video_key.append(key)
+    # print("key=",key)
+    # if key in video_key:
     return render(request,'videoframe.html',{'course':course,'video':video})
+    # else:
+    #     return HttpResponse("Sorry Bad request")
 
 ###
 @login_required(login_url='')
 def v(request,course,video):
+    # print(key,video_key)
+    # if key in video_key:
+    #     print("hi")
+    # video_key.remove(key)
     videolink = "media/videos/courses/"+course+"/"+video+".mp4"
+    # print(os.path.exists(videolink))
     file = FileWrapper(open(videolink, 'rb'))
     response = HttpResponse(file, content_type='video/mp4')
     response['Content-Disposition'] = 'attachment; filename=my_video.mp4'
+
     return response
+    # else:
+    #     return HttpResponse("Sorry Bad request")
+
 
 ###
 @login_required(login_url='')
@@ -109,10 +134,7 @@ def videopermissions(request,view='false'):
             for v in os.listdir(videos):
                 videolist.append(v.split(".")[0])
 
-        try:
-            notice1 = notice.objects.all().order_by('-id')[0:5]
-        except:
-            notice1 = ""
+
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
         # print(memb)
         courses = course.objects.values_list('name', flat=True).distinct()
@@ -135,3 +157,8 @@ def watched_video(request):
         status = videos_watched_status(user=request.user,course=course,watched=vid)
         status.save()
     return HttpResponse("")
+
+def getnewvideokey(request):
+    key = randomstring()
+    video_key.append(key)
+    return HttpResponse(str(key))

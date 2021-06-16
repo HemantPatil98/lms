@@ -43,7 +43,6 @@
 			// console.log(abc.innerHeight);
 			// $('#my-video').css('height',abc.innerHeight+"!important")
 			// $('#my-video').css('width',abc.innerWidth+"!important")
-
 	</script>
 </head>
 <body>
@@ -58,13 +57,11 @@
     data-setup="{}"
   >
     <source src="{%url 'v' course=course video=video%}" type="video/mp4" />
-    <source src="{%url 'v' course=course video=video%}" type="video/webm" />
+ 
     <p class="vjs-no-js">
       To view this video please enable JavaScript, and consider upgrading to a
       web browser that
-      <a href="https://videojs.com/html5-video-support/" target="_blank"
-        >supports HTML5 video</a
-      >
+      <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
     </p>
   </video>
 </body>

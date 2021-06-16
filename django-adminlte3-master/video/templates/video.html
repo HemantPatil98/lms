@@ -80,7 +80,7 @@ Videos
 
       <main class="col-sm-12 col-md-4">
         {%for v in videos%}
-        <article class="item {%if v in watched%} watched {%endif%} "  {%if request.user|has_per_name:v%} data-key="{{v}}"{%else%}class="bg-danger" data-toggle="tooltip" data-placement="top" title="This Video is currently locked for you"{%endif%} >
+        <article class="item {%if v in watched%} watched {%endif%} "  {%if request.user|has_per_name:v or request.user.is_superuser%} data-key="{{v}}"{%else%}class="bg-danger" data-toggle="tooltip" data-placement="top" title="This Video is currently locked for you"{%endif%} >
             <img src="/media/videos/thumb/{{course}}/{{v}}.jpg" alt="" class="thumb">
             <div class="details">
                 <span class='title'>{{v}}</span>  
@@ -98,8 +98,12 @@ Videos
  <script src="https://vjs.zencdn.net/7.11.4/video.min.js"></script>
 <script type="text/javascript">
   $("article").click(function(){
+    url = "{%url 'getnewvideokey'%}";
+    window.key = "";
+
     var datakey=$(this).attr('data-key');
     if (datakey){
+      console.log(window.key);
       var src = window.location.origin+"/videoframe/{{course}}/"+datakey;
       $('iframe').attr('src',src);
       $("#title").text(datakey);

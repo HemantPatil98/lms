@@ -1,0 +1,150 @@
+{%extends 'student/base.html'%}
+{%block style%}
+<style type="text/css">
+	#add_questions{
+		float: right;
+		border-radius: 10px;
+		padding: 10px;
+		margin-top: 7px;
+	}
+</style>
+{%endblock%}
+{%load static%}
+
+{%block page_link%}
+{%block page_title%}
+Add Questions
+{%endblock%}
+{%endblock%}
+
+{%block content%}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Add Course </h3>
+          </div>
+          <!-- /.card-header -->
+          <!-- form start -->
+          <form action="{%url 'add_course'%}" method="POST">
+            {%csrf_token%}
+            <div class="card-body">
+            	<div class="row">
+              <div class="form-group col-md-4">
+              <label>Course</label>
+              <select class="form-control select2" style="width: 100%;" name="cname">
+                {%for course in courses%}
+                <option value="{{course}}">{{course}}</option>
+                {%endfor%}}
+              </select>
+            	</div>
+            	<div class="form-group col-md-4">
+            		<div class="row">
+            			<div class="col-md-6">
+            				<label>Section</label>
+                		<select class="form-control select2" name="type" required>
+                			<option >ORAL</option>
+                			<option >MCQ</option>
+                			<option >PRACTICAL</option>
+                			<option >PROGRAM</option>
+                		</select>
+                	</div>
+                	<div class="col-md-6">
+            				<label>Duration</label>
+                		<input type="number" class="form-control center" name="time" placeholder="Duration in minutes" value="30" required>
+                	</div>
+            		</div>
+            		
+            	</div>
+            	<div class="form-group col-md-2">
+            		<label>Question Count</label>
+            		<input type="number" name="count" class="form-control" required="" value=2>
+            	</div>
+            	<div class="form-group col-md-3">
+            		<button type="button" id="sync" class="btn btn-info" onclick="syncquestions()"><i class="fas fa-sync "></i> Sync Questions</button>
+            	</div>
+            	</div>
+             <hr>
+             <div class="row">
+               <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.MCQ}}" target="new">MCQ Question Sheet</a></div>
+               <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.PRACTICAL}}" target="new">Practical Question Sheet</a></div>
+               <div class="col-md-4" style="font-size:18px;font-weight: 800;"><a class="btn btn-outline-info" href="https://docs.google.com/spreadsheets/d/{{ext.PROGRAM}}" target="new">Program Question Sheet</a></div>
+             </div>
+             <div>
+             	<hr>
+             	<div id="" class="row">
+             		<div class="col-md-12">
+             			<div class="card ">		
+		              <div class="card-header">
+		                <div class="form-group">
+		                	<i class="fas fa-info text-info"> Instructions</i><br>
+		                	<textarea class="form-control" name="instructions" rows="2" placeholder="Instructions">{{crs.instructions}}</textarea>
+		                </div>
+		              </div>
+		              
+		              <!-- /.card-header -->
+		              <!-- form start -->
+		                <div class="card-body" id="body" style="height: auto;">
+		                
+		                </div>
+		                
+		                <!-- /.card-body -->
+		            </div>
+             		</div>
+             	</div>
+             </div>
+              
+            <!-- /.card-body -->
+        	</div>
+            <div class="card-footer">
+            	<input type="submit" name="Submit" class="btn btn-success" value="Submit">
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</section>
+{%endblock%}
+
+
+{%block script%}
+<script type="text/javascript">
+	
+$('#sync').hover(function(){
+	$('.fa-sync').addClass('fa-spin');
+},function(){
+	$('.fa-sync').removeClass('fa-spin');
+});
+
+function syncquestions(){
+	$('.fa-sync').addClass('fa-spin');
+	url = "{%url 'sync_questions'%}";
+	$.get(url,function(data){
+
+	}).done($('.fa-sync').removeClass('fa-spin'));
+};
+
+</script>
+
+<script type="text/javascript">
+	  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2({
+      {%if view != 'true'%}
+          tags:true
+          {%endif%}
+          })
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4',
+      // tags:true
+    })
+});
+</script>
+
+
+    {%endblock%}

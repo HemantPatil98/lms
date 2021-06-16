@@ -1,0 +1,61 @@
+    <div class="modal fade" id="followus">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4>Fortune Cloude Technologies</h4>
+            <button type="button" class="close closelink" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" style="align-self: center;">
+            <a href="https://www.facebook.com/fortunecloudtechnologies/" target="new"><i class="fab fa-facebook-square social" style="color: #1877f2;"></i></a>
+            <a href="https://www.instagram.com/fortunecloud/" target="new"><i class="fab fa-instagram social" style="color: #db3465;"></i></a>
+            <a href="" target="new"><i class="fab fa-twitter social" style="color: #28a9e0;"></i></a>
+            <a href="https://www.linkedin.com/company/fortunecloud/" target="new"><i class="fab fa-linkedin social" style="color: #0077b7"></i></a>
+            <a href="https://www.youtube.com/channel/UCapKgnnZra4mA76FnhL1ZrQ" target="new"><i class="fab fa-youtube social" style="color: red"></i></a>
+          </div>
+          <div class="modal-footer justify-content-between">
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="notemodal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="card-title" id="notetitle"></h3>
+            <button type="button" class="close closelink" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="inputName">Subject</label>
+              <input type="text" name="subject" class="form-control" id="notesubject" disabled>
+            </div>
+            <div class="form-group">
+              <label for="inputDescription">Description</label>
+              <textarea name="description" class="form-control" rows="4" disabled id="notedesc"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="customFile">File</label>
+              <div class="custom-file link">
+                <a class="btn btn-block btn-outline-info" href="/media/{{notice.file}}" id="notefile"><i class="fa fa-download"></i>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspAttachment</a>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="externallink">External links</label>
+               <div class="custom-file link">
+                <a class="btn btn-outline-info form-control" id="notelink" style="overflow: hidden;" target="new">{{notice.externallink}}</a>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>

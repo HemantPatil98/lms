@@ -87,7 +87,7 @@ def indexing_fields():
                              ',INDIRECT("'+all_fields_index['student_performance']['Adv Practical (Out of 40)']+'"&ROW())'+\
                              ',INDIRECT("'+all_fields_index['student_performance']['Adv Oral (Out of 20)']+'"&ROW()))'
 
-    marks['Total Marks (Out of 700)'] = '=sum(INDIRECT('""+all_fields_index['student_performance']['C Total Marks (Out of 100)']+'"&ROW())'+\
+    marks['Total Marks (Out of 700)'] = '=sum(INDIRECT("'+all_fields_index['student_performance']['C Total Marks (Out of 100)']+'"&ROW())'+\
                                         ',INDIRECT("'+all_fields_index['student_performance']['Sql Total Marks (Out of 100)']+'"&ROW())'+ \
                                         ',INDIRECT("' + all_fields_index['student_performance']['WD Total Marks (Out of 200)'] + '"&ROW())' + \
                                         ',INDIRECT("' + all_fields_index['student_performance']['Core Total Marks (Out of 100)'] + '"&ROW())' + \

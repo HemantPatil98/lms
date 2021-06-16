@@ -27,10 +27,13 @@ urlpatterns = [
     path('attendance/', views.attendance, name='attendance'),
     path('attendance_update/', views.attendance_update, name='attendance_update'),
     path('studentattendance/', views.studentattendance, name='studentsattendance'),
-    path('attendance/', views.attendance, name='attendance'),
+
 
     path('add/notice/',models.notice.addnotice,name='addnotice'),
     path('view/notice/',models.notice.addnotice ,{'view': True},name='viewnotice'),
+    path('get/notice/', models.notice.getnotice, name='getnotice'),
+    path('read/notice/', models.notice.markreadnotice, name='readnotice'),
+    path('readall/notice/', models.notice.readallnotice, name='readallnotice'),
 
     path('add/certificate/', views.addcertificate, name='addcertificate'),
     path('get/certificate/', views.getcertificate, name='getcertificate'),

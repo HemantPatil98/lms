@@ -148,7 +148,7 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
-              {%if request.user.is_superuser%}
+              {%if request.user.is_staff%}
               <li class="nav-item">
                 <a href="{%url 'videopermissions'%}" class="nav-link {%if request.resolver_match.url_name == 'videopermissions' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
@@ -157,35 +157,89 @@
               </li>
               {%endif%}
               <li class="nav-item">
-                <a {%if 'video' in per.C%}href="/video/C/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%} class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'C' %}active{%endif%}">
+                <a {%if 'video' in per.C or request.user.is_superuser%}href="/video/C/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%} class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'C' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>C Programing</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a {%if 'video' in per.SQL%}href="/video/Sql/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'SQL' %}active{%endif%}">
+                <a {%if 'video' in per.SQL or request.user.is_superuser%}href="/video/Sql/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'SQL' %}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>SQL</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a {%if 'video' in per.WD%}href="/video/WD/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'WD'%}active{%endif%}">
+                <a {%if 'video' in per.WD or request.user.is_superuser%}href="/video/WD/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%}" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'WD'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Web Designing</p>
                 </a>
               </li>
+              {%if request.user.is_superuser%}
               <li class="nav-item">
-                <a {%if 'video' in per.PYTHON%}href="/video/Python/"{%elif 'video' in per.JAVA%}href="/video/Java/"{%elif 'video' in per.TESTING%}href="/video/Testing/"{%elif 'video' in per.ANGULAR%}href="/video/Angular/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%} class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Core'%}active{%endif%}">
+                <a href="/video/Core_Python/" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Core Python'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Core Python</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/video/Core_JAVA/" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Core JAVA'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Core JAVA</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/video/Core_Angular/" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Core Angular'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Core Angular</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/video/Core_Testing/" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Core Testing'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Core Testing</p>
+                </a>
+              </li>
+              {%else%}
+              <li class="nav-item">
+                <a {%if 'video' in per.PYTHON%}href="/video/Core_Python/"{%elif 'video' in per.JAVA%}href="/video/Core_Java/"{%elif 'video' in per.TESTING%}href="/video/Core_Testing/"{%elif 'video' in per.ANGULAR%}href="/video/Core_Angular/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%} class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Core'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Core Domain</p>
                 </a>
               </li>
+              {%endif%}
+              {%if request.user.is_superuser%}
               <li class="nav-item">
-                <a {%if 'video' in per.PYTHON%}href="/video/Python/"{%elif 'video' in per.JAVA%}href="/video/Java/"{%elif 'video' in per.TESTING%}href="/video/Testing/"{%elif 'video' in per.ANGULAR%}href="/video/Angular/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%} class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Adv'%}active{%endif%}">
+                <a href="/video/Adv_Python/" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Adv_Python'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Adv Python</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/video/Adv_JAVA/" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Adv_JAVA'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Adv JAVA</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/video/Adv_Angular/" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Adv_Angular'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Adv Angular</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/video/Adv_Testing/" class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Adv_Testing'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Adv Testing</p>
+                </a>
+              </li>
+              {%else%}
+              <li class="nav-item">
+                <a {%if 'video' in per.PYTHON%}href="/video/Adv_Python/"{%elif 'video' in per.JAVA%}href="/video/Adv_Java/"{%elif 'video' in per.TESTING%}href="/video/Adv_Testing/"{%elif 'video' in per.ANGULAR%}href="/video/Adv_Angular/"{%else%} data-toggle="tooltip" data-placement="top" title="This section is currently locked for you"{%endif%} class="nav-link {%if request.resolver_match.url_name == 'video' and course == 'Adv'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Adv Domain</p>
                 </a>
-              </li>v
+              </li>
+              {%endif%}
             </ul>
           </li>
           <li class="nav-item">
@@ -205,9 +259,9 @@
               </li>
               {%if request.user.is_superuser%}
               <li class="nav-item">
-                <a href="{%url 'add_questions'%}" class="nav-link {%if request.resolver_match.url_name == 'add_questions'%}active{%endif%}">
+                <a href="{%url 'add_course'%}" class="nav-link {%if request.resolver_match.url_name == 'add_course'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Questions</p>
+                  <p>Add Course</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -239,6 +293,23 @@
             </ul>
           </li>
           {%endif%}
+          <li class="nav-item">
+            <a href="#" class="nav-link {%if request.resolver_match.url_name == 'schedule'%}active{%endif%}">
+              <i class="fa fa-calendar"></i>
+              <p>
+                Schedule
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{%url 'schedule'%}" class="nav-link {%if request.resolver_match.url_name == 'schedule'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Schedule</p>
+                </a>
+              </li>
+            </ul>
+          </li>
           <li class="nav-item">
             <a href="#" class="nav-link {%if request.resolver_match.url_name == 'timeline'%}active{%endif%}">
               <i class="fas fa-history"></i>

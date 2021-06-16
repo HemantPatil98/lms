@@ -33,21 +33,36 @@ Validate Practical
 <section class="content">
   <div class="card card-primary">
     <div class="card-header row">
-      <h3 class="card-title col-md-8 col-sm-6">Student Profile</h3>
+      <h3 class="card-title col-md-6">Student Profile</h3>
 
-      <div class="col-md-4 col-sm-5">
+      <div class=" col-md-6">
         <!-- <label>Custom Select</label> -->
-        <select name="cname" class="custom-select select2 col-6" onchange="load()">
-          {%for course in courses%}
-          <option value="{{course}}">{{course}}</option>
-          {%endfor%}
-        </select>
-        <select name="type" class="custom-select col-5" onchange="load()">
-          <!-- <option value="ORAL">ORAL</option> -->
-          <option value="MCQ">MCQ</option>
-          <option value="PRACTICAL">PRACTICAL</option>
-          <option value="PROGRAM">PROGRAM</option>
-        </select>
+        <div class="row">
+<!--           <div class="col-sm-4">
+            <select name="gname" class="custom-select select2" onchange="load()">
+              <option value="all groups">All Groups</option>
+              {%for gname in groups%}
+              <option value="{{gname}}">{{gname}}</option>
+              {%endfor%}
+            </select>
+          </div> -->
+          <div class="col-sm-4">
+            <select name="cname" class="custom-select select2" onchange="load()">
+              {%for course in courses%}
+              <option value="{{course}}">{{course}}</option>
+              {%endfor%}
+            </select>
+          </div>
+          <div class="col-sm-4">
+            <select name="type" class="custom-select select2" onchange="load()">
+            <!-- <option value="ORAL">ORAL</option> -->
+              <option value="MCQ">MCQ</option>
+              <option value="PRACTICAL">PRACTICAL</option>
+              <option value="PROGRAM">PROGRAM</option>
+            </select>
+          </div>
+        </div>
+        
       </div>
     </div>
     <!-- /.card-header -->
@@ -74,15 +89,26 @@ Validate Practical
   var db = {};
   load();
  function load(){
+  var gname=$("select[name='gname']").val();
+console.log(gname);
     var cname=$("select[name='cname']").val();
 console.log(cname);
     var type=$("select[name='type']").val();
 console.log(type);
   var url = "{%url 'getdata_practicle'%}";
-  // if (type == 'ORAL'){
-  //   var url = "{%url 'getdata_oral'%}";
-  // }
-  if (type=='MCQ') {
+
+  if (type == 'ORAL'){
+    var url = "{%url 'getdata_oral'%}";
+  }
+
+  if (type=='ORAL') {
+   var field= [
+            { name: "ID", type: "number", width: 70,editing:false},
+            { name: "fields.NAME", type: "text", width: 70,editing:false},
+            { name: "MARKS", type: "text",width:100,editing:true},
+        ];
+  }
+  else if (type=='MCQ') {
    var field= [
             { name: "ID", type: "number", width: 70,editing:false},
             { name: "NAME", type: "text", width: 70,editing:false},
@@ -121,10 +147,11 @@ console.log(type);
 
     $('#grid').jsGrid({fields:field});
 
-$.get(url,{cname:cname,type:type},function(data,status){
+$.get(url,{cname:cname,type:type,gname:gname},function(data,status){
 
     data = data.replaceAll("'",'"');
     db.data=JSON.parse(data);
+    console.log(db.data);
 
     $('#grid').jsGrid({data:db.data});
 
@@ -181,11 +208,16 @@ $(function () {
         },
           insertItem: $.noop,
           updateItem: function(item) {
-            Url = "{%url 'setprogrammarks'%}"
+            if ($("select[name='type']").val()=='ORAL'){
+              Url = "{%url 'setoralmarks'%}";
+            }
+            else{
+            Url = "{%url 'setprogrammarks'%}";
+            }
             data={
                 row:item,
             }
-                $.get(Url,{id:item.ID,value:item.MARKS},function(data,status){
+                $.get(Url,{id:item.ID,value:item.MARKS,gname:gname},function(data,status){
 
                 });
             },
@@ -195,13 +227,18 @@ $(function () {
         fields: [
             { name: "ID", type: "number", width: 70,editing:false},
             { name: "NAME", type: "text", width: 70,editing:false},
-            { name: "COURSE", type: "text", width: 70,editing:false},
-            { name: "TYPE", type: "text", width: 70,editing:false},
-            { name: "ATTEMPT", type: "text",width:100,editing:false},
             { name: "MARKS", type: "text",width:100,editing:true},
         ]
     });
   });
+
+// $('.select2').select2({
+//       })
+
+// $('.select2').on('.select2:opening .select2:closing', function( event ) {
+//     var $searchfield = $(this).parent().find('.select2-search__field');
+//     $searchfield.prop('disabled', true);
+// });
 </script>
 {%endblock%}
 

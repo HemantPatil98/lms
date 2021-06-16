@@ -10,12 +10,14 @@ class course(models.Model):
     type = models.CharField(max_length=15)
     time = models.IntegerField(default=30)
     attempts_allowed = models.IntegerField(default=2)
+    questions_count = models.IntegerField(default=2)
 
     class Meta:
         unique_together = (('name', 'type'),)
 
     def __str__(self):
         return self.name
+
 
 class exam_attempts(models.Model):
     student = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -42,15 +44,7 @@ class questions(models.Model):
 
     def __str__(self):
         return self.question
-#
-# class options(models.Model):
-#     question = models.ForeignKey(questions,on_delete=models.CASCADE)
-#     option = models.CharField(max_length=50)
-#     status = models.BooleanField(default=False)
-#     explanation = models.CharField(max_length=250)
-#
-#     def __str__(self):
-#         return self.option
+
 
 class program(models.Model):
     course = models.ForeignKey(course,on_delete=models.CASCADE)
