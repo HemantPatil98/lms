@@ -67,7 +67,8 @@ class notice(models.Model):
         return render(request, 'student/add_notice.html', {'data': page, 'up': up})
 
     def getnotice(request):
-        notices = notice.objects.all().order_by('-id')
+        notices = notice.objects.filter(generateddate__gte=request.user.date_joined).order_by('-id')
+        us_profile = user_profile.objects.get(user_id=request.user)
         pageno = request.GET['pageno']
         try:
             pageno = request.GET['pageno']
@@ -78,36 +79,50 @@ class notice(models.Model):
 
         page = P.page(pageno)
 
-        if 'last_notice' not in request.session:
-            request.session['last_notice'] = notices[0].id
-            new_notices = []
-            for i in notices:
-                new_notices.append(i.id)
-            request.session['unread_notices'] = new_notices
-        else:
-            if request.session['last_notice'] < notices[0].id:
+
+        if not us_profile.last_notice:
+            us_profile.last_notice = notices[0].id
+
+        if len(notices):
+            if us_profile.last_notice < notices[0].id:
                 new_notices = []
-                for i in notices.filter(id__gt=request.session['last_notice']):
+                for i in notices.filter(id__gt= us_profile.last_notice):
                     new_notices.append(i.id)
-                request.session['unread_notices'] += new_notices
+                unread_notices = us_profile.unread_notices.replace('[', '').replace(']', '')
+                unread_notices = unread_notices.split(', ')
+                if unread_notices != ['']:
+                    unread_notices = [int(x) for x in unread_notices]
+                    us_profile.unread_notices = unread_notices + new_notices
+                else:
+                    us_profile.unread_notices = new_notices
+
+                us_profile.last_notice = notices[0].id
+        us_profile.save()
         notices = serializers.serialize('json',list(page),fields=('title', 'description','generateddate','file','externallink'))
 
-        return HttpResponse(notices+";"+str(request.session['unread_notices']))
+        return HttpResponse(notices+";"+str(us_profile.unread_notices))
 
     def markreadnotice(request):
-        unread_notices = request.session['unread_notices']
+        us_profile = user_profile.objects.get(user_id=request.user.id)
+        unread_notices = us_profile.unread_notices.replace('[','').replace(']','')
+        unread_notices = unread_notices.split(', ') #request.session['unread_notices']
+        unread_notices = [int(x) for x in unread_notices]
+
         id = int(request.GET['id'])
         if id in unread_notices:
             unread_notices.remove(id)
-        request.session['unread_notices'] = unread_notices
-        print(request.session['unread_notices'])
+        us_profile.unread_notices= unread_notices
+
+        us_profile.save()
 
         return redirect('index')
 
     def readallnotice(request):
-        request.session['unread_notices'] = []
+        us_profile = user_profile.objects.get(user_id=request.user.id)
+        us_profile.unread_notices = []
+        us_profile.save()
         messages.info(request,"All Notices Read")
-        return render('index')
+        return redirect('index')
 
 
 
@@ -128,6 +143,8 @@ class user_profile(models.Model):
     otp = models.CharField(max_length=6)
     photo = models.FileField(upload_to='profile_photo/')
     certificate = models.ForeignKey(certificate_request,on_delete=models.CASCADE,blank=True,null=True)
+    unread_notices = models.TextField()
+    last_notice = models.IntegerField()
 
     def __str__(self):
         return self.user_id.username

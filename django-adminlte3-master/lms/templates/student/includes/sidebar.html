@@ -13,10 +13,10 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          {%if not request.user.is_staff%}<img src="/media/{{request.session.profile_photo}}" class="img-circle elevation-2" alt="User Image">{%endif%}
+          <img src="/media/{{request.session.profile_photo}}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="{%url 'viewprofile'%}" class="d-block">{{request.user.username}}</a>
+          <a {%if not request.user.is_staff%} href="{%url 'viewprofile'%}" {%endif%} class="d-block">{{request.user.username}}</a>
         </div>
          </div>
 
@@ -33,7 +33,7 @@
       </div>
 
       <!-- Sidebar Menu -->
-      <nav class="mt-2">
+      <nav class="mt-2" style="padding-bottom: 100px;">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
@@ -273,6 +273,23 @@
               {%endif%}
             </ul>
           </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link {%if request.resolver_match.url_name == 'attendance'%}active{%endif%}">
+              <i class="fas fa-check-square"></i>
+              <p>
+                Attendance
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{%if request.user.is_staff%}{%url 'attendance'%}{%else%}{%url 'studentsattendance'%}{%endif%}" class="nav-link {%if request.resolver_match.url_name == 'attendance'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>{%if request.user.is_superuser%}Add /{%endif%} view Attendance</p>
+                </a>
+              </li>
+            </ul>
+          </li>
 
           {%if request.user.is_superuser%}
           <li class="nav-item">
@@ -347,23 +364,6 @@
           </li>
           {%endif%}
           <li class="nav-item">
-            <a href="#" class="nav-link {%if request.resolver_match.url_name == 'attendance'%}active{%endif%}">
-              <i class="fas fa-check-square"></i>
-              <p>
-                Attendance
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{%if request.user.is_staff%}{%url 'attendance'%}{%else%}{%url 'studentsattendance'%}{%endif%}" class="nav-link {%if request.resolver_match.url_name == 'attendance'%}active{%endif%}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>{%if request.user.is_superuser%}Add /{%endif%} view Attendance</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
             <a href="" class="nav-link">
               <i class="nav-icon fas fa-lock"></i>
               <p>
@@ -386,6 +386,7 @@
               </li>
             </ul>
           </li>
+          {%if not request.user.is_staff%}
           <li class="nav-item">
             <a href="" class="nav-link" data-target="#followus" data-toggle='modal'>
               <i class="nav-icon fas fa-user-plus"></i>
@@ -402,6 +403,7 @@
               </p>
             </a>
           </li>
+          {%endif%}
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

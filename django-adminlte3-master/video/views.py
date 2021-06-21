@@ -139,9 +139,8 @@ def videopermissions(request,view='false'):
         # print(memb)
         courses = course.objects.values_list('name', flat=True).distinct()
         return render(request, 'videopermissions.html',
-                      {'gname': gp, 'permissions': Permission.objects.all()[68::],
-                       'up': up, 'notice': notice1, 'vpermissions': videolist, 'courses': courses,
-                       'gpinfo': gpinfo, 'gp_permissions': gp_permissions, 'view': view})
+                      {'gname': gp, 'permissions': Permission.objects.all()[68::],'up': up, 'vpermissions': videolist,
+                       'courses': courses,'gpinfo': gpinfo, 'gp_permissions': gp_permissions, 'view': view})
     groups = Group.objects.all()
     courses = course.objects.values_list('name', flat=True).distinct()
 

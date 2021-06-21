@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group,Permission
 from django.contrib import messages
 from datetime import datetime
 from django.core import serializers
@@ -209,14 +209,9 @@ def mcq_exam(request):
             else:
                 prog = program.objects.all().filter(course=crs.id)
                 prog_set = random.sample(set(prog), crs.questions_count)
-
                 abc = str(serializers.serialize('json', list(prog_set), fields=('programe')))
-                print(abc)
                 prog_set = json.loads(abc)
 
-            # courses = course.objects.values_list('name', flat=True).distinct()
-            # attempt = exam_attempts.objects.filter(student=request.user, course=crs)
-            # attempt = len(attempt)
             response =  render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
                                                            'prog_set': prog_set,'attempt':attempt})
 
@@ -227,9 +222,6 @@ def mcq_exam(request):
         elif crs.type == 'PROGRAM':
             prog = program.objects.all().filter(course=crs.id)
             prog_set = random.sample(set(prog), crs.questions_count)
-            # courses = course.objects.values_list('name', flat=True).distinct()
-            # attempt = exam_attempts.objects.filter(student=request.user,course=crs)
-            # attempt = len(attempt)
 
             if 'prog_set' in request.COOKIES:
                 prog_set = json.loads(request.COOKIES['prog_set'].replace("'",'"'))
@@ -239,7 +231,6 @@ def mcq_exam(request):
                 prog_set = random.sample(set(prog), crs.questions_count)
 
                 abc = str(serializers.serialize('json', list(prog_set), fields=('programe')))
-                print(abc)
                 prog_set = json.loads(abc)
 
             response = render(request, 'practicle_exam.html', {'crs': crs, 'count': count, 'courses': courses,
@@ -249,13 +240,10 @@ def mcq_exam(request):
 
             return response
 
-    # print(request.user.groups.all())
     courses = []
-    for g in request.user.groups.all():
+    for g in request.user.groups.filter(permissions=Permission.objects.get(name='exam')):
         gp = models.groupsinfo.objects.get(group=g.id)
-        # print(gp.course)
         courses.append(gp.course)
-    courses = course.objects.values_list('name', flat=True).distinct()
     return render(request,'mcq_exam.html',{'courses':courses})
 
 ###

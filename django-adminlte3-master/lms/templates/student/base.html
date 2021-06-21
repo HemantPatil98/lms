@@ -126,11 +126,14 @@
   load();
 function load(){
   $.get(url,{pageno:pageno},function(data) {
-
     data = data.split(';')
+
     notice = JSON.parse(data[0]);
+    console.log(data[1]);
 
     unread_notices=JSON.parse(data[1]);
+    console.log(unread_notices);
+
 
     $('#noticecount').text(unread_notices.length);
 
@@ -170,7 +173,9 @@ function load(){
 
   function noticeopen(id){
     
-    unread_notices.pop(id);
+    if (unread_notices.indexOf(id) > -1){
+     unread_notices.pop(id);      
+    }
     $('#noticecount').text(unread_notices.length);
     $('#'+id).removeClass('active');
     $.each(window.data,function(){

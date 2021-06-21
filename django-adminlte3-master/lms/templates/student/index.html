@@ -57,13 +57,11 @@ Dashboard
       <div class="card col-md-3">
           <div class="card-body box-profile">
             <div class="text-center">
-              <img class="profile-user-img img-fluid img-circle"
-                   src="/media/{{request.session.profile_photo}}"
-                   alt="User profile picture">
+              <img class="profile-user-img img-fluid img-circle" src="/media/{{request.session.profile_photo}}" alt="User profile picture">
             </div>
             <br>
             <div class="text-center" id="popupReturn" on hover=>
-                <input type="text" class="knob knob1"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true" value="{{performance|key_with_space:'Total Marks (Out of 700)'|div:7}}"  data-toggle="tooltip" data-placement="top" title="Click to see your score card">
+                <input type="text" class="knob knob1"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true" value="{{performance|key_with_space:'Total Marks (Out of 700)'|int|div:7}}"  data-toggle="tooltip" data-placement="top" title="Click to see your score card">
 
                 <div class="knob-label">Average Performance</div>
                 <div id="tableContent" style="display:none">
@@ -532,21 +530,6 @@ Dashboard
     
   })
 </script>
-<script type="text/javascript">
-  function onexpand(a,x){
-    b=$(a)[0];
-    $(b).toggleClass('col-sm-4');
-    $(b).toggleClass('col-sm-12');
-    b=$(a)[1];
-    $(b).toggleClass('col-sm-8');
-    $(b).toggleClass('col-sm-12');
-    $(b).css('align-self','center')
-    c=$(b).children('h3');
-    c.toggleClass('expand_title');
-    $(x).toggleClass('collapse');
-    }
-</script>
-
 <script>
     $().ready(function(e) {
 
@@ -564,7 +547,24 @@ Dashboard
 
     });
     $(document).ready(function(){
-$('[data-toggle="tooltip"]').tooltip();   
-});
+  $('[data-toggle="tooltip"]').tooltip();   
+  });
 </script>
+
+<script type="text/javascript">
+  function onexpand(a,x){
+    b=$(a)[0];
+    $(b).toggleClass('col-sm-4');
+    $(b).toggleClass('col-sm-12');
+    b=$(a)[1];
+    $(b).toggleClass('col-sm-8');
+    $(b).toggleClass('col-sm-12');
+    $(b).css('align-self','center')
+    c=$(b).children('h3');
+    c.toggleClass('expand_title');
+    $(x).toggleClass('collapse');
+    }
+</script>
+
+
 {%endblock%}

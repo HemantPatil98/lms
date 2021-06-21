@@ -18,6 +18,9 @@
   .fa-camera:hover{
     color: #536273;
   }
+  .knob{
+    font-size: 35px!important;
+  }
 </style>
 {%endblock%}
 {%load admin_menu%}
@@ -38,13 +41,12 @@ Profile
         <div class="card card-primary card-outline">
           <div class="card-body box-profile">
             <div class="text-center">
-              <img class="profile-user-img img-fluid img-circle"
-                   src="/media/{{request.session.profile_photo}}"
-                   alt="User profile picture">
+              <img class="profile-user-img img-fluid img-circle" src="/media/{{request.session.profile_photo}}" alt="User profile picture">
             </div>
             <br>
             <div class="text-center" id="popupReturn" on hover=>
-                <input type="text" class="knob knob1"  data-thickness="0.1" data-width="90" data-height="90"data-fgColor="#00a65a" readonly="true" value="{{performance|key_with_space:'Total Marks ( Out of 700 )'|div:7}}">
+                <input type="text" class="knob knob1"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true" value="{{performance|key_with_space:'Total Marks (Out of 700)'|int|div:7}}"  data-toggle="tooltip" data-placement="top" title="Click to see your score card">
+
                 <div class="knob-label">Average Performance</div>
                 <div id="tableContent" style="display:none">
                     <div>
@@ -56,7 +58,7 @@ Profile
                         <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'WD Total Marks (Out of 200)'}}"><br>WD</div>
                         <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Core Total Marks (Out of 100)'}}"><br>Core</div>
                         <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Adv Total Marks (Out of 100)'}}"><br>Adv</div>
-                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Soft Skills Marks (Out of 100)'}}"><br>Adv</div>
+                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Soft Skills Marks (Out of 100)'}}"><br>Soft Skills</div>
                         </div>
                       </div>
                     </div>
@@ -76,9 +78,14 @@ Profile
                 <b>Current Module</b> <a class="float-right">{{performance|key_with_space:'Current Module'}}</a>
               </li>
             </ul>
+            {%if certificate%}
+              <a {%if certificate.certificate%}href="/media/{{certificate.certificate}}" class='btn btn-success btn-block' target='new' title="Download certificate" {%else%}title="Certificate Not issued yet" class='btn btn-warning btn-block' style='cursor:not-allowed'{%endif%}  data-toggle="tooltip" data-placement="top"  ><b><i class="fa fa-download"></i>Download Certificate</b> </a>
 
-            <a {%if performance|key_with_space:'Eligible For Placement(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block'{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="bottom" title="After 60% you can apply for certicicate" style='cursor:not-allowed'{%endif%}  ><b>Request for Certificate</b></a>
+            {%else%}
+            <a {%if performance|key_with_space:'Eligible For Certificate(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block' data-toggle="tooltip" data-placement="top" title="Click to Apply for certificate"{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="top" title="You can apply for certificate after all test and mocks completed" style='cursor:not-allowed'{%endif%}><b>Request for Certificate</b></a>
+            {%endif%}
             <a class="btn btn-info btn-block" href="{%url 'pdf'%}" style="margin-top:5px;" target="new"><b>Offer Letter</b></a>
+            <a class="btn form-control" href="{{performance|key_with_space:'Portfolio URL'}}">{{performance|key_with_space:'Portfolio URL'}}</a>
           </div>
           <!-- /.card-body -->
         </div>
@@ -90,7 +97,7 @@ Profile
             <h3 class="card-title">About Me</h3>
           </div>
           <!-- /.card-header -->
-          <div class="card-body" style="overflow-y: scroll;">
+          <div class="card-body">
             <strong><i class="fas fa-book mr-1"></i> Education</strong>
 
             <p class="text-muted">
@@ -181,7 +188,7 @@ Profile
       draw: function () {
 
         // "tron" case
-        console.log(this);
+
         if (this.$.data('skin') == 'tron') {
 
           var a   = this.angle(this.cv)  // Angle
@@ -246,17 +253,27 @@ Profile
       });
     })
 
-    /* END JQUERY KNOB */
-
-    //INITIALIZE SPARKLINE CHARTS
-    // var sparkline1 = new Sparkline($('#sparkline-1')[0], { width: 240, height: 70, lineColor: '#92c1dc', endColor: '#92c1dc' })
-    // var sparkline2 = new Sparkline($('#sparkline-2')[0], { width: 240, height: 70, lineColor: '#f56954', endColor: '#f56954' })
-    // var sparkline3 = new Sparkline($('#sparkline-3')[0], { width: 240, height: 70, lineColor: '#3af221', endColor: '#3af221' })
-
-    // sparkline1.draw([1000, 1200, 920, 927, 931, 1027, 819, 930, 1021])
-    // sparkline2.draw([515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921])
-    // sparkline3.draw([15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21])
-
   })
 </script>
+<script>
+    $().ready(function(e) {
+
+        var popupEvent = function() {
+          
+        }
+
+        $('#popupReturn').hunterPopup({
+            width: '500px',
+            height: 'auto',
+            title: "Performance",
+            content: $('#tableContent'),
+            event: popupEvent
+        });
+
+    });
+    $(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();   
+  });
+</script>
+
 {%endblock%}

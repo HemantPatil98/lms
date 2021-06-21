@@ -232,14 +232,14 @@ import math
 @register.filter(name='div')
 def div(num1,num2):
     # print(type(num1),num1)
-    try:
-        if type(num1) == 'str':
-            num1 = int(num1)
-        if type(num2)=='str':
-            num2 = int(num2)
-        return num1//num2
-    except:
-        return 0
+    # try:
+    #     if type(num1) == 'str':
+    #         num1 = int(num1)
+    #     if type(num2)=='str':
+    #         num2 = int(num2)
+    #     return num1//num2
+    # except:
+    return num1/num2
 
 
 @register.filter(name='range')
@@ -268,3 +268,7 @@ def key_with_space(obj,key):
         return obj[key]
     except:
         return 0
+
+@register.filter(name='int')
+def key_with_space(val):
+    return int(val)

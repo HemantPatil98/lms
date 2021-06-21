@@ -23,8 +23,20 @@ def config():
     sheetsapi.startsheet()
     sheetfields.indexing_fields()
     sheetfields.make_media_directory()
+    try:
+        p = Permission(content_type_id=7,name='exam',codename='exam')
+        p.save()
+        p = Permission(content_type_id=7,name='video',codename='video')
+        p.save()
+        p = Permission(content_type_id=7,name='notes',codename='noted')
+        p.save()
+    except:
+        pass
+    # print(p)
     return HttpResponse("")
-# 3PM8SFS
+
+
+###
 def log_in(request):
     if request.method=="POST":
         username = request.POST['username']
@@ -103,11 +115,11 @@ def reset_password(request):
 
     return render(request,'student/reset_password.html')
 
-##
+###
 @login_required(login_url='')
 def index(request):
     try:
-        flag=request.user
+        flag=request.user.username
     except:
         return redirect('login_form')
     if request.user.is_staff:
@@ -151,7 +163,6 @@ def index(request):
                         cper.append('exam')
                     per[c]=cper
 
-        from .models import notice
 
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
 
@@ -159,6 +170,8 @@ def index(request):
             certificate = certificate_request.objects.get(student_id=request.user)
         except:
             certificate = ""
+
+        # print(performance)
         response = render(request, 'student/index.html', {'performance': performance,'up':up,'per':per,'profile':"",'certificate':certificate})
         return response
 
@@ -207,6 +220,7 @@ def addstudent(request):
         if request.user.is_staff:
             profile_row = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=profile)
         else:
+            print(request.user.id)
             sp = user_profile.objects.get(id=request.user.id)
             profile = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=sp.student_profile_row,value=profile)
 
@@ -339,20 +353,74 @@ def addgroups(request,view=False):
         except:
             request_member=[]
 
+        print(request_member)
+
         if request.POST.get('students'):
             for m in members:
-                if gp in m.groups.all():
+                all_groups = m.groups.all()
+                if gp in all_groups:
                     if m.id not in request_member:
                         m.groups.remove(gp.id)
                         messages.info(request,m.first_name+" is removed")
-                else:
+                elif(len(all_groups)<6):
                     if m.id in request_member:
                         m.groups.add(gp.id)
+
                         SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
                         index = '=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)'
                         values = [index,m.id,m.first_name,m.last_name,m.email]
                         sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,values=[values])
                         messages.info(request,m.first_name+" is added")
+
+                        up = user_profile.objects.get(id=request.user.id)
+
+                        performance_row = up.student_performance_row
+                        y = request.user.date_joined.strftime('%Y')
+                        SHEET_NAME = "Apr - Mar " + y
+                        SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
+                        if cname=='C':
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.user.username],col=all_fields_index['student_performance']['C Trainer Name'],cell=True)
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.POST['startdate']],col=all_fields_index['student_performance']['C module start date'],cell=True)
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.POST['enddate']],col=all_fields_index['student_performance']['C module end date'],
+                                                  cell=True)
+                        if cname=='SQL':
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.user.username],col=all_fields_index['student_performance']['SQL Trainer Name'],cell=True)
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.POST['startdate']],col=all_fields_index['student_performance']['SQL module start date'],cell=True)
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.POST['enddate']],col=all_fields_index['student_performance']['SQL module end date'],cell=True)
+                        if cname=='WD':
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.user.username],col=all_fields_index['student_performance']['WD Trainer Name'],cell=True)
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.POST['startdate']],col=all_fields_index['student_performance']['WD module start date'],cell=True)
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.POST['enddate']],col=all_fields_index['student_performance']['WD module end date'],cell=True)
+                        if cname.find('Core'):
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.user.username],col=all_fields_index['student_performance']['Core Trainer Name'],cell=True)
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.POST['startdate']],col=all_fields_index['student_performance']['Core module start date'],cell=True)
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.POST['enddate']],col=all_fields_index['student_performance']['Core module end date'],cell=True)
+                        if cname.find('Adv'):
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.user.username],col=all_fields_index['student_performance']['Adv Trainer Name'],cell=True)
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.POST['startdate']],col=all_fields_index['student_performance']['Adv module start date'],cell=True)
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME,
+                                                  row=performance_row,
+                                                  value=[request.POST['enddate']],
+                                                  col=all_fields_index['student_performance']['Adv module end date'],
+                                                  cell=True)
+
+                else:
+                    messages.error(request,'User Group limit exceed')
+
 
         memb_pre = []  # group existing members
         for m in members:
@@ -513,14 +581,13 @@ def viewprofile(request):
     range = "!A"+str(row)+":AS"+str(row+3)
 
     values = sheetsapi.sheetvalues(SPREADSHEET_ID=sheetid,sheetname='Apr - Mar 2021',range=range)
-    profile = [dict(zip(student_profile,values[0])),dict(zip(student_profile,values[1])),
-               dict(zip(student_profile,values[2])),dict(zip(student_profile,values[3]))] #list data to object
-
+    # print(values)
+    student_profile1 = [x.replace(' ','') for x in student_profile]
+    # print(student_profile1)
+    profile = [dict(zip(student_profile1,values[0])),dict(zip(student_profile1,values[1])),
+               dict(zip(student_profile1,values[2])),dict(zip(student_profile1,values[3]))] #list data to object
+    # print(profile)
     up = user_profile.objects.get(user_id=request.user.id)
-    try:
-        rc = certificate_request.objects.get(student_id=request.user.id)
-    except:
-        rc = ""
 
 
     SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
@@ -533,7 +600,14 @@ def viewprofile(request):
 
     performance = dict(zip(student_performance, values[0]))  # list data to object
 
-    return render(request,'student/profile.html',{'profile':profile,'up':up,'rc':rc,'performance':performance})
+    # print(performance)
+
+    try:
+        certificate = certificate_request.objects.get(student_id=request.user)
+    except:
+        certificate = ""
+
+    return render(request,'student/profile.html',{'profile':profile,'up':up,'certificate':certificate,'performance':performance})
 
 
 ###

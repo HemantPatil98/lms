@@ -224,12 +224,16 @@ Add Groups
               </div>
               <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
                 <label>Start Date</label>
-                <input type="date" name="startdate" class="form-control" value="{{gpinfo.startdate|date:'Y-m-d'}}" {%if gpinfo.startdate %}readonly{%endif%} {%if not gname%}disabled{%endif%} required="">
+                <input type="date" name="startdate" class="form-control" value="{{gpinfo.startdate|date:'Y-m-d'}}" {%if gpinfo.startdate %}readonly{%endif%} {%if not gname%}disabled{%endif%}>
               </div>
               <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
+                <label>End Date</label>
                 <label>End Date</label>{{gpinfo.enddate|date:'Y-m-d'}}
-                <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}" {%if not gname%}disabled{%endif%} required="">
+                <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}" {%if not gname%}disabled{%else%}required{%endif%}>
               </div>
+
+
+
 
               {%if gname%}
               
@@ -437,6 +441,8 @@ function save(){
         // console.log($("select[name='gname']"))
         if (!select2children.includes($("select[name='gname']").val())) {
           $('.cname').removeClass('hide');
+          $("input[name='startdate']").removeAttr('disabled');
+          $("input[name='enddate']").removeAttr('disabled');
         }
         else{
           $('.cname').addClass('hide');
