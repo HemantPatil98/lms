@@ -38,9 +38,9 @@ Attendance
       <h3 class="card-title">Student Attendance</h3>          
     </div>
     <!-- /.card-header -->
-    <div class="card-body">
+    <div class="card-body row">
       {%for d in data%}
-      <div class="col-sm-4">
+      <div class="col-sm-3">
         <div class="text-center">
           <input type="text" class="knob" id="{{d.course}}"  data-thickness="0.1" data-width="90" data-height="90" readonly="true" value="0" rel="{{d.per}}">
 
@@ -81,93 +81,95 @@ Attendance
 
      $('.knob').each(function () {
 
-           var $this = $(this);
-           var id = $(this).attr('id');
-           var myVal = $this.attr("rel");
-           $this.knob();
+         var $this = $(this);
+         var id = $(this).attr('id');
+         var myVal = $this.attr("rel");
+         $this.knob();
 
-           $({
-               value: 0
-           }).animate({
-               value: myVal
-           }, {
-               duration: 2000,
-               easing: 'swing',
-               step: function () {
-                   $this.val(this.value).trigger('change');
-                   // console.log(this.value<40);
-                   if (this.value<40){
-                    // console.log('#'+id);
-                      $($this).css('color','rgb(255, 0, 0)');
-                    }
-                    else{
-                      $($this).css('color','#00a65a');
+         $({
+             value: 0
+         }).animate({
+             value: myVal
+         }, {
+             duration: 2000,
+             easing: 'swing',
+             step: function () {
+                 $this.val(this.value).trigger('change');
+                 // console.log(this.value<40);
+                 if (this.value<40){
+                  // console.log('#'+id);
+                    $($this).css('color','rgb(255, 0, 0)');
+                  }
+                  else{
+                    $($this).css('color','#00a65a');
 
-                    }
-
-               }
-           })
-
-       });
+                  }
+             }
+          })
+      });
   })
 </script>
 <script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
 
-  <script type="text/javascript">
+<script type="text/javascript">
 
-window.db ={};
-load();
-function load(){
+  window.db ={};
+  load();
+  function load(){
     var sheetname=$("select[name='sheetname']").val();
-console.log(sheetname);
-var url = "{%url 'getdata' table='attendance'%}";
-$.get(url,{sheetname:sheetname},function(data,status){
-    // console.log(data);
-    // console.log(JSON.parse(data.replaceAll("'",'"')));
-    data = data.replaceAll("'",'"');
-    db.data=JSON.parse(data);
 
-    fields= [
-        { name: "ID", type: "number", width: 70, css:"",editing:false},
-        { name: "NAME", type: "text", width: 150,css:"fix-name",editing:false},
-        { name: "CONTACT", type: "text", width: 100,css:'fix-contact',editing:false},
-        { name: "EMAIL ID", type: "text",width: 100,editing:false},
-        { name: "Today", type:"checkbox", width:50,editing: false}
-    ];
+    var url = "{%url 'getdata' table='attendance'%}";
+  $.get(url,{sheetname:sheetname},function(data,status){
+      data = data.replaceAll("'",'"');
+      db.data=JSON.parse(data);
 
+      db.data = jQuery.grep(db.data, function( a ) {
+        if (a.USER_ID == {{request.user.id}}) {
+          return a}
+      });
 
-    window.col = Object.keys(db.data[0]);
-    for(i=col.length-1;i>5;i--){
-        if (col[i]===currentdate) {
-        fields.push({name:col[i],type:'checkbox',editing:false});
-        }
-        else{
-        fields.push({name:col[i],type:'checkbox',editing:false});
-        }
-    };
-    $('#grid').jsGrid({fields:fields});
- 
-    $('#grid').jsGrid({data:db.data});
-    add();
-});
-}
+      fields= [
+          { name: "ID", type: "number", width: 70, css:"",editing:false},
+          { name: "NAME", type: "text", width: 150,css:"fix-name",editing:false},
+          { name: "CONTACT", type: "text", width: 100,css:'fix-contact',editing:false},
+          { name: "EMAIL ID", type: "text",width: 100,editing:false},
+          { name: "Today", type:"checkbox", width:50,editing: false}
+      ];
 
-
-
-$(function () {
-   d = new Date();
-  date = d.getDate();
-  if(date.toString().length==1){
-   date="0"+date;
+      window.col = Object.keys(db.data[0]);
+      for(i=col.length-1;i>5;i--){
+          if (col[i]===currentdate) {
+          fields.push({name:col[i],type:'checkbox',editing:false});
+          }
+          else{
+          fields.push({name:col[i],type:'checkbox',editing:false});
+          }
+      };
+      $('#grid').jsGrid({fields:fields});
+   
+      $('#grid').jsGrid({data:db.data});
+      add();
+    }).done(function(){toastr.success('Data loaded Successfully').fail(function(){
+      toastr.error('Failed to load data');
+    });});
   }
-  month = d.getMonth()+1;
-  if(month.toString().length==1){
-   month="0"+month;
-  }
-  year = d.getFullYear();
-  console.log(date,month,year);
-  const currentdate = date+'/'+month+'/'+year;
-  currentdate.replaceAll('"','')
+
+
+
+  $(function () {
+    d = new Date();
+    date = d.getDate();
+    if(date.toString().length==1){
+     date="0"+date;
+    }
+    month = d.getMonth()+1;
+    if(month.toString().length==1){
+     month="0"+month;
+    }
+    year = d.getFullYear();
+
+    const currentdate = date+'/'+month+'/'+year;
+    currentdate.replaceAll('"','')
     $("#grid").jsGrid({
         height: "auto",
         width: "100%",
@@ -211,12 +213,12 @@ $(function () {
         ]
     });
   });
-function add(){
-  {%if request.user.is_staff%}
-  addaction();
-  {%endif%}
-}
-    d = new Date();
+  function add(){
+    {%if request.user.is_staff%}
+    addaction();
+    {%endif%}
+  }
+  d = new Date();
   date = d.getDate();
   if(date.toString().length==1){
    date="0"+date;
@@ -226,39 +228,36 @@ function add(){
    month="0"+month;
   }
   year = d.getFullYear();
-  // console.log(date,month,year);
+
   const currentdate = date+'/'+month+'/'+year;
   currentdate.replaceAll('"',"");
-function addaction(){
-        $('.jsgrid-table tbody tr').each(function(){
-          a=$(this)[0];
-          b=a.children[4];
-          if (db.data[0][currentdate]=="" ||db.data[0][currentdate]=="p") {
-            e=$('.jsgrid-grid-header .jsgrid-table tr')[0].children[4];
-            f=$('.jsgrid-grid-header .jsgrid-table tr')[1].children[4];
-            b.setAttribute("class","hide");
-            e.setAttribute("class","hide");
-            f.setAttribute("class","hide");
-            f=$('.jsgrid-grid-header .jsgrid-table tr')[0].children[5];
-            g=a.children[5];
-            f.innerText='Today';
-          if(db.data[this.rowIndex][currentdate]==='p'){
-              g.innerHTML='<input type=checkbox name=attendance checked onchange=addattendance('+this.rowIndex+')></input>';
-              present.push(this.rowIndex);
-            }
-            else{
-              g.innerHTML='<input type=checkbox name=attendance onchange=addattendance('+this.rowIndex+')></input>';
-            }
-          }
-          else{
-            b.innerHTML='<input type=checkbox name=attendance onchange=addattendance('+this.rowIndex+')></input>';
-          }
-          
-        });
-    }
+  function addaction(){
+    $('.jsgrid-table tbody tr').each(function(){
+      a=$(this)[0];
+      b=a.children[4];
+      if (db.data[0][currentdate]=="" ||db.data[0][currentdate]=="p") {
+        e=$('.jsgrid-grid-header .jsgrid-table tr')[0].children[4];
+        f=$('.jsgrid-grid-header .jsgrid-table tr')[1].children[4];
+        b.setAttribute("class","hide");
+        e.setAttribute("class","hide");
+        f.setAttribute("class","hide");
+        f=$('.jsgrid-grid-header .jsgrid-table tr')[0].children[5];
+        g=a.children[5];
+        f.innerText='Today';
+      if(db.data[this.rowIndex][currentdate]==='p'){
+          g.innerHTML='<input type=checkbox name=attendance checked onchange=addattendance('+this.rowIndex+')></input>';
+          present.push(this.rowIndex);
+        }
+        else{
+          g.innerHTML='<input type=checkbox name=attendance onchange=addattendance('+this.rowIndex+')></input>';
+        }
+      }
+      else{
+        b.innerHTML='<input type=checkbox name=attendance onchange=addattendance('+this.rowIndex+')></input>';
+      }
+      
+    });
+  }
 
-    function changesheet(){
-
-    }
 </script>
 {%endblock%}

@@ -5,7 +5,10 @@
 
   <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid.min.css'%}">
   <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid-theme.min.css'%}">
-  <style type="text/css">
+<style type="text/css">
+  .hide{
+    display: none;
+  }
   .fix-id{
      position: sticky;
   left: 0;
@@ -35,7 +38,7 @@ Schedule
 <section class="content">
   <div class="card card-primary">
     <div class="card-header">
-      <h3 class="card-title">Student Profile</h3>
+      <h3 class="card-title">Schedule</h3>
       <div class="" style="width: max-content;float: right;">
         <!-- <label>Custom Select</label> -->
         <select name="sheetname" class="custom-select" onchange="load()">
@@ -56,12 +59,7 @@ Schedule
 {%endblock%}
 
 {%block script%}
-<style type="text/css">
-  .hide{
-    display: none;
-  }
-</style>
-<!-- <script type="text/javascript" src="{%static 'student/dist/js/student_profile.js'%}"></script> -->
+
 <script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
 
 <script type="text/javascript">
@@ -71,7 +69,7 @@ Schedule
  function load(){
     var sheetname="Sheet 1";
 // console.log(sheetname);
-  var url = "{%url 'getdata' table='schedule'%}";
+  var url = "{%url 'getdata' table='batch_schedule'%}";
 $.get(url,{sheetname:sheetname},function(data,status){
     // console.log(data);
     console.log(JSON.parse(data.replaceAll("'",'"')));

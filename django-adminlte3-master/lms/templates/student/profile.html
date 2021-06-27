@@ -84,8 +84,11 @@ Profile
             {%else%}
             <a {%if performance|key_with_space:'Eligible For Certificate(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block' data-toggle="tooltip" data-placement="top" title="Click to Apply for certificate"{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="top" title="You can apply for certificate after all test and mocks completed" style='cursor:not-allowed'{%endif%}><b>Request for Certificate</b></a>
             {%endif%}
-            <a class="btn btn-info btn-block" href="{%url 'pdf'%}" style="margin-top:5px;" target="new"><b>Offer Letter</b></a>
-            <a class="btn form-control" href="{{performance|key_with_space:'Portfolio URL'}}">{{performance|key_with_space:'Portfolio URL'}}</a>
+            <a class="btn btn-info btn-block" href="{%url 'offer_letter'%}" style="margin-top:5px;" target="new"><b>Offer Letter</b></a>
+
+            {%if performance|key_with_space:'Portfolio URL'%}
+            <a class="btn form-control" href="{{performance|key_with_space:'Portfolio URL'}}" data-toggle="tooltip" data-placement="top" title="Portfolio Link">{{performance|key_with_space:'Portfolio URL'}}</a>
+            {%endif%}
           </div>
           <!-- /.card-body -->
         </div>

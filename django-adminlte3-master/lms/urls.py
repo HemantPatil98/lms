@@ -11,13 +11,14 @@ urlpatterns = [
     path('logout/', views.log_out, name='logout'),
     path('respass/', views.reset_password, name='resspass'),
     path('sendotp/', views.sendotp, name='sendotp'),
+    path('declaration/', views.declaration, name='declaration'),
 
     path('index/',views.index,name='index'),
     path('add/student/',views.addstudent,name='addstudents'),
 
     path('add/groups/',views.addgroups,name='addgroups'),
     path('view/groups/',views.addgroups,{'view': True},name='viewgroups'),
-    path('delete/groups/<slug:gname>',views.deletegroups,name='deletegroups'),
+    path('delete/groups/<slug:gname>/',views.deletegroups,name='deletegroups'),
 
     path('add/users/',views.addusers,name='addusers'),
     path('user_permissions/',views.user_permissions,name='user_permissions'),
@@ -58,10 +59,10 @@ urlpatterns = [
     # path('getcalenderevents/',views.getcalenderevents,name='getcalenderevents'),
     path('students_groups/<slug:gname>/',views.students_groups,name='students_groups'),
     path('students_current_groups/<slug:gname>/',views.students_current_groups,name='students_current_groups'),
-    path('pdftest/',views.pdftest,name='pdftest'),
-    path('render/pdf/', pdfgenerator.Pdf.as_view(),name='pdf'),
+    # path('pdftest/',views.pdftest,name='pdftest'),
+    path('offer_letter/', pdfgenerator.offerletter.as_view(),name='offer_letter'),
 
     path('sheetdata/<slug:table>/',views.sheetdata,name='sheetdata'),
-    path('test/', views.config, name='test')
-
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('test/', pdfgenerator.certificate.as_view(), name='test'),
+    path('test1/', pdfgenerator.certificate1.render_to_file,{'path':'student/certificate.html','params':{'a':'a'}}, name='test1')
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

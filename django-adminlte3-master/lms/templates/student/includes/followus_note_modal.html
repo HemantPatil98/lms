@@ -39,18 +39,22 @@
               <label for="inputDescription">Description</label>
               <textarea name="description" class="form-control" rows="4" disabled id="notedesc"></textarea>
             </div>
+            {%if notice.externallink%}
             <div class="form-group">
               <label for="customFile">File</label>
               <div class="custom-file link">
                 <a class="btn btn-block btn-outline-info" href="/media/{{notice.file}}" id="notefile"><i class="fa fa-download"></i>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspAttachment</a>
               </div>
             </div>
+            {%endif%}
+            {%if notice.externallink%}
             <div class="form-group">
               <label for="externallink">External links</label>
                <div class="custom-file link">
                 <a class="btn btn-outline-info form-control" id="notelink" style="overflow: hidden;" target="new">{{notice.externallink}}</a>
               </div>
             </div>
+            {%endif%}
           </div>
           <div class="modal-footer justify-content-between">
           </div>

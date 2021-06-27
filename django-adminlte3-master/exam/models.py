@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.admin import User
+from datetime import datetime
 # Create your models here.
 def nothing():
     pass
@@ -24,6 +25,7 @@ class exam_attempts(models.Model):
     course = models.ForeignKey(course,on_delete=models.CASCADE)
     attempt = models.IntegerField()
     marks = models.IntegerField(null=True)
+    date = models.DateTimeField(default=datetime.now())
 
     class Meta:
         unique_together = (('student', 'course','attempt'),)

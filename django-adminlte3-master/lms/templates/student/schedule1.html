@@ -1,0 +1,136 @@
+{%extends 'student/base.html'%}
+{%load static%}
+{%load admin_menu%}
+{%block style%}
+
+  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid.min.css'%}">
+  <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid-theme.min.css'%}">
+<style type="text/css">
+  .hide{
+    display: none;
+  }
+  .fix-id{
+     position: sticky;
+  left: 0;
+  z-index: 2;
+  }
+  .fix-name{
+    position: sticky;
+    left: 0px;
+    z-index: 2;
+  }
+  .fix-contact{
+    position: sticky;
+    left: 150px;
+    z-index: 2;
+  }
+</style>
+{%endblock%}
+{%load static%}
+
+{%block page_link%}
+{%block page_title%}
+Schedule
+{%endblock%}
+{%endblock%}
+
+{%block content%}
+<section class="content">
+  <div class="card card-primary">
+    <div class="card-header">
+      <h3 class="card-title">Schedule</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+      <div class="row">
+        <hr style="width:100%;height: 2px;">
+        <div class="col-sm-12"><h3>Current Batches</h3></div>
+        <hr style="width:100%;height: 2px;">
+        {%for d in data%}
+          <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+            <div class="card bg-light d-flex flex-fill">
+              <div class="card-header text-muted border-bottom-0">
+                {{d|key_with_space:'MENTOR NAME'}}
+              </div>
+              <div class="card-body pt-0">
+                <div class="row">
+                  <div class="col-7">
+                    <h2 class="lead"><b>{{d|key_with_space:'MODULE NAME'}}</b></h2>
+                    <p class="text-muted text-sm"><b>Time: </b> {{d|key_with_space:'TIME'}} </p>
+                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                      <li class="small"><span class="fa-li"><i class="fas fa-calendar-alt"></i></span> From Date: {{d|key_with_space:'START DATE'}}</li>
+                      <li class="small"><span class="fa-li"><i class="fas fa-calendar-alt"></i></span> To Date: {{d|key_with_space:'END DATE'}}</li>
+                    </ul>
+                  </div>
+                  <div class="col-5 text-center">
+                    <img src="/static/courses/{{d|key_with_space:'MODULE NAME'}}.png" alt="{{d|key_with_space:'MODULE NAME'}}" class="img-fluid">
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <div class="text-right">
+                  <!--<a href="#" class="btn btn-sm bg-teal">
+                    <i class="fas fa-comments"></i>
+                  </a>
+                  <a href="#" class="btn btn-sm btn-primary">
+                    <i class="fas fa-user"></i> View Profile
+                  </a> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        {%endfor%}
+        <hr style="width:100%;height: 2px;">
+        <div class="col-sm-12"><h3>Upcoming Batches</h3></div>
+        <hr style="width:100%;height: 2px;">
+
+          {%for d in data%}
+          {%if d|key_with_space:'UPCOMING MODULE START DATE'%}
+          <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+            <div class="card bg-light d-flex flex-fill">
+              <div class="card-header text-muted border-bottom-0">
+                {{d|key_with_space:'MENTOR NAME'}}
+              </div>
+              <div class="card-body pt-0">
+                <div class="row">
+                  <div class="col-7">
+                    <h2 class="lead"><b>{{d|key_with_space:'UPCOMING MODULE NAME'}}</b></h2>
+                    <p class="text-muted text-sm"><b>Time: </b> {{d|key_with_space:'TIME'}} </p>
+                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                      <li class="small"><span class="fa-li"><i class="fas fa-calendar-alt"></i></span> From Date: {{d|key_with_space:'UPCOMING MODULE START DATE'}}</li>
+                      <li class="small"><span class="fa-li"><i class="fas fa-calendar-alt"></i></span> To Date: {{d|key_with_space:'UPCOMING MODULE END DATE'}}</li>
+                    </ul>
+                  </div>
+                  <div class="col-5 text-center">
+                    <img src="/static/courses/{{d|key_with_space:'UPCOMING MODULE NAME'}}.png" alt="{{d|key_with_space:'UPCOMING MODULE NAME'}}" class="img-fluid">
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <div class="text-right">
+                  <!--<a href="#" class="btn btn-sm bg-teal">
+                    <i class="fas fa-comments"></i>
+                  </a>
+                  <a href="#" class="btn btn-sm btn-primary">
+                    <i class="fas fa-user"></i> View Profile
+                  </a> -->
+                </div>
+              </div>
+            </div>
+          </div>
+          {%endif%}
+        {%endfor%}
+      </div>
+    </div>
+    <!-- /.card-body -->
+  </div>
+  <!-- /.card -->
+</section>
+{%endblock%}
+
+{%block script%}
+
+<script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
+
+
+{%endblock%}

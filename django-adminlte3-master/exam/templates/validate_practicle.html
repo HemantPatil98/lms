@@ -33,19 +33,19 @@ Validate Practical
 <section class="content">
   <div class="card card-primary">
     <div class="card-header row">
-      <h3 class="card-title col-md-6">Student Profile</h3>
+      <h3 class="card-title col-md-6">Validate Practicle</h3>
 
       <div class=" col-md-6">
         <!-- <label>Custom Select</label> -->
         <div class="row">
-<!--           <div class="col-sm-4">
+          <div class="col-sm-4">
             <select name="gname" class="custom-select select2" onchange="load()">
-              <option value="all groups">All Groups</option>
+              <option value="All_groups">All Groups</option>
               {%for gname in groups%}
               <option value="{{gname}}">{{gname}}</option>
               {%endfor%}
             </select>
-          </div> -->
+          </div>
           <div class="col-sm-4">
             <select name="cname" class="custom-select select2" onchange="load()">
               {%for course in courses%}
@@ -55,7 +55,7 @@ Validate Practical
           </div>
           <div class="col-sm-4">
             <select name="type" class="custom-select select2" onchange="load()">
-            <!-- <option value="ORAL">ORAL</option> -->
+            <option value="ORAL">ORAL</option>
               <option value="MCQ">MCQ</option>
               <option value="PRACTICAL">PRACTICAL</option>
               <option value="PROGRAM">PROGRAM</option>
@@ -83,7 +83,67 @@ Validate Practical
 </style>
 
 <script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
+<script type="text/javascript">
+  $(function () {
 
+    $("#grid").jsGrid({
+        height: "auto",
+        width: "100%",
+
+        filtering: true,
+        editing: true,
+        sorting: true,
+        paging: true,
+
+        data: db.data,
+
+        controller: {
+          loadData: function(filter) {
+           return $.grep(db.data, function(client) {
+                var flag=false;
+                $.each(Object.keys(client),function(key,val){
+                    val=val.toString();
+                    val1=client[val].toString();
+                    val2=filter[val];
+                    if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
+
+                    flag=true;
+                    }else{
+                        flag=false;
+                        return false;
+                    };
+                })
+                 if (flag) {
+                    return client;
+                }
+            });
+        },
+          insertItem: $.noop,
+          updateItem: function(item) {
+            if ($("select[name='type']").val()=='ORAL'){
+              Url = "{%url 'setoralmarks'%}";
+            }
+            else{
+            Url = "{%url 'setprogrammarks'%}";
+            }
+            data={
+                row:item,
+            }
+                $.get(Url,{id:item.ID,value:item.MARKS,gname:gname},function(data,status){
+
+                });
+            },
+          deleteItem: $.noop
+        },
+
+        fields: [
+            { name: "ID", type: "number", width: 70,editing:false},
+            { name: "fields.NAME", type: "text", width: 70,editing:false},
+            { name: "MARKS", type: "text",width:100,editing:true},
+        ]
+    });
+  });
+</script>
 <script type="text/javascript">
 
   var db = {};
@@ -99,6 +159,15 @@ console.log(type);
 
   if (type == 'ORAL'){
     var url = "{%url 'getdata_oral'%}";
+
+   var field= [
+        { name: "ID", type: "number", width: 70,editing:false},
+        { name: "fields.NAME", type: "text", width: 70,editing:false},
+        { name: "MARKS", type: "text",width:100,editing:true},
+    ];
+
+    $('#grid').jsGrid({fields:field});
+
   }
 
   if (type=='ORAL') {
@@ -171,75 +240,7 @@ window.onfocus = function(){
  }
 
 </script>
-<script type="text/javascript">
-$(function () {
 
-    $("#grid").jsGrid({
-        height: "auto",
-        width: "100%",
-
-        filtering: true,
-        editing: true,
-        sorting: true,
-        paging: true,
-
-        data: db.data,
-
-        controller: {
-          loadData: function(filter) {
-           return $.grep(db.data, function(client) {
-                var flag=false;
-                $.each(Object.keys(client),function(key,val){
-                    val=val.toString();
-                    val1=client[val].toString();
-                    val2=filter[val];
-                    if (!val2 || val2==undefined || val1.indexOf(val2) > -1){
-
-                    flag=true;
-                    }else{
-                        flag=false;
-                        return false;
-                    };
-                })
-                 if (flag) {
-                    return client;
-                }
-            });
-        },
-          insertItem: $.noop,
-          updateItem: function(item) {
-            if ($("select[name='type']").val()=='ORAL'){
-              Url = "{%url 'setoralmarks'%}";
-            }
-            else{
-            Url = "{%url 'setprogrammarks'%}";
-            }
-            data={
-                row:item,
-            }
-                $.get(Url,{id:item.ID,value:item.MARKS,gname:gname},function(data,status){
-
-                });
-            },
-          deleteItem: $.noop
-        },
-
-        fields: [
-            { name: "ID", type: "number", width: 70,editing:false},
-            { name: "NAME", type: "text", width: 70,editing:false},
-            { name: "MARKS", type: "text",width:100,editing:true},
-        ]
-    });
-  });
-
-// $('.select2').select2({
-//       })
-
-// $('.select2').on('.select2:opening .select2:closing', function( event ) {
-//     var $searchfield = $(this).parent().find('.select2-search__field');
-//     $searchfield.prop('disabled', true);
-// });
-</script>
 {%endblock%}
 
 

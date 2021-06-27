@@ -5,14 +5,13 @@ from datetime import datetime
 from django.contrib.auth.models import User,Group,Permission
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from django.core.paginator import Paginator
 import itertools
 import os
 
-from .models import notice,user_profile,extra_data,certificate_request,groupsinfo
+from .models import user_profile,extra_data,certificate_request,groupsinfo
 from .extra_functions import randomstring,mail,mailletter
-from .sheetfields import student_profile,student_performance,batch_schedule,attendance,feedback,mcq,program,all_fields_index,marks
-from .pdfgenerator import Render,Pdf
+from .sheetfields import student_profile,student_performance,all_fields_index,marks
+from .pdfgenerator import Render
 from . import sheetsapi, sheetfields
 from exam.models import course
 
@@ -35,7 +34,6 @@ def config():
     # print(p)
     return HttpResponse("")
 
-
 ###
 def log_in(request):
     if request.method=="POST":
@@ -47,13 +45,26 @@ def log_in(request):
             # print(us.last_login)
             if us.last_login != None:
                 login(request, us)
-                messages.info(request, "Successfully Log In")
+                messages.success(request, "Successfully Log In")
                 request.session['profile_photo'] = str(user_profile.objects.get(user_id=request.user.id).photo)
                 return redirect(index)
             else:
-                login(request, us)
-                messages.info(request, "Successfully Log In")
-                return redirect(reset_password)
+                if not us.is_staff:
+                    params = {
+                        'id': us.id,
+                        'addate': us.date_joined,
+                        'today': datetime.now(),
+                        'name': us.first_name,
+                        'contact':'1234567890',
+                    }
+                    Render.render_to_file('student/pdf.html', params)
+                    # return render(request,'student/declaration.html',{'username':us.username})
+                    request.session['username'] = us.username
+                    return redirect('declaration')
+                else:
+                    login(request, us)
+                    messages.info(request, "Successfully Log In")
+                    return redirect(reset_password)
         else:
             messages.error(request, "Username and password not match")
             response = redirect(login_form)
@@ -75,7 +86,6 @@ def login_form(request):
 
 ###
 def reset_password(request):
-
     if request.method=='POST':
         # try:
         if request.user.is_authenticated:
@@ -112,8 +122,25 @@ def reset_password(request):
         # except:
         #     messages.error(request,'Error')
         #     return redirect(reset_password)
-
     return render(request,'student/reset_password.html')
+
+###
+
+def declaration(request):
+    if 'agree' in request.GET:
+        print(request.GET)
+        if request.GET['agree'] == 'agree':
+            us = User.objects.filter(username=request.session['username'])
+            print(us[0])
+            if len(us) == 1:
+                up = user_profile.objects.get(user_id=us[0])
+                up.declaration = datetime.now()
+                up.save()
+                login(request,us[0])
+                return redirect('resspass')
+            else:
+                messages.info(request,"wrong user")
+    return render(request,'student/declaration.html')
 
 ###
 @login_required(login_url='')
@@ -175,7 +202,6 @@ def index(request):
         response = render(request, 'student/index.html', {'performance': performance,'up':up,'per':per,'profile':"",'certificate':certificate})
         return response
 
-
 ###
 @login_required(login_url='')
 def addstudent(request):
@@ -191,12 +217,10 @@ def addstudent(request):
                     profile[i].append(val[i])
                 except:
                     profile[i].append("")
-        # print(profile)
         if request.user.is_staff:
             performance = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)',"", profile[0][8],
                            profile[0][11] + "/" + profile[0][12]
                 , profile[0][13], profile[0][3], profile[0][7], profile[0][5], profile[0][4], profile[0][6]]
-            # print(performance)
 
             SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
             performance = performance + [""]*(len(student_performance)-len(performance)) if len(performance)<len(student_performance) else performance
@@ -212,23 +236,21 @@ def addstudent(request):
                 performance_row = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=[performance])
             else:
                 sp = user_profile.objects.get(id=request.user.id)
-                performance_row = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=sp.student_performance_row,
-                                                        value=[performance])
+                performance_row = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,
+                                                        row=sp.student_performance_row,value=[performance])
 
         SPREADSHEET_ID = extra_data.objects.get(name='student_profile').value
 
         if request.user.is_staff:
             profile_row = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=profile)
         else:
-            print(request.user.id)
-            sp = user_profile.objects.get(id=request.user.id)
+            sp = user_profile.objects.get(user_id=request.user)
             profile = sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=sp.student_profile_row,value=profile)
 
         if request.user.is_staff:
             username = request.POST['emailid']
             password = randomstring(request)
 
-            # print(password,request.POST)
             us = User.objects.create_user(username=username,first_name=request.POST['name'],
                       password=password,email=request.POST['emailid'],last_name=request.POST['contact'])
             try:
@@ -264,9 +286,9 @@ def addstudent(request):
             message = header + '\n Username: ' + username + '\n Password: ' + password + ' \n\n'
             print(message)
 
-            mailletter(us.email,message)
+            # mailletter(us.email,message)
+            mail(us.email,message)
             us.save()
-            # request.session['profile_photo'] = str(us_profile.photo)
             messages.info(request,'Student added successfully')
         else:
             from .models import user_profile
@@ -278,14 +300,11 @@ def addstudent(request):
             us_profile = user_profile.objects.get(user_id=request.user.id)
             us_profile.photo=file
             us_profile.save()
-            # vars(us_profile)['_state'] = None
-            # request.session['ab']=vars(us_profile)
             messages.info(request,'Profile updated successfully')
             request.session['profile_photo'] = str(us_profile.photo)
         return redirect('index')
 
     return render(request,'student/add_student.html')
-
 
 ### #####
 @login_required(login_url='')
@@ -419,7 +438,7 @@ def addgroups(request,view=False):
                                                   cell=True)
 
                 else:
-                    messages.error(request,'User Group limit exceed')
+                    messages.error(request,m.first_name + ' Group limit exceed')
 
 
         memb_pre = []  # group existing members
@@ -476,7 +495,7 @@ def addusers(request):
             us = User(username=email,first_name=fname,last_name=lname,email=email,is_staff=True)
             us.set_password(password)
             us.save()
-            messages.info(request,"User added successfully")
+            messages.success(request,"User added successfully")
             # message to be sent
             header = 'To:' + us.email + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
 
@@ -489,7 +508,9 @@ def addusers(request):
             us = us[0]
 
 
-        us_profile = user_profile(user_id=us,photo=request.FILES['photo'])
+        files = request.FILES['photo'] if 'photo' in request.FILES else ''
+        us_profile = user_profile(user_id=us) if len(user_profile.objects.filter(user_id=us))==0 else user_profile.objects.get(user_id=us)
+        user_profile.photo = files
         us_profile.save()
 
         if 'permissions' in request.POST and 'gname' in request.POST:
@@ -545,12 +566,12 @@ def user_permissions(request):
     us = User.objects.get(id=int(uid))
     per = []
     a = Permission.objects.filter(user=uid)
-    for i in [102,103]:
-        p = Permission.objects.get(id=i)
-        if p in a:
-            per.append({'name':p.name,'value':p.id,'selected':'true'})
-        else:
-            per.append({'name':p.name,'value':p.id})
+    for i in Permission.objects.all():
+        p = Permission.objects.get(id=i.id)
+    if p in a:
+        per.append({'name':p.name,'value':p.id,'selected':'true'})
+    else:
+        per.append({'name':p.name,'value':p.id})
     return HttpResponse(str(per).replace("'",'"'))
 
 ###
@@ -609,14 +630,13 @@ def viewprofile(request):
 
     return render(request,'student/profile.html',{'profile':profile,'up':up,'certificate':certificate,'performance':performance})
 
-
 ###
 @login_required(login_url='')
 def attendance(request):
-    SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
-    SHEET_NAMES = sheetsapi.getsheetnames(SPREADSHEET_ID=SPREADSHEET_ID)
+    gnames = Group.objects.all() if request.user.is_superuser else request.user.groups.all()
+    gnames = [x.name for x in gnames]
 
-    return render(request,'student/attendance.html',{'sheetnames':SHEET_NAMES})
+    return render(request,'student/attendance.html',{'sheetnames':gnames})
 
 ###
 @login_required(login_url='')
@@ -629,12 +649,10 @@ def studentattendance(request):
         c = groupsinfo.objects.get(group=g.id).course
         value = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=g.name)
         for v in value:
-            if us.id == int(v[1]):
+            if us.id == int(v[1]) and len(v)>6:
                 data.append({'course':c,'per':round(v.count('p')/(len(v)-6)*100,2)})
 
     return render(request,'student/studentattendance.html',{'data':data,'gps':gps})
-
-
 
 ###
 @login_required(login_url='')
@@ -681,7 +699,6 @@ def sendotp(request):
     else:
         return HttpResponse("Username not found")
 
-
 ###
 @login_required(login_url='')
 def addfeedback(request):
@@ -719,14 +736,22 @@ def viewfeedback(request):
 ###
 @login_required(login_url='')
 def schedule(request):
-    return render(request,'student/schedule.html')
+    SPREADSHEET_ID = extra_data.objects.get(name='batch_schedule').value
+    SHEET_NAME = 'Schedule'
 
-
-@login_required(login_url='')
-def pdftest(request):
-    return render(request,'student/pdf.html')
-
-
+    values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=SHEET_NAME,range='!A:GZ')
+    data = []
+    fields = [x for x in values[0]]
+    for row,i in zip(values[1::1],range(1,len(values))):
+        dict = {'rowIndex':i}
+        # print(type(row[1]))
+        for s, j in zip(fields, range(len(fields))):
+            if j < len(row):
+                dict[s] = row[j]
+            else:
+                dict[s] = ''
+        data.append(dict)
+    return render(request,'student/schedule1.html',{'data':data})
 
 ####
 @login_required(login_url='')
@@ -739,6 +764,7 @@ def get_data(request,table):
     fields = [x for x in values[0]]
     for row,i in zip(values[1::1],range(1,len(values))):
         dict = {'rowIndex':i}
+        # print(type(row[1]))
         for s, j in zip(fields, range(len(fields))):
             if j < len(row):
                 dict[s] = row[j]
@@ -746,16 +772,14 @@ def get_data(request,table):
                 dict[s] = ''
         data.append(dict)
 
-    # if table == 'attendance':
-    #     data1 = []
-    #     for d in data:
-    #         print(request.user.id, int(d['USER_ID']))
-    #         if int(d['USER_ID']) == request.user.id:
-    #             data1.append(d)
-    #             break
-    # data = data1
-    # print(data)
-    # messages.info(request,'Data fetch successfully')
+    if table == 'attendance' and not request.user.is_staff:
+        data1 = []
+        for d in data:
+            if int(d['USER_ID']) == request.user.id:
+                data1.append(d)
+                break
+        data = data1
+
     return HttpResponse(str(data))
 
 ###
@@ -887,7 +911,6 @@ def set_user(request):
     except:
         return HttpResponse('Failed')
 
-
 ###
 @login_required(login_url='')
 def getcertificate(request):
@@ -943,7 +966,6 @@ def setcertificate(request):
                                    value=[cr.certificate_number],cell=True)
     return HttpResponse("success")
 
-
 ###
 @login_required(login_url='')
 def students_groups(request,gname):
@@ -980,42 +1002,4 @@ def students_current_groups(request,gname):
     return HttpResponse(str(data).replace("'",'"'))
 
 
-
-
-
-def calender(request):
-    SPREADSHEET_ID = extra_data.objects.get(name='Batch_Schedule').value
-    values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname="Sheet 1")
-    # print(values)
-    data = []
-    for v in values:
-        # print(v)
-        event = {}
-        # print(v[1].split('-'))
-        event['title'] = v[1] + " / " + v[3]
-        event['startTime'] = v[0].split('-')[0]
-        event['endTime'] = v[0].split('-')[1]
-        event['start'] = v[2]
-        event['end'] = v[4]
-        # event['daysOfweek'] = ['1', '2', '3', '4', '5', '6']
-        event['dow']= [1, 4]
-        event['allDay'] = False
-        data.append(event)
-    # data = str(data).replace("'", '"').replace('False', 'false')
-    print(data)
-    return render(request,'student/calender.html',{'data':data})
-
-def getcalenderevents(request):
-    SPREADSHEET_ID = extra_data.objects.get(name='Batch_Schedule').value
-    values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname="Sheet 1")
-    data = []
-    for v in values:
-        event = {}
-        event['title'] = v[1] + " / " + v[3]
-        event['startTime'] = v[0].split('-')[0]
-        event['endTime'] = v[0].split('-')[1]
-        event['allDay']= False
-        data.append(event)
-    data = str(data).replace("'",'"').replace('False','false')
-    return HttpResponse(data)
 

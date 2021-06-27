@@ -66,6 +66,7 @@ def add_course(request):
                     ext.save()
 
             crs.save()
+            messages.success(request,crs.name +" " + crs.type + " Added Successfully")
             return redirect(add_course)
     ext = models.extra_data.objects.all()
     ext1 = {}
@@ -76,7 +77,7 @@ def add_course(request):
     ext = ext1
 
     courses = course.objects.values_list('name', flat=True).distinct()
-    return render(request,'add_course.html',{'courses':courses,'ext':ext})
+    return render(request,'add_course.html',{'courses':courses,'ext':ext,'crs':crs})
 
 ###
 @login_required(login_url='')
@@ -423,14 +424,16 @@ def savepracticle(request):
 @login_required(login_url='')
 def practicle_validate(request):
     courses = course.objects.values_list('name', flat=True).distinct()
-    groups = Group.objects.all()
-    return render(request,'validate_practicle.html',{"courses":courses,"groups":groups})
+    gnames = Group.objects.all() if request.user.is_superuser else request.user.groups.all()
+    gnames = [x.name for x in gnames]
+    return render(request,'validate_practicle.html',{"courses":courses,"groups":gnames})
 
 ###
 @login_required(login_url='')
 def getdata_practicle(request):
     cname = request.GET['cname']
     type = request.GET['type']
+
     crs = course.objects.get(name=cname,type=type)
     exa = exam_attempts.objects.filter(course=crs).order_by('-id')
     data = []
@@ -441,29 +444,37 @@ def getdata_practicle(request):
         c["_state"] = 'none'
         c['course'] = c['name']
         c.pop('name')
-        s = vars(User.objects.get(id=a['student_id']))
-        a['name'] = s['first_name']
-        id = str(a['id'])
-        a.update(c)
-        a = {str(k).upper(): str(v).upper() for k, v in a.items()}
-        a['ID'] = id
-        if type == 'PRACTICAL':
-            a['PROGRAMS'] = "?attempt_id="+id
-        elif type == 'PROGRAM':
-            p = program_file.objects.get(student=a['STUDENT_ID'],course=crs,attempt=a['ATTEMPT'])
-            a['FILE'] = p.file.name
-            a['QUATION'] = p.program.programe
 
-        data.append(a)
+        try:
+            g = Group.objects.get(name=request.GET['gname'])
+        except:
+            g = ''
+
+        if g in User.objects.get(id=a['student_id']).groups.all() or request.GET['gname']=='All_groups':
+            s = vars(User.objects.get(id=a['student_id']))
+            a['name'] = s['first_name']
+            id = str(a['id'])
+            a.update(c)
+            a = {str(k).upper(): str(v).upper() for k, v in a.items()}
+            a['ID'] = id
+            if type == 'PRACTICAL':
+                a['PROGRAMS'] = "?attempt_id="+id
+            elif type == 'PROGRAM':
+                p = program_file.objects.get(student=a['STUDENT_ID'],course=crs,attempt=a['ATTEMPT'])
+                a['FILE'] = p.file.name
+                a['QUATION'] = p.program.programe
+
+            data.append(a)
         # print(a)
     return HttpResponse(str(data).replace('None',"'none'").replace("'",'"'))
 
 def getdata_oral(request):
     gname = request.GET['gname']
-    if gname != 'all groups':
-        us = User.objects.filter(groups__name=gname)
-    else:
-        us = User.objects.all()
+    us = User.objects.all() if gname == 'All_groups' else User.objects.filter(groups__name=gname)
+    # if gname != 'All_groups':
+    #     us = User.objects.filter(groups__name=gname)
+    # else:
+    #     us = User.objects.all()
     us = serializers.serialize('json',list(us),fields=('first_name')).replace('pk','ID').replace('first_name','NAME')
 
     return HttpResponse(us)

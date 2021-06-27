@@ -74,7 +74,7 @@ Videos
     <div class="row container">
       <div class="col-sm-12 col-md-8">
         <div id="video"  style="background-color: #9193955e;" style="height: 100%;width: 100%;"><!-- #545190b8; -->
-            <iframe src="{%url 'videoframe' course=course video=videos.0%}" height="100%" width="100%" style="overflow: hidden;"></iframe>
+            <iframe src="{%url 'videoframe' course=course video=videos.0 key=key%}" height="100%" width="100%" style="overflow: hidden;"></iframe>
         </div>
       </div>
 
@@ -103,21 +103,23 @@ Videos
 
     var datakey=$(this).attr('data-key');
     if (datakey){
-      console.log(window.key);
-      var src = window.location.origin+"/videoframe/{{course}}/"+datakey;
+      
+      $.get(url,{},function(data){
+        // console.log(window.key);
+      var src = window.location.origin+"/videoframe/{{course}}/"+datakey+"/"+data+"/";
       $('iframe').attr('src',src);
       $("#title").text(datakey);
       url = window.location.origin+"/watched_video/?course={{course}}&video="+datakey;
-      console.log(url);
-      $.get(url,{},function(data){});
+      // console.log(url);
+      });
     }
     else{
       alert('This video is locked');
     }
   })
-      $(document).ready(function(){
-$('[data-toggle="tooltip"]').tooltip();   
-});
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();   
+  });
 </script>
 </style>
 

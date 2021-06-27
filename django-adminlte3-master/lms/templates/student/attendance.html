@@ -106,7 +106,9 @@ $.get(url,{sheetname:sheetname},function(data,status){
 
     add();
 
-});
+}).done(toastr.success("Data loaded Successfully")).fail(function(){
+  toastr.error('Failed to load data');
+});;
 }
 
 
@@ -192,7 +194,7 @@ $(function () {
 
 function addattendance(x){
   flag=true;
-  console.log(x);
+
   for( var i = 0; i < present.length; i++){ 
         if (present[i] === x) { 
             present.splice(i,1); 
@@ -202,7 +204,7 @@ function addattendance(x){
     if (flag) {
       present.push(x);
     }
-  console.log(present);
+
 }
 function markattendance(){
   // console.log('a');

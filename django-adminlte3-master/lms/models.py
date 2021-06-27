@@ -71,16 +71,15 @@ class notice(models.Model):
         us_profile = user_profile.objects.get(user_id=request.user)
         pageno = request.GET['pageno']
         try:
-            pageno = request.GET['pageno']
+            pageno = int(request.GET['pageno'])
         except:
             pageno = 1
 
         P = Paginator(notices,10)
 
-        page = P.page(pageno)
+        page = P.page(pageno) if pageno <= P.num_pages else []
 
-
-        if not us_profile.last_notice:
+        if not us_profile.last_notice and len(notices):
             us_profile.last_notice = notices[0].id
 
         if len(notices):
@@ -97,8 +96,13 @@ class notice(models.Model):
                     us_profile.unread_notices = new_notices
 
                 us_profile.last_notice = notices[0].id
-        us_profile.save()
+        print(type(us_profile))
         notices = serializers.serialize('json',list(page),fields=('title', 'description','generateddate','file','externallink'))
+
+        if us_profile.unread_notices == '':
+            us_profile.unread_notices = []
+
+        us_profile.save()
 
         return HttpResponse(notices+";"+str(us_profile.unread_notices))
 
@@ -106,7 +110,7 @@ class notice(models.Model):
         us_profile = user_profile.objects.get(user_id=request.user.id)
         unread_notices = us_profile.unread_notices.replace('[','').replace(']','')
         unread_notices = unread_notices.split(', ') #request.session['unread_notices']
-        unread_notices = [int(x) for x in unread_notices]
+        unread_notices = [int(x) for x in unread_notices if x != '']
 
         id = int(request.GET['id'])
         if id in unread_notices:
@@ -124,9 +128,6 @@ class notice(models.Model):
         messages.info(request,"All Notices Read")
         return redirect('index')
 
-
-
-
 class certificate_request(models.Model):
     student_id = models.ForeignKey(User,on_delete=models.CASCADE)
     certificate_number = models.CharField(max_length=10)
@@ -141,10 +142,11 @@ class user_profile(models.Model):
     student_performance_row = models.IntegerField(blank=True,null=True)
     student_profile_row = models.IntegerField(blank=True,null=True)
     otp = models.CharField(max_length=6)
-    photo = models.FileField(upload_to='profile_photo/')
+    photo = models.FileField(upload_to='profile_photo/',blank=True,null=True)
     certificate = models.ForeignKey(certificate_request,on_delete=models.CASCADE,blank=True,null=True)
-    unread_notices = models.TextField()
-    last_notice = models.IntegerField()
+    unread_notices = models.TextField(blank=True,null=True)
+    last_notice = models.IntegerField(blank=True,null=True)
+    declaration = models.DateField(null=True,blank=True)
 
     def __str__(self):
         return self.user_id.username
@@ -221,7 +223,6 @@ class timeline(models.Model):
         timel = str(timel).replace("'", '"')
 
         return HttpResponse(timel)
-
 
 class groupsinfo(models.Model):
     group = models.ForeignKey(Group,on_delete=models.CASCADE)

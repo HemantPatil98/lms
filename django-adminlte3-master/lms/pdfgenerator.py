@@ -10,6 +10,7 @@ import os
 from datetime import datetime
 from .sheetsapi import sheetvalues
 from .sheetfields import student_performance
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 ###
 class Render:
@@ -33,13 +34,13 @@ class Render:
         html = template.render(params)
         # file_name = "{0}-{1}.pdf".format(params['request'].user.first_name, randint(1, 1000000))
         file_name = "Offer Letter.pdf"
-        file_path = os.path.join(os.path.abspath(os.path.dirname("__file__")), "", file_name)
+        file_path = os.path.join(os.path.abspath(os.path.dirname("__file__")), "", 'lms/static/'+file_name)
         with open(file_path, 'wb') as pdf:
             pisa.pisaDocument(BytesIO(html.encode("UTF-8")), pdf)
         return [file_name, file_path]
 
 ###
-class Pdf(View):
+class offerletter(View):
 
     def get(self, request):
         # sales = Sales.objects.all()
@@ -49,15 +50,52 @@ class Pdf(View):
         range = "!"+str(up.student_performance_row)+':'+str(up.student_performance_row)
         values = sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname=SHEET_NAME, range=range)
 
-        # print(values)
-        today = timezone.now()
-        print(values[0])
         params = {
             'id':request.user.id,
             'addate': datetime.strptime(values[0][student_performance.index('Admission Date')],"%Y-%m-%d"),
             'name': request.user.first_name,
-            'contact': values[0][2]
+            'contact': values[0][3]
         }
         # Render.render_to_file('student/pdf.html',params)
         return Render.render('student/pdf.html', params)
 
+class certificate(View):
+
+    def get(self,request):
+        # sales = Sales.objects.all()
+        SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
+        SHEET_NAME = "Apr - Mar " +datetime.now().strftime("%Y")
+        up = user_profile.objects.get(user_id=request.user.id)
+        range = "!"+str(up.student_performance_row)+':'+str(up.student_performance_row)
+        values = sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname=SHEET_NAME, range=range)
+
+        params = {
+            'id':request.user.id,
+        }
+        return Render.render('student/certificate.html', params)
+
+class certificate1(View):
+
+    @xframe_options_exempt
+    def get(request):
+        # sales = Sales.objects.all()
+        SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
+        SHEET_NAME = "Apr - Mar " +datetime.now().strftime("%Y")
+        up = user_profile.objects.get(user_id=request.user.id)
+        range = "!"+str(up.student_performance_row)+':'+str(up.student_performance_row)
+        values = sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID, sheetname=SHEET_NAME, range=range)
+
+        params = {
+            'id':request.user.id,
+        }
+        return render(request,'student/certificate.html')
+
+    def render_to_file(request,path: str, params: dict):
+        template = get_template(path)
+        html = template.render(params)
+        # file_name = "{0}-{1}.pdf".format(params['request'].user.first_name, randint(1, 1000000))
+        file_name = "Offer Letter.pdf"
+        file_path = os.path.join(os.path.abspath(os.path.dirname("__file__")), "", file_name)
+        with open(file_path, 'wb') as pdf:
+            pisa.pisaDocument(BytesIO(html.encode("UTF-8")), pdf)
+        return HttpResponse(str([file_name, file_path]))

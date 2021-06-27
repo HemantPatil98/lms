@@ -195,7 +195,7 @@ Add Groups
           <!-- /.card-header -->
           <!-- form start -->
           <span><i>* For students groups please use abbrevations such as C_,SQL_,WD_,PYTHON_,JAVA_,TESTING_</i></span>
-          <form action="{%url 'addgroups'%}" method="POST" onsubmit="return save()">
+          <form action="{%if view%}{%url 'viewgroups'%}{%else%}{%url 'addgroups'%}{%endif%}" method="POST" onsubmit="return save()">
             {%csrf_token%}
             <div class="card-body row">
               <div class="form-group col-md-6">
@@ -229,7 +229,7 @@ Add Groups
               <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
                 <label>End Date</label>
                 <label>End Date</label>{{gpinfo.enddate|date:'Y-m-d'}}
-                <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}" {%if not gname%}disabled{%else%}required{%endif%}>
+                <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}" {%if not gname or view%}disabled{%else%}required{%endif%}>
               </div>
 
 
@@ -254,15 +254,15 @@ Add Groups
                         <div class="form-group">
                           <label>Sections</label>
                           <div class="inputGroup">
-                            <input id="pervideo" name="pervideo" type="checkbox" {%if pre.video %}checked{%endif%}/>
+                            <input id="pervideo" name="pervideo" type="checkbox" {%if pre.video %}checked{%endif%} />
                             <label for="pervideo">Videos</label>
                           </div>
                           <div class="inputGroup">
-                            <input id="perexam" name="perexam" type="checkbox" {%if pre.exam %}checked{%endif%}/>
+                            <input id="perexam" name="perexam" type="checkbox" {%if pre.exam %}checked{%endif%} />
                             <label for="perexam">Exam</label>
                           </div>
                           <div class="inputGroup">
-                            <input id="pernotes" name="pernotes" type="checkbox" {%if pre.notes %}checked{%endif%}/>
+                            <input id="pernotes" name="pernotes" type="checkbox" {%if pre.notes %}checked{%endif%} />
                             <label for="pernotes">Notes</label>
                           </div>
                         </div>
@@ -413,9 +413,13 @@ var settings = {
         }
 };
 window.myTransfer = $(".transfer").transfer(settings);
+        {%if view%}
+        $("input[type='checkbox']").each(function() {
+          $(this).attr('disabled','true');
+        })
+        {%endif%}
 
 
-console.log(groupData);
 });
 // console.log(window.groupData);
 
@@ -457,6 +461,7 @@ function save(){
               tags:true
               {%endif%}
               })
+
 
         //Initialize Select2 Elements
         $('.select2bs4').select2({

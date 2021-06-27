@@ -65,19 +65,19 @@ Dashboard
 
                 <div class="knob-label">Average Performance</div>
                 <div id="tableContent" style="display:none">
-                    <div>
-                      <div class="panel panel-default">
-                        <div class="panel-heading">Performance</div>
-                        <div class="panel-body form-inline dept1">
-                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'C Total Marks (Out of 100)'}}"><br>C</div>
-                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Sql Total Marks (Out of 100)'}}"><br>Sql</div>
-                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'WD Total Marks (Out of 200)'}}"><br>WD</div>
-                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Core Total Marks (Out of 100)'}}"><br>Core</div>
-                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Adv Total Marks (Out of 100)'}}"><br>Adv</div>
-                        <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Soft Skills Marks (Out of 100)'}}"><br>Soft Skills</div>
-                        </div>
+                  <div>
+                    <div class="panel panel-default">
+                      <div class="panel-heading">Performance</div>
+                      <div class="panel-body form-inline dept1">
+                      <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'C Total Marks (Out of 100)'}}"><br>C</div>
+                      <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Sql Total Marks (Out of 100)'}}"><br>Sql</div>
+                      <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'WD Total Marks (Out of 200)'}}"><br>WD</div>
+                      <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Core Total Marks (Out of 100)'}}"><br>Core</div>
+                      <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Adv Total Marks (Out of 100)'}}"><br>Adv</div>
+                      <div style="padding: 5px;margin:20px;text-align-last: center;"><input type="text" class="knob"  data-thickness="0.1" data-width="90" data-height="90" data-fgColor="#00a65a" readonly="true"  value="{{performance|key_with_space:'Soft Skills Marks (Out of 100)'}}"><br>Soft Skills</div>
                       </div>
                     </div>
+                  </div>
                 </div>
               </div>
             <h3 class="profile-username text-center">{{performance|key_with_space:'Name'}}</h3>
@@ -98,10 +98,12 @@ Dashboard
               <a {%if certificate.certificate%}href="/media/{{certificate.certificate}}" class='btn btn-success btn-block' target='new' title="Download certificate" {%else%}title="Certificate Not issued yet" class='btn btn-warning btn-block' style='cursor:not-allowed'{%endif%}  data-toggle="tooltip" data-placement="top"  ><b><i class="fa fa-download"></i>Download Certificate</b> </a>
 
             {%else%}
-            <a {%if performance|key_with_space:'Eligible For Certificate(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block' data-toggle="tooltip" data-placement="top" title="Click to Apply for certificate"{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="top" title="You can apply for certificate after all test and mocks completed" style='cursor:not-allowed'{%endif%}><b>Request for Certificate</b></a>
+              <a {%if performance|key_with_space:'Eligible For Certificate(Y/N)' == 'Y'%}href="{%url 'request_certificate'%}" class='btn btn-success btn-block' data-toggle="tooltip" data-placement="top" title="Click to Apply for certificate"{%else%}class='btn btn-primary btn-block' data-toggle="tooltip" data-placement="top" title="You can apply for certificate after all test and mocks completed" style='cursor:not-allowed'{%endif%}><b>Request for Certificate</b></a>
             {%endif%}
-            <a class="btn btn-info btn-block" href="{%url 'pdf'%}" style="margin-top:5px;" target="new"><b>Offer Letter</b></a>
-            <a class="btn form-control" href="{{performance|key_with_space:'Portfolio URL'}}">{{performance|key_with_space:'Portfolio URL'}}</a>
+              <a class="btn btn-info btn-block" href="{%url 'offer_letter'%}" style="margin-top:5px;" target="new"><b>Offer Letter</b></a>
+              {%if performance|key_with_space:'Portfolio URL'%}
+              <a class="btn form-control" href="{{performance|key_with_space:'Portfolio URL'}}" data-toggle="tooltip" data-placement="top" title="Portfolio Link">{{performance|key_with_space:'Portfolio URL'}}</a>
+              {%endif%}
           </div>
       </div>
       <div class="col-md-9">
@@ -111,10 +113,10 @@ Dashboard
             <div class="card-header" data-card-widget="maximize" onclick="onexpand('.c','#cbody')" data-toggle="tooltip" data-placement="top" title="Expand Card For More Features">
               <div class="row">
                 <div class="col-sm-12 c">
-                  <img src="{%static 'courses/c.png'%}" width="150px"> 
+                  <img src="{%static 'courses/C Programing.png'%}" width="150px"> 
                 </div>
                 <div class="col-sm-12 c">
-                  <h3 class="card-title" >C Programinig</h3>   
+                  <h3 class="card-title" >C Programing</h3>   
                 </div>
               </div>
 
@@ -166,7 +168,7 @@ Dashboard
             <div class="card-header" data-card-widget="maximize" onclick="onexpand('.sql','#sqlbody')" data-toggle="tooltip" data-placement="top" title="Expand Card For More Features">
               <div class="row">
                 <div class="col-sm-12 sql">
-              <img src="{%static 'courses/sql.png'%}" width="150px">
+              <img src="{%static 'courses/SQL.png'%}" width="150px">
                   <!-- <i class="fas fa-database" style="width: 100%;font-size: 100px;"></i> -->
                 </div>
                 <div class="col-sm-12 sql">
@@ -223,7 +225,7 @@ Dashboard
             <div class="card-header" data-card-widget="maximize" onclick="onexpand('.wd','#wdbody')" data-toggle="tooltip" data-placement="top" title="Expand Card For More Features">
               <div class="row">
                 <div class="col-sm-12 wd">
-              <img src="{%static 'courses/wd.png'%}" width="150px">
+              <img src="{%static 'courses/Web Designing.png'%}" width="150px">
                   
                 </div>
                 <div class="col-sm-12 wd">
@@ -326,7 +328,6 @@ Dashboard
                   </div>
                 </div>
               </div>
-
             </div>
             <!-- /.card-body -->
         </div>
@@ -345,7 +346,6 @@ Dashboard
                   
                 </div>
               </div>
-
               <div class="card-tools" id="#adv">
                 <button type="button" class="btn btn-tool" ><i class="fas fa-expand"></i>
                 </button>
@@ -382,13 +382,11 @@ Dashboard
                     </a>
                   </div>
               </div>
-
             </div>
             <!-- /.card-body -->
         </div>
         <!-- /.card -->
         </div></div>
-
         <div class="col-md-3">
           <div class="card card-danger shadow-lg">
             <div class="card-header" data-card-widget="maximize" onclick="onexpand('.softskills','#softskills')" data-toggle="tooltip" data-placement="top" title="Expand Card For More Features">
@@ -426,31 +424,16 @@ Dashboard
                     <h2>Exam</h2>
                     </a>
                   </div>
-                  <!-- <div class="col-sm-4">
-                    <a href="">
-                    <img src="{%static 'courses/notes.png'%}" width="150px">
-                    <h2>Notes</h2>
-                    </a>
-                  </div>
-                  <div class="col-sm-4">
-                    <a href="">
-                    <img src="{%static 'courses/syllabus4.png'%}" width="150px">
-                    <h2>Syllabus</h2>
-                    </a>
-                  </div> -->
                 </div>
               </div>
-
             </div>
             <!-- /.card-body -->
-        </div>
-        <!-- /.card -->
+          </div>
+          <!-- /.card -->
         </div>
       </div>
     </div>
-
     </div>
-   
   </div><!--/. container-fluid -->
 </section>
 {%endblock%}
@@ -462,7 +445,6 @@ Dashboard
     /* jQueryKnob */
 
     $('.knob').knob({
-
       draw: function () {
         if (this.$.data('skin') == 'tron') {
 
@@ -527,27 +509,20 @@ Dashboard
           }
       });
     })
-    
   })
 </script>
+
 <script>
-    $().ready(function(e) {
-
-        var popupEvent = function() {
-          
-        }
-
-        $('#popupReturn').hunterPopup({
-            width: '500px',
-            height: 'auto',
-            title: "Performance",
-            content: $('#tableContent'),
-            event: popupEvent
-        });
-
+  $().ready(function(e) {
+    var popupEvent = function() {
+    }
+    $('#popupReturn').hunterPopup({
+        width: '500px',
+        height: 'auto',
+        title: "Performance",
+        content: $('#tableContent'),
+        event: popupEvent
     });
-    $(document).ready(function(){
-  $('[data-toggle="tooltip"]').tooltip();   
   });
 </script>
 
@@ -563,7 +538,7 @@ Dashboard
     c=$(b).children('h3');
     c.toggleClass('expand_title');
     $(x).toggleClass('collapse');
-    }
+  }
 </script>
 
 

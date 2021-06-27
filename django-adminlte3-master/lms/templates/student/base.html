@@ -91,7 +91,6 @@
 <!-- ./wrapper -->
 <!-- <div id="sidebar-overlay"></div> -->
 {%include 'student/includes/scriptlinks.html'%}
-
   {%include 'student/includes/followus_note_modal.html'%}
 {%if not crs%}
   {%include 'student/includes/feedbackform.html'%}
@@ -101,11 +100,12 @@
 <!-- Page specific script -->
 {%for message in messages%}
 <script type="text/javascript">
-  toastr.success('{{message}}')
+  toastr.{{message.tags}}('{{message}}')
 </script>
 {%endfor%}
+
 <script type="text/javascript">
-    function feedbackform(a){
+  function feedbackform(a){
     if ($(a).val()=='Yes'){
       $("#refer").removeClass('collapse');
     }
@@ -118,57 +118,57 @@
     $('#feedbacklink').trigger('click');
   {%endif%}
 
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();   
+  });
 </script>
+
 <script type="text/javascript">
-  
   url = "{%url 'getnotice'%}";
   pageno = 1;
   load();
-function load(){
-  $.get(url,{pageno:pageno},function(data) {
-    data = data.split(';')
+  function load(){
+    $.get(url,{pageno:pageno},function(data) {
 
-    notice = JSON.parse(data[0]);
-    console.log(data[1]);
+      data = data.split(';')
 
-    unread_notices=JSON.parse(data[1]);
-    console.log(unread_notices);
+      notice = JSON.parse(data[0]);
 
+      unread_notices=JSON.parse(data[1]);
 
-    $('#noticecount').text(unread_notices.length);
+      $('#noticecount').text(unread_notices.length);
 
-    window.data = notice;
+      window.data = notice;
 
-    $.each(notice,function(){
-      active = '';
-      if (unread_notices.indexOf(this.pk)>-1){
-        active = 'active';
-      }
+      $.each(notice,function(){
+        active = '';
+        if (unread_notices.indexOf(this.pk)>-1){
+          active = 'active';
+        }
 
-       note = ` <a class="dropdown-item `+active+`" id=`+this.pk+` onclick=noticeopen(`+this.pk+`)>
-            <!-- Message Start -->
-            <div class="media" >
-              <span class="img-size-50 mr-3" style="font-size: x-large; text-align-last: center;align-self: center;"><i class="fas fa-link" onclick="window.location.href='`+this.fields.externallink+`'" ></i></span>
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  `+this.fields.title+","+this.pk+`
-                  <span class="float-right text-sm "><i class="fas fa-file" onclick="(function(){window.location.href='/media/`+this.fields.file+`'})()"></i></span>
-                </h3>
-                <p class="text-sm">`+this.fields.description+`</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> `+this.fields.generateddate+`</p>
+        note = ` <a class="dropdown-item `+active+`" id=`+this.pk+` onclick=noticeopen(`+this.pk+`)>
+              <!-- Message Start -->
+              <div class="media" >
+                <span class="img-size-50 mr-3" style="font-size: x-large; text-align-last: center;align-self: center;"><i class="fas fa-link" onclick="window.location.href='`+this.fields.externallink+`'" ></i></span>
+                <div class="media-body">
+                  <h3 class="dropdown-item-title">
+                    `+this.fields.title+","+this.pk+`
+                    <span class="float-right text-sm "><i class="fas fa-file" onclick="(function(){window.location.href='/media/`+this.fields.file+`'})()"></i></span>
+                  </h3>
+                  <p class="text-sm">`+this.fields.description+`</p>
+                  <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> `+this.fields.generateddate+`</p>
+                </div>
               </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>`;
-      
-      // $("#noticepannel div").append(note)
-      $("#notes").append(note)
+              <!-- Message End -->
+            </a>
+            <div class="dropdown-divider"></div>`;
+        
+        // $("#noticepannel div").append(note)
+        $("#notes").append(note)
+      })
     })
-
-  })
-  pageno +=1;
-}
+    pageno +=1;
+  }
   
 
   function noticeopen(id){
@@ -196,9 +196,7 @@ function load(){
   }
 
   $('#notes').scroll(function() {
-   if($('#notes').scrollTop()%500==0) {
-    console.log($('#notes').scrollTop(),$('#notes')[0].scrollHeight,$('#notes'));
-    
+   if($('#notes').scrollTop()%500==0) {   
     load();
    }
   });

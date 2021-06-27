@@ -12,7 +12,7 @@ from lms.models import *
 from lms import sheetsapi
 from exam.models import *
 video_key = []
-
+video_request_counter = 0
 def randomstring():
     import secrets
     import string
@@ -37,36 +37,43 @@ def video(request,course):
     else:
         per = 0
 
-    return render(request,'video.html',{'course':course,'videos':videolist,'watched':watch,'per':per})
+    global video_key
+    key = randomstring()
+    video_key = key
+    print("key=",key)
+
+    return render(request,'video.html',{'course':course,'videos':videolist,'watched':watch,'per':per,'key':key})
 
 ###
 @xframe_options_sameorigin
 @login_required(login_url='')
-def videoframe(request,course,video):
-    # key = randomstring()
-    # video_key.append(key)
-    # print("key=",key)
+def videoframe(request,course,video,key):
+
     # if key in video_key:
-    return render(request,'videoframe.html',{'course':course,'video':video})
+    return render(request,'videoframe.html',{'course':course,'video':video,'key':key})
     # else:
     #     return HttpResponse("Sorry Bad request")
 
 ###
 @login_required(login_url='')
-def v(request,course,video):
-    # print(key,video_key)
-    # if key in video_key:
-    #     print("hi")
-    # video_key.remove(key)
-    videolink = "media/videos/courses/"+course+"/"+video+".mp4"
-    # print(os.path.exists(videolink))
-    file = FileWrapper(open(videolink, 'rb'))
-    response = HttpResponse(file, content_type='video/mp4')
-    response['Content-Disposition'] = 'attachment; filename=my_video.mp4'
+def v(request,course,video,key):
+    global video_key,video_request_counter
+    print(video_request_counter)
 
-    return response
-    # else:
-    #     return HttpResponse("Sorry Bad request")
+    if key == video_key:
+        # video_request_counter +=1
+        print("hi")
+        videolink = "media/videos/courses/"+course+"/"+video+".mp4"
+        print(os.path.exists(videolink))
+        file = FileWrapper(open(videolink, 'rb'))
+        response = HttpResponse(file, content_type='video/mp4')
+        response['Content-Disposition'] = 'attachment; filename=my_video.mp4'
+
+        return response
+    else:
+        # video_key = ""
+        video_request_counter = 0
+        return HttpResponse("Sorry Bad request")
 
 
 ###
@@ -158,6 +165,7 @@ def watched_video(request):
     return HttpResponse("")
 
 def getnewvideokey(request):
+    global video_key
     key = randomstring()
-    video_key.append(key)
+    video_key = key
     return HttpResponse(str(key))

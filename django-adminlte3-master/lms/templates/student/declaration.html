@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+{%load static%}
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <title>
+    LMS | Student Login
+  </title>
+
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+  <!-- CSS Files -->
+  <link href="{%static 'student/material-dashboard.css'%}" rel="stylesheet" />
+<!-- Toastr -->
+  <link rel="stylesheet" href="{%static 'student/plugins/toastr/toastr.min.css'%}">
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+</head>
+<style type="text/css">
+  .center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+body,html{
+    height: 100%;
+}
+
+.title{
+    text-decoration: underline
+}
+.embeded{
+    height:100%;
+    width: 100%;
+    border-radius: 1%;
+}
+</style>
+<body class="container" style="position: inherit">
+    <center class="title"><h2><i><b>Acknowledge</b></i></h2></center>
+
+  <div class="row" style="height: 80%">
+    <div class="col-sm-6" style="height:100%;width: 90%;">
+        <embed class="embeded" src="{%static 'EDGE Training Execution Process.pdf'%}#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf"></embed>
+        
+    </div>
+    <div class="col-sm-6" style="height:100%;width: 90%;">
+        <embed class="embeded" src="{%static 'Offer Letter.pdf'%}#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf"></embed>
+        
+    </div>
+  </div>
+  <h6>Declaration</h6>
+  <div style="display:flex;">
+  <p style="width:90%">I have read the terms and conditions and hereby declare that I have read, understood all the
+points and abide by the same</p><button class="btn btn-warning" onclick=(function(){window.location="/declaration?agree=agree"})()>Agree</button></div>
+  
+    <script src="{%static 'student/plugins/toastr/toastr.min.js'%}"></script>
+
+    <script type="text/javascript">
+      document.addEventListener('contextmenu',event => event.preventDefault());
+
+     // url = "{%url 'declaration'%}";
+     // function agree() {
+     //   $.post(url,{username:'{{username}}'},function (data) {
+     //   // body...
+     //    }).done(window.location={%url 'resspass'%});
+     // }
+     
+
+    </script>
+
+    <script type="text/javascript">
+
+        {%for message in messages%}
+
+          {%if message.tags == 'success'%}
+                toastr.success('{{message.tags}}')
+          {%elif message.tags == 'error'%}
+                toastr.error('{{message}}')
+          {%elif message.tags == 'warning'%}
+                toastr.warning('{{message}}')
+          {%elif message.tags == 'info'%}
+                toastr.info('{{message}}')
+          {%endif%}
+
+        {%endfor%}
+    </script>
+</body>
+</html>

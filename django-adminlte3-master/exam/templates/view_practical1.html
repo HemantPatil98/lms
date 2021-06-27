@@ -54,7 +54,6 @@ View Practical
             {%csrf_token%}
             <div class="card-body" style="border: 2px solid #17a2b8;">
             	<div class="row">
-
               <div class="form-group col-md-12">
                 <div class="form-control">
                   <label>NAME: </label><span style="padding-left: 20px;font-size: 16px;font-weight: 800;">{{prog_set.0.student.first_name}}</span>
@@ -94,7 +93,6 @@ View Practical
                 		{%endif%}
                 	</div>
             		</div>
-            		
             	</div>
             	<div class="form-group col-md-4">
                 <div class="row">
@@ -112,7 +110,6 @@ View Practical
              		<div class="col-md-12">
              			<div class="card ">
 		                <div class="card-body" id="body" style="height: 800px;overflow: auto;">
-
                       <div class="row">
                         <div class="col-sm-6">
                           <iframe src="https://techiedelight.com/compiler/" width="100%" height="500px;"></iframe>
@@ -123,21 +120,20 @@ View Practical
                         <div class='question' id='{{pro.id}}'>
                           <div>
                             <div class="form-group">
-                                <label for="question">Program #{{forloop.counter}}</label>
-                                <div class="form-control program" id="que{{pro.id}}" >
-                                  <div class="row">
-                                    <div class="col-sm-9" onclick="(function(){$('#program{{pro.id}}').toggleClass('collapse')})()">{{pro.program}}</div>
-                                    <div class="col-sm-2"><input type="integer" class="form-control" name="marks" min=0 max="4" placeholder="0-3" required=""></div>
-                                    <div class="col-sm-1"><a><i class="fas fa-copy" onclick="copy_to_clipboard('{{pro.id}}')"></i></a></div>
-                                </div>
-                                  
+                              <label for="question">Program #{{forloop.counter}}</label>
+                              <div class="form-control program" id="que{{pro.id}}" >
+                                <div class="row">
+                                  <div class="col-sm-9" onclick="(function(){$('#program{{pro.id}}').toggleClass('collapse')})()">{{pro.program}}</div>
+                                  <div class="col-sm-2"><input type="integer" class="form-control" name="marks" min=0 max="4" placeholder="0-3" required=""></div>
+                                  <div class="col-sm-1"><a><i class="fas fa-copy" onclick="copy_to_clipboard({{pro.id}})"></i></a></div>
                                 </div> 
+                              </div> 
                             </div>
 
                             <div id="program{{pro.id}}" class="row collapse">
                               {%if crs.type == 'PRACTICAL'%}
                              <div class="col-sm-12">
-                               <textarea class="form-control ans" style="width: 100%;height: 90%" id="{{pro.id}}" name="ans{{pro.id}}" placeholder="Paste your code here" readonly="">{{pro.answer}}</textarea>
+                               <textarea class="form-control ans" style="width: 100%;height: 90%" name="ans{{pro.id}}" placeholder="Paste your code here" readonly="">{{pro.answer}}</textarea>
                                <div class="row" style="padding: 10px;">
                              </div>
 
@@ -155,12 +151,9 @@ View Practical
                         </div>
                         <hr>
                         {%endfor%}
-                        </div>
-                        
+                        </div>         
                       </div>
-
-		                </div>
-		                
+		                </div>  
 		                <!-- /.card-body -->
 		            </div>
              		</div>
@@ -181,26 +174,19 @@ View Practical
 {%endblock%}
 
 
-    {%block script%}
+{%block script%}
+  <script>
+    $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2({
+      	tags:true
+      })
 
-
-<script>
-  $(function () {
-    //Initialize Select2 Elements
-    $('.select2').select2({
-    	tags:true
     })
 
-    //Initialize Select2 Elements
-    $('.select2bs4').select2({
-      theme: 'bootstrap4',
-      tags:true
-    })
-  })
-
-  function copy_to_clipboard(name) {
-    $("#"+name).select();
-    document.execCommand("copy");
-  }
-</script>
-    {%endblock%}
+    function copy_to_clipboard(name) {
+      $("textarea[name=ans"+name+"]").select();
+      document.execCommand("copy");
+    }
+  </script>
+{%endblock%}

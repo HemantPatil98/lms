@@ -43,7 +43,7 @@ def mailletter(receiver,body):
 
         message.attach(MIMEText(body, 'plain'))
 
-        pdfname = 'Offer Letter.pdf'
+        pdfname = 'EDGE Training Execution Process.pdf'
 
         # open the file in bynary
         binary_pdf = open(pdfname, 'rb')
