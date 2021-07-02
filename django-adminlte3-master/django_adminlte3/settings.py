@@ -130,4 +130,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = '/media/'
 LOGIN = ''
 
-
+from . import views
+handler404 = views.error
+handler500 = "lms.views.error"
+handler403 = "lms.views.error"
+handler400 = "lms.views.error"

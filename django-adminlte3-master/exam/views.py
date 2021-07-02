@@ -77,7 +77,7 @@ def add_course(request):
     ext = ext1
 
     courses = course.objects.values_list('name', flat=True).distinct()
-    return render(request,'add_course.html',{'courses':courses,'ext':ext,'crs':crs})
+    return render(request,'add_course.html',{'courses':courses,'ext':ext})
 
 ###
 @login_required(login_url='')
@@ -242,9 +242,10 @@ def mcq_exam(request):
             return response
 
     courses = []
-    for g in request.user.groups.filter(permissions=Permission.objects.get(name='exam')):
+    for g in request.user.groups.filter(permissions=Permission.objects.get(name='exam')) if not request.user.is_superuser else course.objects.all():
         gp = models.groupsinfo.objects.get(group=g.id)
         courses.append(gp.course)
+
     return render(request,'mcq_exam.html',{'courses':courses})
 
 ###
@@ -413,9 +414,6 @@ def savepracticle(request):
         result.save()
         messages.info(request, 'Practical saved successfully')
     else:
-    # if attempt != "Attempts Overed":
-    #     result = exam_attempts(student=request.user, course=crs, attempt=attempt)
-    #     result.save()
         messages.error(request,'Attempts Overed')
 
     return redirect('index')
@@ -465,16 +463,12 @@ def getdata_practicle(request):
                 a['QUATION'] = p.program.programe
 
             data.append(a)
-        # print(a)
+
     return HttpResponse(str(data).replace('None',"'none'").replace("'",'"'))
 
 def getdata_oral(request):
     gname = request.GET['gname']
     us = User.objects.all() if gname == 'All_groups' else User.objects.filter(groups__name=gname)
-    # if gname != 'All_groups':
-    #     us = User.objects.filter(groups__name=gname)
-    # else:
-    #     us = User.objects.all()
     us = serializers.serialize('json',list(us),fields=('first_name')).replace('pk','ID').replace('first_name','NAME')
 
     return HttpResponse(us)
@@ -497,7 +491,6 @@ def view_practicle(request):
 def marks_practicle(request):
     marks = 0
     for m in request.POST.getlist('marks'):
-        print(m,type(m))
         marks += int(m)
     attempt = request.POST['attempt']
     ex = exam_attempts.objects.get(id=int(attempt))

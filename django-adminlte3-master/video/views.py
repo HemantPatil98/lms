@@ -62,9 +62,10 @@ def v(request,course,video,key):
 
     if key == video_key:
         # video_request_counter +=1
-        print("hi")
+        # video_key = ""
+
         videolink = "media/videos/courses/"+course+"/"+video+".mp4"
-        print(os.path.exists(videolink))
+
         file = FileWrapper(open(videolink, 'rb'))
         response = HttpResponse(file, content_type='video/mp4')
         response['Content-Disposition'] = 'attachment; filename=my_video.mp4'
@@ -135,7 +136,7 @@ def videopermissions(request,view='false'):
         gp_permissions = gp.permissions.all()
 
         videolist = []
-        # print(gpinfo.course)
+
         videos = "media/videos/courses/" + gpinfo.course
         if os.path.exists(videos):
             for v in os.listdir(videos):
@@ -143,7 +144,7 @@ def videopermissions(request,view='false'):
 
 
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-        # print(memb)
+
         courses = course.objects.values_list('name', flat=True).distinct()
         return render(request, 'videopermissions.html',
                       {'gname': gp, 'permissions': Permission.objects.all()[68::],'up': up, 'vpermissions': videolist,

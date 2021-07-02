@@ -10,7 +10,7 @@
   {%block style%}
 
   {%endblock%}
-    <style type="text/css">
+  <style type="text/css">
     .fa-link{
       color: deepskyblue;
     }
@@ -37,7 +37,6 @@
 
   <!-- Navbar -->
     {%include 'student/includes/navbar.html'%}
-
   <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
@@ -86,7 +85,6 @@
       <b>LEARNING MANAGMENT SYSTEM</b> 1.0v
     </div>
   </footer>
-
 </div>
 <!-- ./wrapper -->
 <!-- <div id="sidebar-overlay"></div> -->
@@ -152,7 +150,7 @@
                 <span class="img-size-50 mr-3" style="font-size: x-large; text-align-last: center;align-self: center;"><i class="fas fa-link" onclick="window.location.href='`+this.fields.externallink+`'" ></i></span>
                 <div class="media-body">
                   <h3 class="dropdown-item-title">
-                    `+this.fields.title+","+this.pk+`
+                    `+this.fields.title+`
                     <span class="float-right text-sm "><i class="fas fa-file" onclick="(function(){window.location.href='/media/`+this.fields.file+`'})()"></i></span>
                   </h3>
                   <p class="text-sm">`+this.fields.description+`</p>

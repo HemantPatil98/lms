@@ -96,11 +96,13 @@ class notice(models.Model):
                     us_profile.unread_notices = new_notices
 
                 us_profile.last_notice = notices[0].id
-        print(type(us_profile))
+
         notices = serializers.serialize('json',list(page),fields=('title', 'description','generateddate','file','externallink'))
 
         if us_profile.unread_notices == '':
             us_profile.unread_notices = []
+
+        print(us_profile)
 
         us_profile.save()
 

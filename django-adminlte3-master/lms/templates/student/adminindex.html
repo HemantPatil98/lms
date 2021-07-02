@@ -1,5 +1,7 @@
 {%extends 'student/base.html'%}
+{%load admin_menu%}
 {%block style%}
+
 <style type="text/css">
   .inner{
     height: 100px;
@@ -23,7 +25,8 @@ Dashboard
 <section class="content">
   <div class="container-fluid">
     <div class="row">
-      
+
+      {%if request.user|has_per_name:'student'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
         <div class="small-box bg-info">
@@ -40,7 +43,9 @@ Dashboard
           </a>
         </div>
       </div>
-      
+      {%endif%}
+
+      {%if request.user|has_per_name:'group'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
         <div class="small-box bg-danger">
@@ -57,9 +62,12 @@ Dashboard
           </a>
         </div>
       </div>
+      {%endif%}
+
+      {%if request.user|has_per_name:'member'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
-        <div class="small-box bg-warning">
+        <div class="small-box bg-warning" style="color: white!important;">
           <div class="inner">
             <!-- <h3>44</h3> -->
 
@@ -68,12 +76,14 @@ Dashboard
           <div class="icon">
             <a href="{% url 'addusers' %}" class="icon"><i class="fas fa-user-plus"></i></a>
           </div>
-          <a href="{% url 'viewmembers'%}" class="small-box-footer">
+          <a href="{% url 'viewmembers'%}" class="small-box-footer" style="color: white!important;">
             View Members <i class="fas fa-arrow-circle-right"></i>
           </a>
         </div>
       </div>
+      {%endif%}
 
+      {%if request.user|has_per_name:'attendance'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
         <div class="small-box bg-success">
@@ -90,6 +100,9 @@ Dashboard
           </a>
         </div>
       </div>
+      {%endif%}
+
+      {%if request.user|has_per_name:'performance'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
         <div class="small-box bg-danger">
@@ -106,7 +119,9 @@ Dashboard
           </a>
         </div>
       </div>
+      {%endif%}
 
+      {%if request.user|has_per_name:'notice'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
         <div class="small-box bg-warning" style="color: white!important;">
@@ -123,6 +138,9 @@ Dashboard
           </a>
         </div>
       </div>
+      {%endif%}
+
+      {%if request.user|has_per_name:'certificate'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
         <div class="small-box bg-success">
@@ -139,6 +157,9 @@ Dashboard
           </a>
         </div>
       </div>
+      {%endif%}
+
+      {%if request.user|has_per_name:'questions'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
         <div class="small-box bg-info">
@@ -155,9 +176,12 @@ Dashboard
           </a>
         </div>
       </div>
+      {%endif%}
+
+      {%if request.user|has_per_name:'evaluate'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
-        <div class="small-box bg-warning">
+        <div class="small-box bg-warning" style="color: white!important;">
           <div class="inner">
             <!-- <h3>44</h3> -->
 
@@ -166,11 +190,14 @@ Dashboard
           <div class="icon">
             <a href="{% url 'practicle_validate' %}" class="icon"><i class="fa fa-code" aria-hidden="true"></i></a>
           </div>
-          <a href="{% url 'practicle_validate'%}" class="small-box-footer">
+          <a href="{% url 'practicle_validate'%}" class="small-box-footer" style="color: white!important;">
             View Marks <i class="fas fa-arrow-circle-right"></i>
           </a>
         </div>
       </div>
+      {%endif%}
+
+      {%if request.user|has_per_name:'timeline'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
         <div class="small-box bg-success">
@@ -187,6 +214,9 @@ Dashboard
           </a>
         </div>
       </div>
+      {%endif%}
+
+      {%if request.user|has_per_name:'feedback'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
         <div class="small-box bg-info">
@@ -203,6 +233,9 @@ Dashboard
           </a>
         </div>
       </div>
+      {%endif%}
+
+      {%if request.user|has_per_name:'video_permissions'%}
       <div class="col-lg-3 col-6">
         <!-- small card -->
         <div class="small-box bg-danger">
@@ -219,6 +252,8 @@ Dashboard
           </a>
         </div>
       </div>
+      {%endif%}
+
     </div>
    
   </div><!--/. container-fluid -->

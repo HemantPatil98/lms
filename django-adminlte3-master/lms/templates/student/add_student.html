@@ -21,11 +21,9 @@
   .fa-camera:hover{
     color: #536273;
   }
-</style>
-<style type="text/css">
   input[readonly="True"] {
-  pointer-events: none;
-}
+    pointer-events: none;
+  }
 </style>
 {%endblock%}
 
@@ -44,12 +42,9 @@ Add Student
           <div class="card-header">
             <h3 class="card-title">{%if request.user.is_staff%}Admission Form{%else%}Profile{%endif%}</h3>
           </div>
-
           {%include 'student/includes/add_student_form.html'%}
-        
     </div>
   </div>
-
 </section>
 {%endblock%}
 
@@ -60,16 +55,25 @@ Add Student
   month = d.getMonth()+1>10?d.getMonth()+1:"0"+(d.getMonth()+1);
   year = d.getFullYear();
   currentdate = year+"-"+month+'-'+day;
-  console.log(currentdate,day,month,year);
-$("input[name='dateofadmission']").val(currentdate);
+  $("input[name='dateofadmission']").val(currentdate);
   $("input[name='mode']").click(function(){
-    mode=$("input[name='mode']:checked").val();
+    // mode=$("input[name='mode']:checked").val();
+    mode = this.value;
+    // console.log(this.value);
     if (mode=="LumpSum"){
       $('#installment tbody tr').each(function(){
         $.each($(this).children(),function(i){
           if (i>2){
           $(this).children('input').attr('readonly','readonly');
-
+          }
+        })
+      })
+    }
+    else if(mode==2){
+      $('#installment tbody tr').each(function(){
+        $.each($(this).children(),function(i){
+          if (i>3){
+          $(this).children('input').attr('readonly','readonly');
           }
         })
       })

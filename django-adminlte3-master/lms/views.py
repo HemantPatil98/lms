@@ -31,8 +31,20 @@ def config():
         p.save()
     except:
         pass
-    # print(p)
+
+    dashboard_permissions = ["student","group","member","attendance","performance","notice","certificate","questions"
+        ,"evaluate","timeline","feedback","video_permissions"]
+
+    for i in dashboard_permissions:
+        try:
+            p = Permission(content_type_id=18,name=i,codename=i)
+            p.save()
+        except:
+            pass
     return HttpResponse("")
+
+def error(request):
+    return render(request,'student/base.html')
 
 ###
 def log_in(request):
@@ -42,7 +54,7 @@ def log_in(request):
         us = authenticate(request, username=username, password=password)
 
         if us is not None:
-            # print(us.last_login)
+
             if us.last_login != None:
                 login(request, us)
                 messages.success(request, "Successfully Log In")
@@ -112,7 +124,7 @@ def reset_password(request):
                 message = header + '\n Username: ' + us.username + '\n New Password: ' + password + ' \n\n'
                 mail(us.email, message)
 
-                print(message)
+                # print(message)
                 messages.success(request,'Password reset successfully')
                 messages.success(request,'Check email for new password')
                 return redirect(login_form)
@@ -128,10 +140,10 @@ def reset_password(request):
 
 def declaration(request):
     if 'agree' in request.GET:
-        print(request.GET)
+
         if request.GET['agree'] == 'agree':
             us = User.objects.filter(username=request.session['username'])
-            print(us[0])
+
             if len(us) == 1:
                 up = user_profile.objects.get(user_id=us[0])
                 up.declaration = datetime.now()
@@ -198,7 +210,6 @@ def index(request):
         except:
             certificate = ""
 
-        # print(performance)
         response = render(request, 'student/index.html', {'performance': performance,'up':up,'per':per,'profile':"",'certificate':certificate})
         return response
 
@@ -284,7 +295,7 @@ def addstudent(request):
             header = 'To:' + us.username + '\n' + 'From: aniket.pawar@cravitaindia.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
 
             message = header + '\n Username: ' + username + '\n Password: ' + password + ' \n\n'
-            print(message)
+            # print(message)
 
             # mailletter(us.email,message)
             mail(us.email,message)
@@ -328,7 +339,6 @@ def addgroups(request,view=False):
             messages.info(request,'Group created')
             SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
 
-            # print(sheetfields.attendance)
             sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,columns=sheetfields.attendance)
             messages.info(request, gname + " is added in sheet")
         else:
@@ -338,7 +348,7 @@ def addgroups(request,view=False):
             if 'enddate' in request.POST:
                 gpinfo.enddate = request.POST['enddate']
                 gpinfo.save()
-            print(gpinfo.enddate)
+
             cname = request.POST['cname']
         if 'videopermission' in request.POST:
             for p in gp.permissions.all():
@@ -352,7 +362,7 @@ def addgroups(request,view=False):
         if 'pervideo' in request.POST or 'perexam' in request.POST or 'pernotes' in request.POST:
             permissions = {'video': request.POST.get('pervideo'), 'exam': request.POST.get('perexam'),
                            'notes': request.POST.get('pernotes')}
-            # print(permissions)
+
             for p in permissions:
                 if permissions.get(p) == 'on':
                     gp.permissions.add(Permission.objects.get(name=p))
@@ -372,7 +382,6 @@ def addgroups(request,view=False):
         except:
             request_member=[]
 
-        print(request_member)
 
         if request.POST.get('students'):
             for m in members:
@@ -455,7 +464,7 @@ def addgroups(request,view=False):
 
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
         courses = course.objects.values_list('name', flat=True).distinct()
-        print(gpinfo.startdate)
+
 
         return render(request,'student/add_groups.html',{'gname':gp,'permissions':Permission.objects.all()[68::],'pre':pre,
                                                         'members':members,'memb_pre':memb_pre,'up':up,'groups':groups,
@@ -471,9 +480,8 @@ def addgroups(request,view=False):
 def deletegroups(request,gname):
     gp = Group.objects.filter(name=gname)
     for u in User.objects.all():
-        # print(u.groups.filter(name=gname))
+
         if u.groups.filter(name=gname):
-            # print(u)
             up = user_profile.objects.filter(user_id=u.id)
             up.delete()
             u.delete()
@@ -500,7 +508,7 @@ def addusers(request):
             header = 'To:' + us.email + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
 
             message = header + '\n Username: ' + us.username + '\n Password: ' + password + ' \n\n'
-            print(message)
+            # print(message)
 
             mail(us.email,message)
 
@@ -602,14 +610,11 @@ def viewprofile(request):
     range = "!A"+str(row)+":AS"+str(row+3)
 
     values = sheetsapi.sheetvalues(SPREADSHEET_ID=sheetid,sheetname='Apr - Mar 2021',range=range)
-    # print(values)
+
     student_profile1 = [x.replace(' ','') for x in student_profile]
-    # print(student_profile1)
+
     profile = [dict(zip(student_profile1,values[0])),dict(zip(student_profile1,values[1])),
                dict(zip(student_profile1,values[2])),dict(zip(student_profile1,values[3]))] #list data to object
-    # print(profile)
-    up = user_profile.objects.get(user_id=request.user.id)
-
 
     SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
     up = user_profile.objects.get(user_id=request.user)
@@ -621,7 +626,6 @@ def viewprofile(request):
 
     performance = dict(zip(student_performance, values[0]))  # list data to object
 
-    # print(performance)
 
     try:
         certificate = certificate_request.objects.get(student_id=request.user)
@@ -690,7 +694,7 @@ def sendotp(request):
         header = 'To:' + us[0].username + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS OTP \n'
 
         message = header + '\n Username: ' + us[0].username + '\n OTP: ' + otp + ' \n\n'
-        print(message)
+        # print(message)
 
         if mail(us[0].email,message) == 'success':
             return HttpResponse("Otp send successfully")
@@ -739,12 +743,12 @@ def schedule(request):
     SPREADSHEET_ID = extra_data.objects.get(name='batch_schedule').value
     SHEET_NAME = 'Schedule'
 
-    values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=SHEET_NAME,range='!A:GZ')
+    values = sheetsapi.sheetvalues(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=SHEET_NAME,range='!A:H')
     data = []
     fields = [x for x in values[0]]
     for row,i in zip(values[1::1],range(1,len(values))):
         dict = {'rowIndex':i}
-        # print(type(row[1]))
+
         for s, j in zip(fields, range(len(fields))):
             if j < len(row):
                 dict[s] = row[j]
@@ -764,13 +768,14 @@ def get_data(request,table):
     fields = [x for x in values[0]]
     for row,i in zip(values[1::1],range(1,len(values))):
         dict = {'rowIndex':i}
-        # print(type(row[1]))
+
         for s, j in zip(fields, range(len(fields))):
             if j < len(row):
                 dict[s] = row[j]
             else:
                 dict[s] = ''
         data.append(dict)
+
 
     if table == 'attendance' and not request.user.is_staff:
         data1 = []
@@ -817,7 +822,7 @@ def set_data(request,table):
             year = date.strftime("%Y")
             currentdate = day + "/" + month + "/" + year
             present = [currentdate]
-            print(len(rowv))
+
             if len(rowv):
                 rowv = [int(x) for x in rowv]
                 for i in range(0, max(rowv) + 1):
@@ -830,7 +835,7 @@ def set_data(request,table):
                 present += rowv
 
 
-            print(present)
+
             row = int(row) if request.GET['update']=='true' else int(row)+1
 
             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,value=[present],SHEET_NAME=SHEET_NAME,col=row,row=0,dimension="COLUMNS")
@@ -956,7 +961,7 @@ def setcertificate(request):
     SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
 
     row = user_profile.objects.get(user_id=cr.student_id).student_performance_row
-    print(row)
+
 
     y = request.user.date_joined.strftime('%Y')
     SHEET_NAME = "Apr - Mar " + y

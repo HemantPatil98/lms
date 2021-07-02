@@ -64,15 +64,16 @@
 <script src="{%static 'student/plugins/jsgrid/jsgrid.min.js'%}"></script>
 
 <script type="text/javascript">
-  // window.db = db;
+
   var db = {};
   load();
  function load(){
     var sheetname=$("select[name='sheetname']").val();
-console.log(sheetname);
+
   var url = "{%url 'getdata' table=table%}";
 $.get(url,{sheetname:sheetname},function(data,status){
     data = data.replaceAll("'",'"');
+
     db.data=JSON.parse(data);
     $('#grid').jsGrid({data:db.data});
 
@@ -82,7 +83,7 @@ $.get(url,{sheetname:sheetname},function(data,status){
 readonly = ['ID','CERTIFICATE NO','NAME','CONTACT NO','EMAIL ID','ADMISSION DATE','TRAINING MODE','C TOTAL MARKS','SQL TOTAL MARKS','WD TOTAL MARKS','PORTFOLIO LINK','CORE TOTAL MARKS','ADV TOTAL MARKS','TOTAL MARKS (OUT OF 700)'];
 
     for(i=0;i<col.length;i++){
-      console.log(col[i]=='CONTACT NO');
+
       if(readonly.indexOf(col[i])>-1){
         if (col[i]=='NAME'){
           fields.push({name:col[i],type:'text',editing:false,css:'fix-name'});

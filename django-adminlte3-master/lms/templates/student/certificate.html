@@ -4,9 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>Certificate | {{request.user.first_name}}</title>
-    <!-- <link rel="stylesheet" type="text/css" href="{%static 'webfontkit-20210623-064840/stylesheet.css'%}"> -->
-    <link rel="stylesheet" type="text/css" href="{%static 'wedding-text-regular_HkrlN/Wedding Text Regular.ttf'%}">
-    <!-- <link rel="stylesheet" type="text/css" href="{%static 'webfontkit-20210623-064840/wedding_text_regular.woff2'%}"> -->
+<link rel="preload" href="{%static 'WeddingText.woff2'%}" as="font" type="font/woff2" crossorigin>
     <style type="text/css">
         /*@page {
             size: A4;
@@ -39,12 +37,15 @@
             list-style-type: "\27A2";
         }
 
-        @media print {
         @font-face {
-            font-family: 'Wedding Text';
-            src: url("Wedding.ttf") format('ttf');
-        }
-        }
+    font-family: 'Wedding Text';
+    src: local('Wedding Text'), local('WeddingText'),
+        url('WeddingText.woff2') format('woff2'),
+        url('WeddingText.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
 .abc{
     font-family: Wedding Text;
 }
@@ -66,7 +67,7 @@
             
         </div>
         <div id="content_frame" class="card-body">
-            <h1 style="top:5pt;position: absolute;">Certificate</h1>
+            <h1 style="top:5pt;position: absolute;" class="abc">Certificate</h1>
             <h2 class="abc">This is to certify that</h2>
         </div>
         <div id="footer_content" class="card-footer">
