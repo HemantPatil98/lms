@@ -17,6 +17,8 @@ from exam.models import course
 
 # Create your views here.
 
+excluded_groups=["Admin","Trainer","Hr"]
+
 ###
 def config():
     sheetsapi.startsheet()
@@ -75,7 +77,7 @@ def log_in(request):
                     return redirect('declaration')
                 else:
                     login(request, us)
-                    messages.info(request, "Successfully Log In")
+                    messages.success(request, "Successfully Log In")
                     return redirect(reset_password)
         else:
             messages.error(request, "Username and password not match")
@@ -91,7 +93,7 @@ def log_out(request):
 
 ###
 def login_form(request):
-    if request.user.username != "":
+    if request.user.is_authenticated:
         return redirect('index')
     else:
         return render(request, 'student/login_form.html')
@@ -111,7 +113,6 @@ def reset_password(request):
                 return redirect('index')
             else:
                 return redirect(reset_password)
-
         else:
             us = User.objects.filter(username=request.POST['username'])
             if len(us)==1:
@@ -119,12 +120,12 @@ def reset_password(request):
                 password = randomstring(request)
                 us.set_password(password)
                 us.save()
-                header = 'To:' + us.username + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
+
+                header = 'To:' + us.username + '\n' + 'From: admin@fortunecloudindia.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
 
                 message = header + '\n Username: ' + us.username + '\n New Password: ' + password + ' \n\n'
                 mail(us.email, message)
 
-                # print(message)
                 messages.success(request,'Password reset successfully')
                 messages.success(request,'Check email for new password')
                 return redirect(login_form)
@@ -137,10 +138,8 @@ def reset_password(request):
     return render(request,'student/reset_password.html')
 
 ###
-
 def declaration(request):
     if 'agree' in request.GET:
-
         if request.GET['agree'] == 'agree':
             us = User.objects.filter(username=request.session['username'])
 
@@ -201,7 +200,6 @@ def index(request):
                     if len(g.permissions.filter(name="exam")):
                         cper.append('exam')
                     per[c]=cper
-
 
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
 
@@ -282,8 +280,6 @@ def addstudent(request):
                 us_profile.photo = file
                 us_profile.save()
 
-            # message to be sent
-
             params = {
                 'id' : us.id,
                 'addate': datetime.now(),
@@ -293,14 +289,50 @@ def addstudent(request):
             Render.render_to_file('student/pdf.html', params)
 
             header = 'To:' + us.username + '\n' + 'From: aniket.pawar@cravitaindia.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
+            matter = '''Dear Candidate,
 
-            message = header + '\n Username: ' + username + '\n Password: ' + password + ' \n\n'
-            # print(message)
+ 
 
-            # mailletter(us.email,message)
-            mail(us.email,message)
-            us.save()
-            messages.info(request,'Student added successfully')
+Thank you for enrolling for Job enabling Training program ( EDGE) at Fortune Cloud Technologies. Your admission has been confirmed.
+
+We welcome you to Fortune Cloud family and look forward to many years of a mutually beneficial association. 
+
+Our incredible process has made us unique and by following this process & the rules will certainly make you reach your career destination.
+
+ 
+
+PFA the attached execution process..
+
+For any concern, feel free to contact us on 9766439090
+
+ 
+
+Kindly acknowledge the receipt of this mail.
+
+ 
+
+ 
+
+--
+
+Thanks & Regards,
+
+Fortune Cloud Technologies Group
+
+IT Training | Recruitment Services
+
+Contact: +91 – 9766439090 | www.fortunecloudindia.com
+
+ 
+
+ '''
+            message = matter + '\n Username: ' + username + '\n Password: ' + password + ' \n'+'Link:- lms.fortunecloudindia.com\n\n'
+
+            if mailletter(us.email,message) == False:
+                messages.error(request,'Failed to add student')
+            else:
+                us.save()
+            messages.success(request,us.username+' added successfully')
         else:
             from .models import user_profile
             try:
@@ -317,12 +349,14 @@ def addstudent(request):
 
     return render(request,'student/add_student.html')
 
-### #####
+###
 @login_required(login_url='')
 def addgroups(request,view=False):
     if request.method == 'POST':
         gname = request.POST['gname']
         gp = Group.objects.filter(name=gname)
+        groups = Group.objects.all().order_by('-id')
+        members = User.objects.all().order_by('-id')
         gpinfo = ""
 
         if len(gp) == 0:
@@ -340,16 +374,18 @@ def addgroups(request,view=False):
             SPREADSHEET_ID = extra_data.objects.get(name='attendance').value
 
             sheetsapi.addsheet(SPREADSHEET_ID=SPREADSHEET_ID,sheetname=gname,columns=sheetfields.attendance)
-            messages.info(request, gname + " is added in sheet")
+            messages.success(request, gname + " is added in sheet")
+            return redirect('addgroups')
         else:
             gp=gp[0]
             gpinfo = groupsinfo.objects.get(group_id=gp.id)
 
+
             if 'enddate' in request.POST:
                 gpinfo.enddate = request.POST['enddate']
                 gpinfo.save()
-
             cname = request.POST['cname']
+
         if 'videopermission' in request.POST:
             for p in gp.permissions.all():
                 if p.name not in request.POST.getlist('videopermission'):
@@ -374,22 +410,15 @@ def addgroups(request,view=False):
             pre[p]=len(gp.permissions.filter(name=p))
 
         gp_permissions = gp.permissions.all()
-        groups = Group.objects.all().order_by('-id')
-        members = User.objects.all().order_by('-id')
 
-        try:
-            request_member = [int(x) for x in request.POST.get('students').split(',')[:-1:]]
-        except:
-            request_member=[]
-
-
-        if request.POST.get('students'):
+        if 'students' in request.POST:
+            request_member = [int(x) for x in request.POST.get('students').split(',')[:-1:] if x != '']
             for m in members:
                 all_groups = m.groups.all()
                 if gp in all_groups:
                     if m.id not in request_member:
                         m.groups.remove(gp.id)
-                        messages.info(request,m.first_name+" is removed")
+                        messages.success(request,m.first_name+" is removed")
                 elif(len(all_groups)<6):
                     if m.id in request_member:
                         m.groups.add(gp.id)
@@ -406,49 +435,43 @@ def addgroups(request,view=False):
                         y = request.user.date_joined.strftime('%Y')
                         SHEET_NAME = "Apr - Mar " + y
                         SPREADSHEET_ID = extra_data.objects.get(name='student_performance').value
-                        if cname=='C':
+                        if not m.is_staff and cname=='C':
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
                                                   value=[request.user.username],col=all_fields_index['student_performance']['C Trainer Name'],cell=True)
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
                                                   value=[request.POST['startdate']],col=all_fields_index['student_performance']['C module start date'],cell=True)
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME,row=performance_row,
-                                                  value=[request.POST['enddate']],col=all_fields_index['student_performance']['C module end date'],
-                                                  cell=True)
-                        if cname=='SQL':
+                                                  value=[request.POST['enddate']],col=all_fields_index['student_performance']['C module end date'],cell=True)
+                        if not m.is_staff and cname=='SQL':
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
-                                                  value=[request.user.username],col=all_fields_index['student_performance']['SQL Trainer Name'],cell=True)
+                                                  value=[request.user.username],col=all_fields_index['student_performance']['Sql Trainer Name'],cell=True)
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
-                                                  value=[request.POST['startdate']],col=all_fields_index['student_performance']['SQL module start date'],cell=True)
+                                                  value=[request.POST['startdate']],col=all_fields_index['student_performance']['Sql module start date'],cell=True)
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
-                                                  value=[request.POST['enddate']],col=all_fields_index['student_performance']['SQL module end date'],cell=True)
-                        if cname=='WD':
+                                                  value=[request.POST['enddate']],col=all_fields_index['student_performance']['Sql module end date'],cell=True)
+                        if not m.is_staff and cname=='WD':
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
                                                   value=[request.user.username],col=all_fields_index['student_performance']['WD Trainer Name'],cell=True)
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
                                                   value=[request.POST['startdate']],col=all_fields_index['student_performance']['WD module start date'],cell=True)
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
                                                   value=[request.POST['enddate']],col=all_fields_index['student_performance']['WD module end date'],cell=True)
-                        if cname.find('Core'):
+                        if not m.is_staff and cname.find('Core'):
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
                                                   value=[request.user.username],col=all_fields_index['student_performance']['Core Trainer Name'],cell=True)
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
                                                   value=[request.POST['startdate']],col=all_fields_index['student_performance']['Core module start date'],cell=True)
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME,row=performance_row,
                                                   value=[request.POST['enddate']],col=all_fields_index['student_performance']['Core module end date'],cell=True)
-                        if cname.find('Adv'):
+                        if not m.is_staff and cname.find('Adv'):
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
                                                   value=[request.user.username],col=all_fields_index['student_performance']['Adv Trainer Name'],cell=True)
                             sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID,SHEET_NAME=SHEET_NAME,row=performance_row,
                                                   value=[request.POST['startdate']],col=all_fields_index['student_performance']['Adv module start date'],cell=True)
-                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME,
-                                                  row=performance_row,
-                                                  value=[request.POST['enddate']],
-                                                  col=all_fields_index['student_performance']['Adv module end date'],
-                                                  cell=True)
-
+                            sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME,row=performance_row,
+                                                  value=[request.POST['enddate']],col=all_fields_index['student_performance']['Adv module end date'],cell=True)
                 else:
                     messages.error(request,m.first_name + ' Group limit exceed')
-
 
         memb_pre = []  # group existing members
         for m in members:
@@ -461,13 +484,13 @@ def addgroups(request,view=False):
         for v in os.listdir(videos):
             videolist.append(v.split(".")[0])
 
+        videolist.sort()
 
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
         courses = course.objects.values_list('name', flat=True).distinct()
 
-
         return render(request,'student/add_groups.html',{'gname':gp,'permissions':Permission.objects.all()[68::],'pre':pre,
-                                                        'members':members,'memb_pre':memb_pre,'up':up,'groups':groups,
+                                                        'members':members,'memb_pre':memb_pre,'up':up,
                                                          'vpermissions':videolist,'courses':courses,
                                                          'gpinfo':gpinfo,'gp_permissions':gp_permissions,'view':view})
     groups = Group.objects.all()
@@ -480,7 +503,6 @@ def addgroups(request,view=False):
 def deletegroups(request,gname):
     gp = Group.objects.filter(name=gname)
     for u in User.objects.all():
-
         if u.groups.filter(name=gname):
             up = user_profile.objects.filter(user_id=u.id)
             up.delete()
@@ -502,23 +524,20 @@ def addusers(request):
             password = randomstring(request)
             us = User(username=email,first_name=fname,last_name=lname,email=email,is_staff=True)
             us.set_password(password)
-            us.save()
             messages.success(request,"User added successfully")
             # message to be sent
             header = 'To:' + us.email + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
-
             message = header + '\n Username: ' + us.username + '\n Password: ' + password + ' \n\n'
-            # print(message)
 
-            mail(us.email,message)
-
+            if mail(us.email,message):
+                us.save()
+                us.groups.add(gp.id)
         else:
             us = us[0]
 
-
         files = request.FILES['photo'] if 'photo' in request.FILES else ''
         us_profile = user_profile(user_id=us) if len(user_profile.objects.filter(user_id=us))==0 else user_profile.objects.get(user_id=us)
-        user_profile.photo = files
+        us_profile.photo = files
         us_profile.save()
 
         if 'permissions' in request.POST and 'gname' in request.POST:
@@ -542,13 +561,10 @@ def addusers(request):
         perm = {'group_per':gp_per,'user_per':usr_per}
         up = user_profile.objects.all().filter(user_id=request.user.id)[0]
 
-
-        return render(request, 'student/add_users.html', {'groups': Group.objects.all(),'gname':gp.name,'perm':perm,
-                                                          'permissions':Permission.objects.filter(id__gte=64),'member':us,
-                                                          'up':up })
-
-    up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-    return render(request,'student/add_users.html',{'groups':Group.objects.all(),'up':up})
+        #return render(request, 'student/add_users.html', {'groups': Group.objects.all(),'gname':gp.name,'perm':perm,
+         #                                                 'permissions':Permission.objects.filter(id__gte=64),'member':us,'up':up })
+        return redirect('index')
+    return render(request,'student/add_users.html',{'groups':Group.objects.all().order_by('-id')})
 
 ###
 @login_required(login_url='')
@@ -560,11 +576,10 @@ def reset_user_password(request):
         password = randomstring(request)
         us.set_password(password)
         us.save()
-        header = 'To:' + us.username + '\n' + 'From: aniket.pawar@cravitaindia.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
-
+        header = 'To:' + us.username + '\n' + 'From: admin@fortunecloudindia.com  \n' + 'Subject:Fortune Cloud LMS Passsword \n'
         message = header + '\n Username: ' + us.username + '\n New Password: ' + password + ' \n\n'
         mail(us.email,message)
-        messages.info("Password Reset Successfull")
+        messages.success("Password Reset Successfull")
     return HttpResponse()
 
 ###
@@ -586,7 +601,6 @@ def user_permissions(request):
 def sheetdata(request,table):
     SPREADSHEET_ID = extra_data.objects.get(name=table).value
     SHEET_NAMES = sheetsapi.getsheetnames(SPREADSHEET_ID=SPREADSHEET_ID)
-
     if table=='attendance':
         return render(request,'student/attendance.html',{'sheetnames':SHEET_NAMES,"table":table})
     return render(request,'student/sheet_data.html',{'sheetnames':SHEET_NAMES,"table":table})
@@ -598,7 +612,6 @@ def viewmembers(request):
     gnames = []
     for g in groups:
         gnames.append(g.name)
-
     return render(request, 'student/view_users.html', {'sheetnames': gnames})
 
 ###
@@ -626,7 +639,6 @@ def viewprofile(request):
 
     performance = dict(zip(student_performance, values[0]))  # list data to object
 
-
     try:
         certificate = certificate_request.objects.get(student_id=request.user)
     except:
@@ -637,7 +649,7 @@ def viewprofile(request):
 ###
 @login_required(login_url='')
 def attendance(request):
-    gnames = Group.objects.all() if request.user.is_superuser else request.user.groups.all()
+    gnames = Group.objects.all().exclude(name__in=excluded_groups) if request.user.is_superuser else request.user.groups.all().exclude(name__in=excluded_groups)
     gnames = [x.name for x in gnames]
 
     return render(request,'student/attendance.html',{'sheetnames':gnames})
@@ -667,7 +679,7 @@ def request_certificate(request):
         us = user_profile.objects.get(user_id=request.user.id)
         us.certificate=cr
         us.save()
-        messages.info(request,'Certificate Request saved Successfully')
+        messages.success(request,'Certificate Request Saved Successfully')
     else:
         messages.info(request,'Certificate Request Saved Already')
     return redirect('index')
@@ -687,14 +699,11 @@ def sendotp(request):
             up = user_profile(user_id=request.user,otp=otp)
         else:
             up=up[0]
-
         up.otp=otp
         up.save()
 
-        header = 'To:' + us[0].username + '\n' + 'From: paniket281@gmail.com  \n' + 'Subject:Fortune Cloud LMS OTP \n'
-
+        header = 'To:' + us[0].username + '\n' + 'From: admin@fortunecloudindia.com  \n' + 'Subject:Fortune Cloud LMS OTP \n'
         message = header + '\n Username: ' + us[0].username + '\n OTP: ' + otp + ' \n\n'
-        # print(message)
 
         if mail(us[0].email,message) == 'success':
             return HttpResponse("Otp send successfully")
@@ -706,7 +715,6 @@ def sendotp(request):
 ###
 @login_required(login_url='')
 def addfeedback(request):
-
     day = datetime.now()
     data = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)',day.strftime("%d/%M/%Y"),request.user.first_name,
             request.user.last_name,request.user.email]
@@ -718,11 +726,9 @@ def addfeedback(request):
                 data1.append(val[i])
             except:
                 data1.append("")
-
     feedback = data+data1
 
-    SPREADSHEET_ID = extra_data.objects.get(name='Feedback').value
-
+    SPREADSHEET_ID = extra_data.objects.get(name='feedback').value
     feedback = sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=[feedback])
 
     request.session['feedback'] = False
@@ -731,11 +737,10 @@ def addfeedback(request):
 ###
 @login_required(login_url='')
 def viewfeedback(request):
-    up = user_profile.objects.all().filter(user_id=request.user.id)[0]
-    SPREADSHEET_ID = extra_data.objects.get(name='Feedback').value
+    SPREADSHEET_ID = extra_data.objects.get(name='feedback').value
     SHEET_NAMES = sheetsapi.getsheetnames(SPREADSHEET_ID=SPREADSHEET_ID)
 
-    return render(request, 'student/view_feedback.html', {'up': up, 'sheetnames': SHEET_NAMES})
+    return render(request, 'student/view_feedback.html', {'sheetnames': SHEET_NAMES})
 
 ###
 @login_required(login_url='')
@@ -757,7 +762,7 @@ def schedule(request):
         data.append(dict)
     return render(request,'student/schedule1.html',{'data':data})
 
-####
+###
 @login_required(login_url='')
 def get_data(request,table):
     SPREADSHEET_ID = extra_data.objects.get(name=table).value
@@ -1005,6 +1010,3 @@ def students_current_groups(request,gname):
         data.append({'uname': u.first_name, 'uid': u.id,'selected':"true"})
 
     return HttpResponse(str(data).replace("'",'"'))
-
-
-

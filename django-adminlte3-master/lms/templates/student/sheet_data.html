@@ -79,9 +79,11 @@ $.get(url,{sheetname:sheetname},function(data,status){
 
     fields = []
     window.col = Object.keys(db.data[0]);
-
-readonly = ['ID','CERTIFICATE NO','NAME','CONTACT NO','EMAIL ID','ADMISSION DATE','TRAINING MODE','C TOTAL MARKS','SQL TOTAL MARKS','WD TOTAL MARKS','PORTFOLIO LINK','CORE TOTAL MARKS','ADV TOTAL MARKS','TOTAL MARKS (OUT OF 700)'];
-
+{%if not request.user.is_superuser%}
+readonly = ['ID','CERTIFICATE NO','NAME','CONTACT NO','EMAIL ID','ADMISSION DATE','TRAINING MODE','C TOTAL MARKS (OUT OF 100)','SQL TOTAL MARKS (OUT OF 100)','WD TOTAL MARKS (OUT OF 100)','PORTFOLIO LINK','CORE TOTAL MARKS (OUT OF 100)','ADV TOTAL MARKS (OUT OF 100)','ELIGIBLE FOR CERTIFICATE(Y/N)','ELIGIBLE FOR PLACEMENT(Y/N)','TOTAL MARKS (OUT OF 700)','GRADE'];
+{%else%}
+readonly = [];
+{%endif%}
     for(i=0;i<col.length;i++){
 
       if(readonly.indexOf(col[i])>-1){
@@ -118,7 +120,11 @@ $(function () {
         width: "100%",
 
         filtering: true,
-        editing: true,
+        {%if table == 'feedback'%}
+        editing: false,
+        {%else%}
+        editing:true,
+        {%endif%}
         sorting: true,
         paging: true,
 

@@ -99,14 +99,13 @@ Add Notice
               <select name="type" class="form-control select2" disabled>
                 <option {%if notice.type == 'Notice'%} selected {%endif%}>Notice</option>
                 <option {%if notice.type == 'Placement'%} selected {%endif%}>Placement</option>
-                <!-- <option></option> -->
               </select>
             </div>
 
             <div class="form-group">
               <label for="customFile">File</label>
               <div class="custom-file link">
-                <a class="btn btn-block btn-outline-info" href="/media/{{notice.file}}"><i class="fa fa-download"></i>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspAttachment</a>
+                <a class="btn btn-block btn-outline-info" {%if notice.file%} href="/media/{{notice.file}}" {%endif%}><i class="fa fa-download"></i>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspAttachment</a>
               </div>
               <div class="custom-file input hide">
                 <input type="file" name="file" class="custom-file-input">
@@ -122,9 +121,11 @@ Add Notice
                 <input type="text" name="externallink" class="form-control" value="{{notice.externallink}}">
               </div>
             </div>
+            {%if request.user.is_staff%}
             <div class="form-group">
               <input type="submit" name="submit" class="form-control bg-success" value="Submit" disabled>
             </div>
+            {%endif%}
           </div>
 
         <!-- /.card-body -->

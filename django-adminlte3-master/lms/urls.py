@@ -63,6 +63,6 @@ urlpatterns = [
     path('offer_letter/', pdfgenerator.offerletter.as_view(),name='offer_letter'),
 
     path('sheetdata/<slug:table>/',views.sheetdata,name='sheetdata'),
-    path('test/', pdfgenerator.certificate.as_view(), name='test'),
+    path('test/', pdfgenerator.render_pdf_view, name='test'),
     path('test1/', pdfgenerator.certificate1.render_to_file,{'path':'student/certificate.html','params':{'a':'a'}}, name='test1')
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -55,7 +55,7 @@ Validate Practical
           </div>
           <div class="col-sm-4">
             <select name="type" class="custom-select select2" onchange="load()">
-            <option value="ORAL">ORAL</option>
+            <!-- <option value="ORAL">ORAL</option> -->
               <option value="MCQ">MCQ</option>
               <option value="PRACTICAL">PRACTICAL</option>
               <option value="PROGRAM">PROGRAM</option>
@@ -129,8 +129,12 @@ Validate Practical
             data={
                 row:item,
             }
-                $.get(Url,{id:item.ID,value:item.MARKS,gname:gname},function(data,status){
+                $.get(Url,{id:item.ID,value:item.MARKS,gname:$('gname').val()},function(data,status){
 
+                }).success(function() {
+                  toastr.success("marks added successfully");
+                }).fail(function() {
+                  toastr.success("Failed to add marks");
                 });
             },
           deleteItem: $.noop
@@ -138,7 +142,10 @@ Validate Practical
 
         fields: [
             { name: "ID", type: "number", width: 70,editing:false},
-            { name: "fields.NAME", type: "text", width: 70,editing:false},
+            { name: "NAME", type: "text", width: 70,editing:false},
+            { name: "COURSE", type: "text", width: 70,editing:false},
+            { name: "TYPE", type: "text", width: 70,editing:false},
+            { name: "ATTEMPT", type: "text",width:70,editing:false},
             { name: "MARKS", type: "text",width:100,editing:true},
         ]
     });

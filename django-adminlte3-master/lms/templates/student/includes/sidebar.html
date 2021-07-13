@@ -250,24 +250,25 @@
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{%url 'mcq_exam'%}" class="nav-link {%if request.resolver_match.url_name == 'mcq_exam'%}active{%endif%}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Exam</p>
-                </a>
-              </li>
+            <ul class="nav nav-treeview"> 
               {%if request.user.is_superuser%}
               <li class="nav-item">
-                <a href="{%url 'add_course'%}" class="nav-link {%if request.resolver_match.url_name == 'add_course'%}active{%endif%}">
+                <a href="{%url 'add_questions'%}" class="nav-link {%if request.resolver_match.url_name == 'add_course'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Course</p>
+                  <p>Add Questions</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{%url 'view_questions' pageno=1%}" class="nav-link {%if request.resolver_match.url_name == 'view_questions'%}active{%endif%}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>View Questions</p>
+                </a>
+              </li>
+              {%else%}
+              <li class="nav-item">
+                <a href="{%url 'mcq_exam'%}" class="nav-link {%if request.resolver_match.url_name == 'mcq_exam'%}active{%endif%}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Exam</p>
                 </a>
               </li>
               {%endif%}

@@ -25,7 +25,7 @@ Add Questions
         <!-- general form elements -->
         <div class="card card-primary">
           <div class="card-header">
-            <h3 class="card-title">Add Questions </h3>
+            <h3 class="card-title">Add Questions</h3>
           </div>
           <!-- /.card-header -->
           <!-- form start -->
@@ -33,56 +33,49 @@ Add Questions
             {%csrf_token%}
             <div class="card-body">
             	<div class="row">
-
-              <!-- <div class="form-group col-md-6">
-                <label for="nameInputEmail1">Group Name</label>
-                <input name="gname" type="text" class="form-control" id="addressInputEmail1" placeholder="Enter Group Name" value="{{gname}}">
-              </div> -->
-              <div class="form-group col-md-4">
-              <label>Course</label>
-              <select class="form-control select2" style="width: 100%;" name="cname" {%if crs%}disabled{%endif%}>
-                {%for course in courses%}
-                <option {%if crs ==  course%}selected{%endif%}>{{course}}</option>
-                {%endfor%}}
-              </select>
-              {%if crs%}
-              <input type="hidden" name="cname" value="{{crs}}">
-              {%endif%}
-            	</div>
-            	<div class="form-group col-md-4">
-            		<div class="row">
-            			<div class="col-md-6">
-            				<label>Section</label>
-                		<select class="form-control select2" name="type" {%if crs%}disabled{%endif%}>
-                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>ORAL</option>
-                			<option {%if crs.type == 'MCQ' %}selected{%endif%}>MCQ</option>
-                			<option {%if crs.type == 'PRACTICAL' %}selected{%endif%}>PRACTICAL</option>
-                			<option {%if crs.type == 'PROGRAM' %}selected{%endif%}>PROGRAM</option>
-                		</select>
-                		{%if crs%}
-		                  <input type="hidden" name="type" value="{{crs.type}}">
-		                  {%endif%}
-                	</div>
-                	<div class="col-md-6">
-            				<label>Duration</label>
-                		<input type="number" class="form-control center" name="time" placeholder="Duration in minutes" {%if crs%} value="{{crs.time}}" disabled{%else%}value="30"{%endif%} >
-                		{%if crs%}
-		                  <input type="hidden" name="time" value="{{crs.time}}">
-		                  {%endif%}
-                	</div>
-            		</div>
-            		
-            	</div>
-            	<div class="form-group col-md-4">
-            		{%if crs%}
-            		<button type="button" id="add_questions" class="btn btn-success" data-card-widget="collapse" onclick="addquestion()"><i class="fas fa-plus"></i> Add Questions</button>
-            		{%else%}
-            		<br>
-            		{%if courses%}
-            		<button type="button" id="sync" class="btn btn-info" onclick="syncquestions()"><i class="fas fa-sync "></i> Sync Questions</button>
-            		{%endif%}
-            		{%endif%}
-            	</div>
+                <div class="form-group col-md-4">
+                  <label>Course</label>
+                  <select class="form-control select2" style="width: 100%;" name="cname">
+                  	{%if crs%}
+                  	<option>{{crs.name}}</option>
+                  	{%else%}
+                    {%for course in courses%}
+                    <option value="{{course}}">{{course}}</option>
+                    {%endfor%}}
+                    {%endif%}
+                  </select>
+              	</div>
+              	<div class="form-group col-md-4">
+              		<div class="row">
+              			<div class="col-md-6">
+              				<label>Section</label>
+                  		<select class="form-control select2" name="type" required>
+                  			<!-- <option >ORAL</option> -->
+                  			{%if crs%}
+                  			<option>{{crs.type}}</option>
+                  			{%else%}
+                  			<option>MCQ</option>
+                  			<option>PRACTICAL</option>
+                  			<option>PROGRAM</option>
+                  			{%endif%}
+                  		</select>
+                  	</div>
+                  	<div class="col-md-6">
+              				<label>Duration</label>
+                  		<input type="number" class="form-control center" name="time" placeholder="Duration in minutes" required {%if crs%} value="{{crs.time}}" disabled {%else%} value="30" {%endif%}>
+                  	</div>
+              		</div>
+              	</div>
+              	<div class="form-group col-md-2">
+              		<label>Question Count</label>
+              		<input type="number" name="count" class="form-control" required="" {%if crs%} value="{{crs.count}}" disabled {%else%} value="2" {%endif%}>
+              	</div>
+              	<div class="form-group col-md-2">
+		              {%if crs%}<button type="button" id="add_questions" class="btn btn-success"data-card-widget="collapse" onclick=addquestion() style="margin-top: 25px;"><i class="fas fa-plus"></i> Add Questions</button>{%endif%}
+		            </div>
+              	<div class="form-group col-md-3">
+              		<button type="button" id="sync" class="btn btn-info" onclick="syncquestions()"><i class="fas fa-sync "></i> Sync Questions</button>
+              	</div>
             	</div>
              {%if not crs%}
              <hr>

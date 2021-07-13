@@ -169,7 +169,6 @@ Menu = _Menu()
 def menu_tag(context):
     return Menu.admin_apps(context, Menu.render(context))
 
-
 @register.simple_tag(takes_context=True, name='icon')
 def icon_tag(context):
     return Menu.get_model_icon(context)
@@ -189,11 +188,6 @@ def grp_name(mem):
 @register.filter(name='grp_id')
 def grp_id(obj,key):
     return obj[int(key)]['grp_id']
-#
-# @register.filter(name='key')
-# def key(dict,key):
-#     print(dict,key)
-#     return dict[key]
 
 @register.filter(name='str_int')
 def str_int(val):
@@ -201,8 +195,6 @@ def str_int(val):
 
 @register.filter(name='sub')
 def sub(num1,num2):
-    # print(num1,type(num1))
-    # print(num2,type(num2))
     return int(num1)-int(num2)
 
 @register.filter(name='str')
@@ -214,7 +206,6 @@ from _datetime import datetime
 def installmentdate(date1):
     date1 = datetime.strptime(date1, '%Y-%m-%d')
     date2 = datetime.now()
-    print(date1,date2)
     if date1>=date2:
         return date1.strftime("%Y-%m-%d")
     else:
@@ -231,15 +222,7 @@ def replace1(txt):
 import math
 @register.filter(name='div')
 def div(num1,num2):
-    # print(type(num1),num1)
-    # try:
-    #     if type(num1) == 'str':
-    #         num1 = int(num1)
-    #     if type(num2)=='str':
-    #         num2 = int(num2)
-    #     return num1//num2
-    # except:
-    return num1/num2
+    return 0
 
 
 @register.filter(name='range')
@@ -270,5 +253,5 @@ def key_with_space(obj,key):
         return 0
 
 @register.filter(name='int')
-def key_with_space(val):
-    return int(val)
+def int_convert(val):
+    return val

@@ -13,6 +13,8 @@ import json
 from lms import models,sheetsapi
 from lms.sheetfields import all_fields_index
 
+
+excluded_groups=["Admin","Trainer","Hr"]
 # from lms.models import gpinfo
 # Create your views here.
 
@@ -84,18 +86,16 @@ def add_course(request):
 def add_questions(request):
     if request.method == 'POST':
         cname = request.POST['cname']
-        count = 0
         type = request.POST['type']
-        SPREADSHEET_ID = ""
-        try:
-            crs = course.objects.get(name=cname,type=type)
-            try:
-                crs.instructions=request.POST['instructions']
-            except:
-                pass
+        crs = course.objects.filter(name=cname, type=type)
 
+        if len(crs)==1:
+            crs=crs[0]
+            crs.time=request.POST['time']
+            crs.count=request.POST['count']
+            crs.instructions=request.POST['instructions'] if 'instructions' in request.POST else ""
             crs.save()
-        except:
+        else:
             crs = course(name=cname,type=type,time=request.POST['time'])
             if not os.path.exists('media/videos/courses/'+cname):
                 os.mkdir('media/videos/courses/'+cname)
@@ -129,6 +129,7 @@ def add_questions(request):
                     ext = models.extra_data(name=(cname+"_"+type),value=1)
                     ext.save()
 
+            messages.success(request, crs.name + crs.type + ' Course Added')
             crs.save()
         courses = course.objects.all()
 
@@ -139,36 +140,29 @@ def add_questions(request):
                     choice = "choice"+qno
                     expla = "explanation"+qno
                     choices = request.POST.getlist(choice)
-                    ans = choices[int(qno)]
+                    ansno = request.POST['ans'+qno]
+                    ans = choices[int(ansno)]
                     try :
                         explanation = request.POST[expla]
                     except:
                         explanation = ""
-                    q = questions(course=crs,question=request.POST[field],
-                                  option1=choices[0],option2=choices[1],option3=choices[2],option4=choices[3],
-                                  answer=ans,explanation=explanation)
-                    q.save()
 
-            count = questions.objects.all().filter(course=crs)
-
+                    SPREADSHEET_ID = models.extra_data.objects.get(name='MCQ').value
+                    values = [request.POST[field]]+choices+[ans]+[explanation]
+                    sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID,values=[values],sheetname=crs.name)
         elif type == 'PRACTICAL':
             for field in request.POST:
                 if field.find('question')==0:
-                    p = program(course=crs,programe=request.POST[field])
-                    p.save()
-
-            count = program.objects.all().filter(course=crs)
-
+                    SPREADSHEET_ID = models.extra_data.objects.get(name='PRACTICAL').value
+                    values = [request.POST[field]]
+                    sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=[values], sheetname=crs.name)
         elif type == 'PROGRAM':
             for field in request.POST:
                 if field.find('question')==0:
-                    p = program(course=crs,programe=request.POST[field])
-                    p.save()
-
-            count = program.objects.all().filter(course=crs)
-
-        messages.info(request,'Question Added')
-        return redirect('index')
+                    SPREADSHEET_ID = models.extra_data.objects.get(name='PROGRAM').value
+                    values = [request.POST[field]]
+                    sheetsapi.appendsheet(SPREADSHEET_ID=SPREADSHEET_ID, values=[values], sheetname=crs.name)
+        return render(request,'add_question.html',{'crs':crs})
 
     ext = models.extra_data.objects.all()
     ext1 = {}
@@ -242,9 +236,12 @@ def mcq_exam(request):
             return response
 
     courses = []
-    for g in request.user.groups.filter(permissions=Permission.objects.get(name='exam')) if not request.user.is_superuser else course.objects.all():
-        gp = models.groupsinfo.objects.get(group=g.id)
-        courses.append(gp.course)
+    if not request.user.is_superuser:
+        for g in request.user.groups.filter(permissions=Permission.objects.get(name='exam')):
+            gp = models.groupsinfo.objects.get(group=g.id)
+            courses.append(gp.course)
+    else:
+        courses = course.objects.values_list('name', flat=True).distinct()
 
     return render(request,'mcq_exam.html',{'courses':courses})
 
@@ -422,7 +419,7 @@ def savepracticle(request):
 @login_required(login_url='')
 def practicle_validate(request):
     courses = course.objects.values_list('name', flat=True).distinct()
-    gnames = Group.objects.all() if request.user.is_superuser else request.user.groups.all()
+    gnames = Group.objects.all().exclude(name__in=excluded_groups) if request.user.is_superuser else request.user.groups.all().exclude(name__in=excluded_groups)
     gnames = [x.name for x in gnames]
     return render(request,'validate_practicle.html',{"courses":courses,"groups":gnames})
 
@@ -466,6 +463,7 @@ def getdata_practicle(request):
 
     return HttpResponse(str(data).replace('None',"'none'").replace("'",'"'))
 
+
 def getdata_oral(request):
     gname = request.GET['gname']
     us = User.objects.all() if gname == 'All_groups' else User.objects.filter(groups__name=gname)
@@ -501,7 +499,6 @@ def marks_practicle(request):
     sheetname = "Apr - Mar " + datetime.now().strftime("%Y")
     row = models.user_profile.objects.get(user_id=ex.student).student_performance_row
     row = int(row)
-
 
     if crs.name == 'C':
         col = all_fields_index['student_performance']['C Practical (Out of 40)']
@@ -547,7 +544,6 @@ def saveprogram(request):
         messages.info(request,'Program saved successfully')
         return redirect('index')
 
-
     return redirect('index')
 
 ###
@@ -568,7 +564,7 @@ def setprogrammarks(request):
         col = all_fields_index['student_performance']['Adv Practical (Out of 40)']
         sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=[value], col=col, cell=True)
         messages.info(request,'Program marks saved')
-    if crs.name.find('WD') == 0:
+    if crs.name.find('Web Designing') == 0:
         col = all_fields_index['student_performance']['WD Practical (Out of 150)']
         sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=[value], col=col, cell=True)
         messages.info(request,'Program marks saved')
@@ -576,14 +572,27 @@ def setprogrammarks(request):
 
 def setoralmarks(request):
     id = request.GET['id']
-    marks = request.GET['marks']
+    marks = request.GET['value']
     gname = request.GET['gname']
-    gp = Group.objects.filter(name=gname)
-    gpinfo = models.groupsinfo.filter(group=gp)
+    gp = Group.objects.get(name=gname)
+    gpinfo = models.groupsinfo.objects.get(group=gp)
     us = User.objects.get(id=id)
-    up = models.user_profile.objects.filter(user_id=us)
+    up = models.user_profile.objects.get(user_id=us)
     row = up.student_performance_row
     SPREADSHEET_ID = models.extra_data.objects.get(name='student_performance').value
+    y = us.date_joined.strftime('%Y')
+    SHEET_NAME = "Apr - Mar " + y
+    col = ''
+    if gpinfo.course == 'C':
+        col = 'Q'
+    if gpinfo.course == 'SQL':
+        col = 'X'
+    if gpinfo.course == 'Web Designing':
+        col = 'AD'
+    if gpinfo.course.find('Core'):
+        col = 'AM'
+    if gpinfo.course.find('Adv'):
+        col = 'AU'
 
-    # sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, row=row, value=[marks], col=col, cell=True)
-    return HttpResponse("")
+    sheetsapi.updatesheet(SPREADSHEET_ID=SPREADSHEET_ID, SHEET_NAME=SHEET_NAME, row=row, value=[marks], col=col,cell=True)
+    return HttpResponse("success")

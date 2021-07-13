@@ -102,8 +102,6 @@ class notice(models.Model):
         if us_profile.unread_notices == '':
             us_profile.unread_notices = []
 
-        print(us_profile)
-
         us_profile.save()
 
         return HttpResponse(notices+";"+str(us_profile.unread_notices))
@@ -199,14 +197,16 @@ class timeline(models.Model):
     def timelinedata(request):
         pre = int(request.GET['pre'])
         data = timeline.objects.all().order_by('-id')[pre:pre + 20]
-
+        # for i in range(0,len(data)-1):
+        #     vars(data[i])["generator"] = data[i].generator.username
+        # print(data)
         timel = []
         if len(data) > 0:
             for d in data:
                 vars(d)['_state'] = 'none'
                 vars(d)['name'] = User.objects.get(id=vars(d)['generator_id']).first_name
                 now = datetime.now(timezone.utc)
-                d.body = str(d.body).replace('"', '')
+                vars(d)['body'] = str(d.body).replace('"',"`")
                 vars(d)['date'] = d.generatedtime.strftime('%d %B %Y')
                 if (now - d.generatedtime).days > 0:
                     time = str((now - d.generatedtime).days) + " days"
@@ -219,11 +219,15 @@ class timeline(models.Model):
                 vars(d)['time'] = time
                 vars(d)['generatedtime'] = ""
                 timel.append((vars(d)))
-
         else:
             timel = "-1"
-        timel = str(timel).replace("'", '"')
+        timel = str(timel).replace("'", '"').replace("`","'")
 
+        # abc = serializers.serialize('json',list(timel),fields=('title', 'body','type','generator','generatedtime'))
+
+
+
+        # print(abc)
         return HttpResponse(timel)
 
 class groupsinfo(models.Model):

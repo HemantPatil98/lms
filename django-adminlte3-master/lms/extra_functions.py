@@ -1,26 +1,24 @@
 import smtplib
+
 ###
 def randomstring(request):
     import secrets
     import string
-
     N = 7
     res = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for i in range(N))
-
     return str(res)
 
 ###
 def mail(receiver,body):
-    import smtplib
     try:
         s = smtplib.SMTP('mail.fortunecloudindia.com', 587)
         s.starttls()
-        s.login("aniket.pawar@cravitaindia.com", "Aniket@123")
-        s.sendmail("aniket.pawar@cravitaindia.com", receiver, body)
+        s.login("admin@fortunecloudindia.com", "Cravita@admin")
+        s.sendmail("admin@fortunecloudindia.com", receiver, body)
         s.quit()
-        return "success"
+        return True
     except:
-        return "failed"
+        return False
 
 ###
 def mailletter(receiver,body):
@@ -32,12 +30,11 @@ def mailletter(receiver,body):
     try:
         s = smtplib.SMTP('mail.fortunecloudindia.com', 587)
         s.starttls()
-        s.login("aniket.pawar@cravitaindia.com", "Aniket@123")
-
+        s.login("admin@fortunecloudindia.com", "Cravita@admin")
 
         # Setup the MIME
         message = MIMEMultipart()
-        message['From'] = "aniket.pawar@cravitaindia.com"
+        message['From'] = "admin@fortunecloudindia.com"
         message['To'] = receiver
         message['Subject'] = 'Fortune Cloud LMS'
 
@@ -60,14 +57,14 @@ def mailletter(receiver,body):
         message.attach(payload)
 
         text = message.as_string()
-        s.sendmail("aniket.pawar@cravitaindia.com", receiver, text)
+        s.sendmail("admin@fortunecloudindia.com", receiver, text)
         s.quit()
 
         print("success")
-        return "success"
+        return True
     except:
         print("failed")
-        return "failed"
+        return False
 
 
 

@@ -118,6 +118,7 @@ Timeline
   $.get( url, { pre:pre }).done(function( data ) {
     window.data = data;
     data = JSON.parse(data);
+
     $.each(data,function(){
       icon = '';
       if (this.type == 'video'){
@@ -151,7 +152,7 @@ Timeline
               </div>
               <!-- END timeline item -->`;
 
-    // console.log(item);
+    // console.log(this.body);
     $(".timeline").append(item);
     });
 

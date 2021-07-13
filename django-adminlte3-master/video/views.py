@@ -1,16 +1,18 @@
-from django.shortcuts import render,HttpResponse
-from django.views.decorators.clickjacking import xframe_options_sameorigin,xframe_options_exempt
+from django.shortcuts import render,HttpResponse,redirect
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.contrib.auth.models import Permission,Group
 from django.contrib.auth.decorators import login_required
-
-# Create your views here.
-from .models import videos_watched_status
-import os
+from django.contrib import messages
 from wsgiref.util import FileWrapper
 import math
+import os
+
+from .models import videos_watched_status
 from lms.models import *
-from lms import sheetsapi
 from exam.models import *
+
+# Create your views here.
+
 video_key = []
 video_request_counter = 0
 def randomstring():
@@ -30,6 +32,8 @@ def video(request,course):
     for v in os.listdir(videos):
         videolist.append(v.split(".")[0])
 
+    videolist.sort()
+
     watch = videos_watched_status.objects.filter(user=request.user,course=course)
     watch = [x.watched for x in watch]
     if len(videolist):
@@ -40,7 +44,6 @@ def video(request,course):
     global video_key
     key = randomstring()
     video_key = key
-    print("key=",key)
 
     return render(request,'video.html',{'course':course,'videos':videolist,'watched':watch,'per':per,'key':key})
 
@@ -58,18 +61,19 @@ def videoframe(request,course,video,key):
 @login_required(login_url='')
 def v(request,course,video,key):
     global video_key,video_request_counter
-    print(video_request_counter)
 
     if key == video_key:
         # video_request_counter +=1
         # video_key = ""
+        if len(videos_watched_status.objects.filter(user=request.user, course=course, watched=video)) == 0:
+            status = videos_watched_status(user=request.user, course=course, watched=video)
+            status.save()
 
         videolink = "media/videos/courses/"+course+"/"+video+".mp4"
 
         file = FileWrapper(open(videolink, 'rb'))
         response = HttpResponse(file, content_type='video/mp4')
         response['Content-Disposition'] = 'attachment; filename=my_video.mp4'
-
         return response
     else:
         # video_key = ""
@@ -79,7 +83,7 @@ def v(request,course,video,key):
 
 ###
 @login_required(login_url='')
-def thumb(request):
+def video_sync(request):
     import cv2
 
     # Opens the Video file
@@ -104,7 +108,8 @@ def thumb(request):
             except:
                 pass
 
-    return HttpResponse("Videos Synced Successfully")
+    messages.success(request,"Videos Synced Successfully")
+    return redirect('index')
 
 ###
 @login_required(login_url='')

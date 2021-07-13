@@ -194,7 +194,7 @@ Add Groups
           </div>
           <!-- /.card-header -->
           <!-- form start -->
-          <span><i>* For students groups please use abbrevations such as C_,SQL_,WD_,PYTHON_,JAVA_,TESTING_</i></span>
+          <span style="color:red"><i>* For students groups please use abbrevations such as C_,SQL_,WD_,Core_Python_,Adv_Python_ etc.</i></span>
           <form action="{%if view%}{%url 'viewgroups'%}{%else%}{%url 'addgroups'%}{%endif%}" method="POST" onsubmit="return save()">
             {%csrf_token%}
             <div class="card-body row">
@@ -224,19 +224,14 @@ Add Groups
               </div>
               <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
                 <label>Start Date</label>
-                <input type="date" name="startdate" class="form-control" value="{{gpinfo.startdate|date:'Y-m-d'}}" {%if gpinfo.startdate %}readonly{%endif%} {%if not gname%}disabled{%endif%}>
+                <input type="date" name="startdate" class="form-control" {%if gpinfo.startdate %} value="{{gpinfo.startdate|date:'Y-m-d'}}" readonly{%endif%} {%if not gname%}disabled{%endif%}>
               </div>
               <div class="form-group col-md-6 {%if not gname%}hide{%endif%} cname">
                 <label>End Date</label>
-                <label>End Date</label>
-                <input type="date" name="enddate" class="form-control" value="{{gpinfo.enddate|date:'Y-m-d'}}" {%if not gname or view%}disabled{%else%}required{%endif%}>
+                <input type="date" name="enddate" class="form-control" {%if gpinfo.startdate %} value="{{gpinfo.enddate|date:'Y-m-d'}}" readonly{%endif%} {%if not gname%}disabled{%endif%}>
               </div>
 
-
-
-
               {%if gname%}
-              
                 <div class="card card-default">
                   <div class="card-header" style="background-color: #6f42c1cf;color: white">
                     <h3 class="card-title">Select Permissions</h3>
@@ -274,14 +269,12 @@ Add Groups
                   </div>
                   <!-- /.card-body -->
                   <div class="card-footer">
-
                   </div>
                 </div>
                 <!-- /.card -->
                 <div class="card card-default">
                   <div class="card-header"  style="background-color: #6f42c1cf;color: white">
                     <h3 class="card-title">Video Permissions</h3>
-
                     <div class="card-tools">
                       <button type="button" class="btn btn-tool" data-card-widget="collapse">
                         <i class="fas fa-minus"></i>
@@ -297,9 +290,7 @@ Add Groups
                       <div class="col-12">
                         <div class="form-group">
                           <!-- <label>Allow and block videos</label>-->
-
                           <div class="">
-
                             <ul class="ks-cboxtags">
                               {%for vp in vpermissions%}
                               <li><input type="checkbox" name='videopermission' id="{{vp}}" value="{{vp}}" {%if gname.permissions.all|has_per:vp%}checked{%endif%}><label for="{{vp}}">{{vp}}
@@ -317,19 +308,16 @@ Add Groups
                   </div>
                   <!-- /.card-body -->
                   <div class="card-footer">
-
                   </div>
                 </div>
                 <!-- /.card -->
                 <div class="card card-default col-sm-12">
                   <div class="card-header" style="background-color: #6f42c1cf;color: white">
                     <h3 class="card-title">Select Users</h3>
-
                     <div class="card-tools">
                       <button type="button" class="btn btn-tool" data-card-widget="collapse">
                         <i class="fas fa-minus"></i>
-                      </button>
-                      
+                      </button>        
                     </div>
                   </div>
                   <!-- /.card-header -->
@@ -348,20 +336,16 @@ Add Groups
                     <!-- /.row -->
                   </div>
                   <!-- /.card-body -->
-
                   <div class="card-footer">
-
                   </div>
                 </div>
               {%endif%}
-
             </div>
             <!-- /.card-body -->
-
             <div class="card-footer">
               <button type="submit" class="btn btn-primary">Submit</button>
               {%if gname%}
-              <a class="btn btn-danger" type="submit" onclick="(function(){if(confirm('Are you sure wnat to delete these this group !')){window.location.replace('{%url 'deletegroups' gname=gname%}')}})()" style="float:right;">Delete Group</a>
+              <a class="btn btn-danger" type="submit" onclick="(function(){if(confirm('Are you sure want to delete these this group? This Will delete group with members!')){window.location.replace('{%url 'deletegroups' gname=gname%}')}})()" style="float:right;">Delete Group With Membres</a>
               {%endif%}
             </div>
           </form>
@@ -379,58 +363,52 @@ Add Groups
 window.groupData = [];
 url = "{%url 'students_groups' gname=gname%}";
 $.get(url,{},function(data){
-// console.log(data);
-groupData = JSON.parse(data);
-var settings = {
-    // data item name
-    itemName:"uname",
-    // group data item name
-    groupItemName:"groupName",
-    // group data array name
-    groupArrayName:"groupData",
-    // data value name
-    valueName:"uid",
-    // tab text
-    tabNameText:"Student Groups",
-    // right tab text
-    rightTabNameText:"Selected Students",
-    // search placeholder text
-    searchPlaceholderText:"Search by groups and students names",
-    // items data array
-    // dataArray: languages,
-    // group data array
-    groupDataArray: groupData,
-    // callable:function (data, names) {
-    //         console.log("Selected ID：" + data)
-    //         $("#selectedItemSpan").text(names)
-    //     }
-    callable:function (items) {
-            console.dir(items)
-            // console.log(items)
-            // $.each(items,function(){
-              // console.log($(this).id);
-            // })
-        }
-};
-window.myTransfer = $(".transfer").transfer(settings);
-        {%if view%}
-        $("input[type='checkbox']").each(function() {
-          $(this).attr('disabled','true');
-        })
-        {%endif%}
-
-
+  groupData = JSON.parse(data);
+  var settings = {
+      // data item name
+      itemName:"uname",
+      // group data item name
+      groupItemName:"groupName",
+      // group data array name
+      groupArrayName:"groupData",
+      // data value name
+      valueName:"uid",
+      // tab text
+      tabNameText:"Student Groups",
+      // right tab text
+      rightTabNameText:"Selected Students",
+      // search placeholder text
+      searchPlaceholderText:"Search by groups and students names",
+      // items data array
+      // dataArray: languages,
+      // group data array
+      groupDataArray: groupData,
+      // callable:function (data, names) {
+      //         console.log("Selected ID：" + data)
+      //         $("#selectedItemSpan").text(names)
+      //     }
+      callable:function (items) {
+              console.dir(items)
+              // console.log(items)
+              // $.each(items,function(){
+                // console.log($(this).id);
+              // })
+          }
+  };
+  window.myTransfer = $(".transfer").transfer(settings);
+  {%if view%}
+  $("input[type='checkbox']").each(function() {
+    $(this).attr('disabled','true');
+  })
+  {%endif%}
 });
-// console.log(window.groupData);
 
 function save(){
   items = window.myTransfer.getSelectedItems();
-  console.log(items)
   data = "";
   $.each(items,function(){
     data +=(this.uid).toString()+",";
   })
-  console.log(data);
   $("input[name='students']").val(data);
 }
 
@@ -442,7 +420,6 @@ function save(){
       $("select[name='gname'] option").each(function(){ select2children.push($(this).text())})
       abc = $(".a").length;
       $("select[name='gname']").change(function(){
-        // console.log($("select[name='gname']"))
         if (!select2children.includes($("select[name='gname']").val())) {
           $('.cname').removeClass('hide');
           $("input[name='startdate']").removeAttr('disabled');
@@ -452,22 +429,14 @@ function save(){
           $('.cname').addClass('hide');
         }
       })
-    </script>
-    <script>
       $(function () {
         //Initialize Select2 Elements
         $('.select2').select2({
           {%if not view and not gname %}
-              tags:true
-              {%endif%}
-              })
-
-
-        //Initialize Select2 Elements
-        $('.select2bs4').select2({
-          theme: 'bootstrap4',
-          // tags:true
+          tags:true
+          {%endif%}
         })
-    });
+      });
     </script>
+
 {%endblock%}
