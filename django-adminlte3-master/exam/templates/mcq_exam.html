@@ -134,7 +134,7 @@ Exam
                         <div>
                           <div class="form-group">
                               <label for="question">Question #{{forloop.counter}}</label>
-                              <textarea class="form-control" style="height:max-content" disabled>{{que.question}}</textarea>
+                              <textarea class="form-control" rows="2" max-rows="12" style="height:max-content" disabled>{{que.question}}</textarea>
                           </div>
                           <div id="choice" class="row">  
                             <div class="form-group col-md-6">
@@ -182,7 +182,11 @@ Exam
             {%endif%}
             <!-- /.card-body -->
             <div class="card-footer">
+              {%if crs%}
               <input name="submit" type="submit" class="btn btn-primary">
+              {%else%}
+              <input name="submit" type="submit" value="START" class="btn btn-primary">
+              {%endif%}
             </div>
           </form>
         </div>
@@ -257,6 +261,7 @@ Exam
 
 {%block script%}
 {%if crs%}
+  <script src="{%static 'js/textarea-max-rows.js'%}"></script>
   <script type="text/javascript">
     function startTimer(duration, display) {
       var timer = duration, hr, minutes, seconds;

@@ -4,24 +4,27 @@
   <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid.min.css'%}">
   <link rel="stylesheet" href="{%static 'student/plugins/jsgrid/jsgrid-theme.min.css'%}">
   <style type="text/css">
-  .fix-id{
-     position: sticky;
-  left: 0;
-  z-index: 2;
+  @media screen(max-width: 920px){
+    .fix-id{
+      position: sticky;
+      left: 0;
+      z-index: 2;
+    }
+    .fix-name{
+      position: sticky;
+      left: 0px;
+      z-index: 2;
+    }
+    .fix-contact{
+      position: sticky;
+      left: 150px;
+      z-index: 2;
+    }
+      .knob{
+      font-size: 19px!important;
+    }  
   }
-  .fix-name{
-    position: sticky;
-    left: 0px;
-    z-index: 2;
-  }
-  .fix-contact{
-    position: sticky;
-    left: 150px;
-    z-index: 2;
-  }
-    .knob{
-    font-size: 19px!important;
-  }
+  
 </style>
 {%endblock%}
 

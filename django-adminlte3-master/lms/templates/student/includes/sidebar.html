@@ -15,8 +15,8 @@
         <div class="image">
           <img src="/media/{{request.session.profile_photo}}" class="img-circle elevation-2" alt="User Image">
         </div>
-        <div class="info">
-          <a {%if not request.user.is_staff%} href="{%url 'viewprofile'%}" {%endif%} class="d-block">{{request.user.username}}</a>
+        <div class="info" style="overflow:hidden;">
+          <a {%if not request.user.is_staff%} href="{%url 'viewprofile'%}" {%endif%} class="d-block">{{request.user.first_name}}</a>
         </div>
          </div>
 

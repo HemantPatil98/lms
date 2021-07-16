@@ -214,6 +214,7 @@ def index(request):
 ###
 @login_required(login_url='')
 def addstudent(request):
+    print(request.POST)
     if request.method == 'POST':
         y = request.user.date_joined.strftime('%Y')
         SHEET_NAME = "Apr - Mar " + y
@@ -226,6 +227,7 @@ def addstudent(request):
                     profile[i].append(val[i])
                 except:
                     profile[i].append("")
+        print(profile)
         if request.user.is_staff:
             performance = ['=IF(INDIRECT("A"&ROW()-1)="ID",1,INDIRECT("A"&ROW()-1)+1)',"", profile[0][8],
                            profile[0][11] + "/" + profile[0][12]
@@ -619,7 +621,7 @@ def viewmembers(request):
 def viewprofile(request):
     sheetid = extra_data.objects.get(name='student_profile').value
     up = user_profile.objects.get(user_id=request.user.id)
-    row = up.student_performance_row
+    row = up.student_profile_row
     range = "!A"+str(row)+":AS"+str(row+3)
 
     values = sheetsapi.sheetvalues(SPREADSHEET_ID=sheetid,sheetname='Apr - Mar 2021',range=range)

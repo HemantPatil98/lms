@@ -182,7 +182,11 @@ def mcq_exam(request):
         count = 0
         cname = request.POST['cname']
         type = request.POST['type']
-        crs = course.objects.get(name=cname, type=type)
+        try:
+            crs = course.objects.get(name=cname, type=type)
+        except:
+            messages.info(request,'Wrong selection please follow instructions')
+            return redirect('mcq_exam')
         courses = course.objects.values_list('name', flat=True).distinct()
         attempt = exam_attempts.objects.filter(student=request.user, course=crs)
         attempt = len(attempt)

@@ -105,20 +105,20 @@ Add Notice
             <div class="form-group">
               <label for="customFile">File</label>
               <div class="custom-file link">
-                <a class="btn btn-block btn-outline-info" {%if notice.file%} href="/media/{{notice.file}}" {%endif%}><i class="fa fa-download"></i>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspAttachment</a>
+                <a class="btn btn-block btn-outline-info" {%if notice.file%} href="/media/{{notice.file}}" {%else%} title="There is no attachment" data-toggle="tooltip" data-placement="top"{%endif%}><i class="fa fa-download"></i>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspAttachment</a>
               </div>
               <div class="custom-file input hide">
-                <input type="file" name="file" class="custom-file-input">
+                <input type="file" name="file" class="custom-file-input" disabled>
                 <label class="custom-file-label" for="customFile">Choose file</label>
               </div>
             </div>
             <div class="form-group">
               <label for="externallink">External links</label>
                <div class="custom-file link">
-                <a class="btn btn-outline-info form-control" {%if externallink%}href="{{notice.externallink}}" style="overflow: hidden;" target="new"{%endif%}>{{notice.externallink}}</a>
+                <a class="btn btn-outline-info form-control" {%if notice.externallink%}href="{{notice.externallink}}" style="overflow: hidden;" target="new"{%else%} title="There is no link" data-toggle="tooltip" data-placement="top"{%endif%}>{{notice.externallink}}</a>
               </div>
               <div class="custom-file input hide">
-                <input type="text" name="externallink" class="form-control" value="{{notice.externallink}}">
+                <input type="text" name="externallink" class="form-control" value="{{notice.externallink}}" disabled>
               </div>
             </div>
             {%if request.user.is_staff%}

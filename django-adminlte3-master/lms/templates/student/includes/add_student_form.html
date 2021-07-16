@@ -57,7 +57,7 @@
     </div>
     <div class="form-group col-md-6">
       <label for="name">Name</label>
-      <input name="name" type="text" class="form-control" id="name" placeholder="Enter Name" value="{{profile.0.name}}" required="" style="background-color:#8c868652;">
+      <input name="name" type="text" class="form-control" id="name" placeholder="Enter Name" value="{{profile.0.name}}" required="" style="background-color:#8c868652;" {%if profile%} readonly {%endif%}>
     </div>
     <div class="form-group col-md-6">
       <label for="address">Address</label>

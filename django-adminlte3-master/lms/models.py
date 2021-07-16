@@ -50,7 +50,7 @@ class notice(models.Model):
             else:
                 data = notice.objects.all().order_by('-id')
         else:
-            data = notice.objects.all().order_by('-id')
+            data = notice.objects.filter(generateddate__gte=request.user.date_joined).order_by('-id')
         try:
             pageno = request.GET['page']
         except:

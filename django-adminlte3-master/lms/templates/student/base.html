@@ -144,7 +144,7 @@
           active = 'active';
         }
 
-        note = ` <a class="dropdown-item `+active+`" id=`+this.pk+` onclick=noticeopen(`+this.pk+`)>
+        note = ` <a class="dropdown-item `+active+`" id=`+this.pk+` onclick=noticeopen(`+this.pk+`) style="cursor: pointer;">
               <!-- Message Start -->
               <div class="media" >
                 <span class="img-size-50 mr-3" style="font-size: x-large; text-align-last: center;align-self: center;"><i class="fas fa-link" onclick="window.location.href='`+this.fields.externallink+`'" ></i></span>
@@ -198,6 +198,12 @@
    }
   });
 </script>
+    <script type="text/javascript">
+      function loadinframe(link){
+        href = $(link).attr('href');
+        $('#mapframe').attr('src',href);
+      }
+    </script>
 {%block script%}
 
 {%endblock%}
